@@ -3,7 +3,7 @@ import { HTMLAttributes, ReactNode } from "react";
 
 export type CardVariant = "elevated" | "outlined";
 
-export interface CardProps extends HTMLAttributes<HTMLDivElement> {
+export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, "title"> {
   variant?: CardVariant;
   padding?: "sm" | "md" | "lg";
   title?: ReactNode;

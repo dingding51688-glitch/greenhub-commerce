@@ -3,6 +3,8 @@ import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { DesktopHeader, Footer } from "@/components/navigation";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Bloom Vapor Dashboard",
   description: "Account overview and orders for Bloom Vapor",

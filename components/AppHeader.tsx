@@ -23,8 +23,17 @@ export function AppHeader() {
           <Link className="text-white/80 transition hover:text-white" href="/notifications">
             Notifications
           </Link>
+          <Link className="text-white/80 transition hover:text-white" href="/about">
+            About
+          </Link>
           <Link className="text-white/80 transition hover:text-white" href="/how-it-works">
             How it works
+          </Link>
+          <Link className="text-white/80 transition hover:text-white" href="/shipping">
+            Shipping
+          </Link>
+          <Link className="text-white/80 transition hover:text-white" href="/returns">
+            Returns
           </Link>
           <Link className="text-white/80 transition hover:text-white" href="/faq">
             FAQ

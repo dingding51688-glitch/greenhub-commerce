@@ -250,3 +250,101 @@ export const faqEntries: HowItWorksFaq[] = [
     answer: "Let concierge know before the 2h timer expires. We can restock or schedule another locker once the courier returns."
   }
 ];
+
+export type ShippingMilestone = {
+  icon: string;
+  title: string;
+  description: string;
+  window: string;
+};
+
+export const shippingTimeline: ShippingMilestone[] = [
+  {
+    icon: "①",
+    title: "Order cutoff",
+    description: "Place orders before 8pm to guarantee same-evening locker allocation.",
+    window: "Cutoff 20:00"
+  },
+  {
+    icon: "②",
+    title: "Courier prep",
+    description: "Team weighs, seals, and books an InPost slot. Expect status updates in the app.",
+    window: "Prep 20:00-22:00"
+  },
+  {
+    icon: "③",
+    title: "Locker SMS",
+    description: "We send SMS + email with QR/PIN once the parcel is loaded and sensors verify it.",
+    window: "Pickup 22:00-00:00"
+  }
+];
+
+export const lockerUsageTips = {
+  title: "Locker etiquette & late fees",
+  steps: [
+    { icon: "①", title: "Arrive within 2h", description: "Lockers auto-reset after 120 minutes to keep the queue fair." },
+    { icon: "②", title: "Bring ID", description: "Concierge may request photo proof if sensors flag anomalies." },
+    { icon: "③", title: "Report issues", description: "Message concierge immediately if the locker is jammed or empty." }
+  ],
+  tip: { label: "Late policy", content: "No-shows are restocked after 2h and incur £15 restocking fee unless you contact us." }
+};
+
+export type ReturnPolicyItem = {
+  icon: string;
+  title: string;
+  description: string;
+};
+
+export const returnPolicies: ReturnPolicyItem[] = [
+  {
+    icon: "🕒",
+    title: "2-hour locker window",
+    description: "Refunds only apply before lockers auto-reset. Contact us before the window closes."
+  },
+  {
+    icon: "📦",
+    title: "Seal + photo required",
+    description: "Send a photo of the unopened parcel + locker bay so we can investigate courier errors."
+  },
+  {
+    icon: "💳",
+    title: "Wallet credits",
+    description: "Approved refunds return to your wallet within 6 hours; banks may take 3-5 days."
+  },
+  {
+    icon: "🚫",
+    title: "Non-refundable",
+    description: "Opened products or missed locker pickups without notice fall outside refund scope."
+  }
+];
+
+export const supportSteps = [
+  { title: "Message concierge", detail: "Use Telegram or email within 2 hours, include order reference." },
+  { title: "Provide evidence", detail: "Photo/video of parcel, locker, and any damage helps us escalate." },
+  { title: "Wait for update", detail: "We confirm within 4 hours and credit wallet or schedule a replacement." }
+];
+
+export type AboutHighlight = {
+  icon: string;
+  title: string;
+  description: string;
+};
+
+export const aboutHighlights: AboutHighlight[] = [
+  { icon: "🔒", title: "Private lockers", description: "50+ Belfast & Derry lockers with 24/7 CCTV and PIN access." },
+  { icon: "⚡", title: "Same-evening drops", description: "Order by 8pm, collect before midnight with live SMS tracking." },
+  { icon: "🤝", title: "Human concierge", description: "NI-based team on Telegram + email every day 10:00-00:00." },
+  { icon: "🌿", title: "Curated flower", description: "We partner with EU craft growers and test every batch." }
+];
+
+export const coverageStats = [
+  { label: "Locker cities", value: "2", description: "Belfast & Derry" },
+  { label: "Postcodes served", value: "47", description: "Titanic Quarter → Lisburn" },
+  { label: "Partners", value: "3", description: "InPost, Rapid courier, NowPayments" }
+];
+
+export const supportCommitments = [
+  { title: "Telegram concierge", detail: "@greenhub_concierge · replies < 5 min" },
+  { title: "Email", detail: "concierge@greenhub420.co.uk · 4h resolution" },
+  { title: "Ticket SLA", detail: "Refunds processed in 4h, replacements scheduled same evening" }
+];
