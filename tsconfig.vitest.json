@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "vitest.setup.ts",
+    "components/**/*",
+    "lib/**/*",
+    "data/**/*"
+  ]
+}
