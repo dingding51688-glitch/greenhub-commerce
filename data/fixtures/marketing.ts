@@ -20,6 +20,21 @@ export const heroClassicContent = {
   ]
 };
 
+export const homeHeroContent = {
+  highlight: "HOME",
+  eyebrow: "Online order · Locker pickup",
+  title: "Order Online & Pick Up at InPost Lockers",
+  subtitle: "According to the postcode you provide, the parcel will be delivered to the nearest InPost locker.",
+  bullets: [
+    "24-hour dispatch with real-time tracking updates",
+    "Sealed disguise packaging with scent & appearance masking",
+    "Privacy-safe delivery straight to the locker"
+  ],
+  primaryCta: { label: "Shop now", href: "/search" } satisfies HeroLink,
+  secondaryCta: { label: "How it works", href: "/how-it-works" } satisfies HeroLink,
+  alignment: "left" as const
+};
+
 export type LockerStep = {
   icon: string;
   title: string;
@@ -31,23 +46,23 @@ export const lockerFlow = {
   steps: [
     {
       icon: "①",
-      title: "Place your order",
-      description: "Lock in your mix online — we reserve inventory instantly."
+      title: "Place your order online",
+      description: "Browse the menu, choose the locker that suits your route, and confirm the pickup window."
     },
     {
       icon: "②",
-      title: "We prep the locker",
-      description: "Staff verify your pickup slot, seal the parcel, and assign a code."
+      title: "We prep + text your code",
+      description: "Concierge weighs, seals, and books the InPost slot before texting you the QR + PIN."
     },
     {
       icon: "③",
-      title: "Collect 24/7",
-      description: "Use the SMS code to open the locker whenever you're ready, no queues."
+      title: "Collect at the locker",
+      description: "Swing by whenever you're ready—scan the QR, grab your parcel, and reply DONE so we can reset it."
     }
   ] satisfies LockerStep[],
   tip: {
-    label: "NI members",
-    content: "Locker network now covers Titanic Quarter, Cathedral Quarter, and Ormeau."
+    label: "Locker coverage",
+    content: "Belfast + Derry lockers stay live 24/7 with concierge relocation if you ping us 2 hours ahead."
   }
 };
 
@@ -133,29 +148,31 @@ export const paymentRecommendations = {
 
 export type FeaturedCollection = {
   title: string;
-  blurb: string;
   href: string;
-  accent: string;
+  imageUrl: string;
+  bgGradient: string;
+  tagline?: string;
 };
 
 export const featuredCollectionsContent: FeaturedCollection[] = [
   {
-    title: "Fresh flower",
-    blurb: "Indoor drops trimmed the morning they ship to lockers.",
-    href: "/products?strain=Hybrid",
-    accent: "from-plum-600/40 to-night-900"
+    title: "Flowers",
+    href: "/search/flower",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/Rainbow_Runtz_07747a3ee4.jpg",
+    bgGradient: "#0d5b3f,#13a86b"
   },
   {
-    title: "Discreet vapes",
-    blurb: "Live resin carts + pods with full terp expressions.",
-    href: "/products?category=vapes",
-    accent: "from-jade-500/30 to-night-900"
+    title: "Pre-rolls",
+    tagline: "Infused minis",
+    href: "/search/pre-rolls",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/20260312152800_3_2_ec9202b7d0.jpg",
+    bgGradient: "#af5a13,#f2a33a"
   },
   {
-    title: "Bundles & locker sets",
-    blurb: "Curated locker-ready kits with SMS concierge support.",
-    href: "/collections",
-    accent: "from-amber-500/30 to-night-900"
+    title: "Vapes",
+    href: "/search/Vapes",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/123_3e71adf87c.jpg",
+    bgGradient: "#0d5b3f,#13a86b"
   }
 ];
 
@@ -183,6 +200,12 @@ export const howItWorksFaq: HowItWorksFaq[] = [
   }
 ];
 
+export type ContactHeroDetail = {
+  label: string;
+  value: string;
+  href?: string;
+};
+
 export type ContactChannel = {
   title: string;
   detail: string;
@@ -191,30 +214,37 @@ export type ContactChannel = {
   badge?: string;
 };
 
+export const contactHeroDetails = [
+  { label: "Email", value: "support@greenhub.app", href: "mailto:support@greenhub.app" },
+  { label: "Secure chat", value: "In-app encrypted messenger" },
+  { label: "Operating hours", value: "09:00–21:00 GMT · Mon–Sun" }
+];
+
 export const contactChannels: ContactChannel[] = [
   {
-    title: "Concierge email",
-    detail: "concierge@greenhub420.co.uk",
-    description: "Best for locker reschedules, payment confirmations, and general support.",
-    href: "mailto:concierge@greenhub420.co.uk"
-  },
-  {
-    title: "Telegram live chat",
+    title: "Telegram concierge",
     detail: "@greenhub_concierge",
-    description: "Fastest responses between 10:00–00:00. Provide order reference for priority.",
+    description: "Fastest replies between 09:00–21:00 GMT. Share your order reference for priority handling.",
     href: "https://t.me/greenhub_concierge",
     badge: "< 5 min"
   },
   {
-    title: "SMS hotline",
-    detail: "+44 7441 902134",
-    description: "Locker pickup or code issues only. Text HELP + your locker code.",
-    href: "sms:+447441902134"
+    title: "Email support",
+    detail: "support@greenhub.app",
+    description: "Best for locker reschedules, payment confirmations, and general support threads.",
+    href: "mailto:support@greenhub.app"
   },
   {
-    title: "Business hours",
-    detail: "10:00 – 00:00 GMT",
-    description: "Concierge monitors high-priority incidents overnight for Reserve+ members."
+    title: "Wholesale & media",
+    detail: "partners@greenhub.app",
+    description: "For corporate refills, influencer drops, or urgent press enquiries.",
+    href: "mailto:partners@greenhub.app"
+  },
+  {
+    title: "SMS hotline",
+    detail: "+44 7441 902134",
+    description: "Locker pickup or code issues only. Text HELP + your locker code for the on-call agent.",
+    href: "sms:+447441902134"
   }
 ];
 
@@ -228,26 +258,134 @@ export const inPostFlow = {
   tip: { label: "InPost", content: "Most Belfast lockers sit inside 24/7 petrol stations for easier pickup." }
 };
 
-export const faqEntries: HowItWorksFaq[] = [
+
+export type TermsSection = {
+  id: string;
+  title: string;
+  summary: string;
+  body: string[];
+  bullets?: string[];
+};
+
+// TODO: replace placeholder copy once Legal supplies the final Terms version.
+export const termsSections: TermsSection[] = [
   {
-    question: "How do I verify my account?",
-    answer: "Upload photo ID once inside /account. Concierge approves within 1-2 hours so you can reserve lockers the same day."
+    id: "eligibility",
+    title: "Eligibility & membership",
+    summary: "Placeholder copy outlining who can create or keep a locker membership.",
+    body: [
+      "Members must be 21+ and reside within areas covered by the locker network. A government-issued ID and proof of address are reviewed before any order is dispatched.",
+      "Accounts flagged for duplicate IDs or suspicious activity may be paused while support re-validates the identity on file."
+    ],
+    bullets: [
+      "One account per member; sharing QR codes voids locker access until reverified.",
+      "Concierge may request a selfie with ID for manual reviews.",
+      "Members agree to update their address within 24 hours of moving."
+    ]
   },
   {
-    question: "Can I change lockers after ordering?",
-    answer: "Yes—reply to the locker SMS or ping Telegram @greenhub_concierge. We need 2 hours notice to reassign inventory."
+    id: "payments",
+    title: "Payments & billing",
+    summary: "Placeholder text describing accepted payment methods and settlement timing.",
+    body: [
+      "Card payments process via the NowPayments bridge; crypto submissions settle once one confirmation is observed. Wallet credits remain valid for 12 months.",
+      "Chargebacks or disputed transfers may result in immediate suspension pending finance review."
+    ],
+    bullets: [
+      "Visa / Mastercard via bridge checkout (limits apply).",
+      "USDT (TRC20) with on-chain confirmations.",
+      "Manual bank transfers for wholesale partners upon request."
+    ]
   },
   {
-    question: "What payment methods are supported?",
-    answer: "USDT (TRC20) via NowPayments is instant. Wallet top-ups and Visa/Mastercard bridge work once your billing profile is verified."
+    id: "compliance",
+    title: "Compliance & locker conduct",
+    summary: "Placeholder obligations covering lawful use of lockers and parcel handling.",
+    body: [
+      "Members agree not to tamper with lockers, resell access codes, or interfere with couriers. Any misuse may be reported to local authorities.",
+      "All products remain sealed; opening parcels inside the InPost site breaches terms and voids support."
+    ],
+    bullets: [
+      "Collect parcels within the stated 2-hour window unless concierge extends it.",
+      "Do not leave waste, packaging, or personal items in lockers.",
+      "Report damaged parcels within 4 hours via support@greenhub.app."
+    ]
   },
   {
-    question: "Do you ship outside Belfast/Derry?",
-    answer: "Lockers currently cover Belfast + Derry. Refill Club ships statewide; join the waitlist inside /contact."
+    id: "privacy",
+    title: "Privacy & data handling",
+    summary: "Placeholder statements covering how personal data, IDs, and chat logs are stored.",
+    body: [
+      "ID uploads and locker history are encrypted at rest. Access is restricted to vetted concierge leads for verification purposes only.",
+      "Support transcripts are retained for 30 days before anonymisation unless a regulatory request requires longer retention."
+    ],
+    bullets: [
+      "Members may request data export or deletion via privacy@greenhub.app.",
+      "Operational alerts (locker codes, delivery ETA) are transactional and cannot be unsubscribed from.",
+      "Marketing preferences can be updated inside /account at any time."
+    ]
+  }
+];
+
+export type FaqGroup = {
+  title: string;
+  description: string;
+  entries: HowItWorksFaq[];
+};
+
+export const faqGroups: FaqGroup[] = [
+  {
+    title: "Lockers & verification",
+    description: "Checklist before you collect or change an InPost slot.",
+    entries: [
+      {
+        question: "How do I verify my account?",
+        answer:
+          "Upload photo ID once inside /account. Concierge approves within 1-2 hours so you can reserve lockers the same day."
+      },
+      {
+        question: "Can I change lockers after ordering?",
+        answer:
+          "Yes—reply to the locker SMS or ping Telegram @greenhub_concierge. We need 2 hours notice to reassign inventory."
+      },
+      {
+        question: "What happens if I miss the pickup window?",
+        answer:
+          "Let concierge know before the 2h timer expires. We can restock or schedule another locker once the courier returns."
+      }
+    ]
   },
   {
-    question: "What happens if I miss the pickup window?",
-    answer: "Let concierge know before the 2h timer expires. We can restock or schedule another locker once the courier returns."
+    title: "Payments & refunds",
+    description: "Supported methods, billing limits, and wallet credits.",
+    entries: [
+      {
+        question: "What payment methods are supported?",
+        answer:
+          "USDT (TRC20) via NowPayments is instant. Wallet top-ups and Visa/Mastercard bridge work once your billing profile is verified."
+      },
+      {
+        question: "How do wallet credits or refunds work?",
+        answer:
+          "Approved refunds return to your wallet within 6 hours. Bank cards can take 3-5 working days depending on your issuer."
+      }
+    ]
+  },
+  {
+    title: "Coverage & support",
+    description: "Where we currently deliver and how fast concierge responds.",
+    entries: [
+      {
+        question: "Do you ship outside Belfast/Derry?",
+        answer:
+          "Lockers currently cover Belfast + Derry. Refill Club ships statewide; join the waitlist inside /contact."
+      },
+      {
+        question: "How fast does concierge reply?",
+        answer:
+          "Telegram replies usually arrive in under 5 minutes from 09:00–21:00 GMT. Email support@greenhub.app for long-form requests."
+      }
+    ]
   }
 ];
 

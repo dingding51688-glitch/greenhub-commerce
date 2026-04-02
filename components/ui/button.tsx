@@ -13,24 +13,28 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const baseStyles =
-  "inline-flex items-center justify-center font-medium transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-night-950 disabled:opacity-60 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center font-semibold uppercase tracking-[0.12em] transition focus-visible:outline-none rounded-pill disabled:opacity-40 disabled:cursor-not-allowed";
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-plum-600 text-white shadow-surface hover:bg-plum-500 focus-visible:ring-plum-500",
+    "cta-gradient text-white shadow-cta border border-transparent hover:opacity-95",
   secondary:
-    "bg-night-800 text-ink-400 border border-ink-800 hover:border-ink-600 hover:text-white",
-  ghost: "text-plum-500 hover:bg-night-800/60 hover:text-white"
+    "border border-white/30 text-[rgba(255,255,255,0.85)] hover:text-white hover:border-white/60",
+  ghost:
+    "text-[rgba(255,255,255,0.7)] hover:text-white"
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: "h-9 px-sm text-sm gap-2",
-  md: "h-11 px-md gap-2",
-  lg: "h-12 px-lg text-lg gap-3"
+  sm: "h-10 px-6 text-[11px]",
+  md: "h-12 px-8 text-xs",
+  lg: "h-14 px-9 text-sm"
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "primary", size = "md", fullWidth = false, asChild = false, ...props }, ref) => {
+  (
+    { className, variant = "primary", size = "md", fullWidth = false, asChild = false, ...props },
+    ref
+  ) => {
     const Comp = asChild ? Slot : "button";
     return (
       <Comp

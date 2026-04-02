@@ -1,79 +1,58 @@
 import type { Config } from "tailwindcss";
 
-const palette = {
-  night: {
-    50: "#f5f7fb",
-    100: "#e4e9f3",
-    200: "#cacfec",
-    300: "#a4b3df",
-    400: "#7f96cc",
-    500: "#5a75b0",
-    600: "#3c558f",
-    700: "#273c6a",
-    800: "#172243",
-    900: "#0b1426",
-    950: "#05070c"
+const colors = {
+  base: {
+    DEFAULT: "#050505",
+    soft: "#070707",
+    alt: "#0f1412"
   },
-  plum: {
-    100: "#f3e8ff",
-    300: "#d1b0ff",
-    500: "#a56bff",
-    600: "#7c3aed"
+  text: {
+    primary: "#ffffff",
+    secondary: "rgba(255,255,255,0.8)",
+    muted: "rgba(255,255,255,0.6)"
   },
-  jade: {
-    200: "#bce5d5",
-    400: "#4fd9a9",
-    500: "#24b485"
+  cta: {
+    start: "#0d5b3f",
+    end: "#13a86b"
   },
-  amber: {
-    300: "#fbd38d",
-    500: "#f6ad55"
-  },
-  ink: {
-    400: "#aeb3d9",
-    500: "#8c92bb",
-    600: "#5c6287",
-    800: "#2c314e"
+  orange: {
+    start: "#af5a13",
+    end: "#f2a33a"
   }
 };
 
 const spacing = {
-  "2xs": "var(--gh-spacing-2xs)",
-  xs: "var(--gh-spacing-xs)",
-  sm: "var(--gh-spacing-sm)",
-  md: "var(--gh-spacing-md)",
-  lg: "var(--gh-spacing-lg)",
-  xl: "var(--gh-spacing-xl)",
-  "2xl": "var(--gh-spacing-2xl)"
+  sectionX: "var(--gh-spacing-section-x)",
+  sectionY: "var(--gh-spacing-section-y)",
+  3.5: "0.875rem",
+  4.5: "1.125rem"
 };
 
 const config: Config = {
-  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./data/**/*.{ts,tsx}", "./docs/**/*.{md,mdx}"],
   theme: {
     extend: {
-      colors: {
-        ...palette,
-        surface: "#0b0f14",
-        card: "#141925",
-        accent: {
-          DEFAULT: "#4fd9a9",
-          subtle: "rgba(79, 217, 169, 0.2)"
-        }
-      },
+      colors,
       fontFamily: {
-        sans: ["Space Grotesk", "Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
-        display: ["Sora", "Space Grotesk", "Inter", "system-ui", "sans-serif"],
-        mono: ["IBM Plex Mono", "SFMono-Regular", "Menlo", "monospace"]
+        sans: ["Geist", "Geist Sans", "Space Grotesk", "Inter", "system-ui", "sans-serif"],
+        display: ["Geist", "Geist Sans", "Space Grotesk", "Inter", "system-ui", "sans-serif"]
       },
       spacing,
       borderRadius: {
-        sm: "var(--gh-radius-sm)",
-        md: "var(--gh-radius-md)",
-        lg: "var(--gh-radius-lg)"
+        lg: "var(--gh-radius-lg)",
+        card: "var(--gh-radius-card)",
+        pill: "var(--gh-radius-pill)"
       },
       boxShadow: {
-        surface: "var(--gh-shadow-soft)",
-        ring: "var(--gh-shadow-ring)"
+        header: "var(--gh-shadow-header)",
+        card: "var(--gh-shadow-card)",
+        cta: "var(--gh-shadow-cta)"
+      },
+      backgroundImage: {
+        "hero-gradient": "linear-gradient(135deg,#050505,#0f1412)",
+        "cta-gradient": "linear-gradient(135deg,#0d5b3f,#13a86b)",
+        "card-green": "linear-gradient(160deg,#0d5b3f,#13a86b)",
+        "card-orange": "linear-gradient(160deg,#af5a13,#f2a33a)"
       }
     }
   },

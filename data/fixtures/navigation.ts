@@ -31,6 +31,13 @@ export type DrawerSection = {
   links: NavItem[];
 };
 
+export const marketingLinks: NavItem[] = [
+  { label: "About", href: "/about" },
+  { label: "Shipping", href: "/shipping" },
+  { label: "Returns", href: "/returns" },
+  { label: "Terms", href: "/terms" }
+];
+
 export const drawerSections: DrawerSection[] = [
   {
     title: "Menu",
@@ -57,6 +64,7 @@ export const drawerSections: DrawerSection[] = [
 export const drawerQuickLinks: NavItem[] = [
   { label: "FAQ", href: "/faq" },
   { label: "Shipping", href: "/shipping" },
+  { label: "Returns", href: "/returns" },
   { label: "Contact", href: "/contact" }
 ];
 
@@ -79,7 +87,15 @@ export const footerColumns: FooterColumn[] = [
     links: [
       { label: "Support", href: "/support" },
       { label: "FAQ", href: "/faq" },
-      { label: "Terms", href: "/terms" }
+      { label: "Shipping", href: "/shipping" }
+    ]
+  },
+  {
+    title: "Policies",
+    links: [
+      { label: "Returns", href: "/returns" },
+      { label: "Terms", href: "/terms" },
+      { label: "Privacy", href: "/privacy" }
     ]
   }
 ];
