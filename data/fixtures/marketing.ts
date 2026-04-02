@@ -10,7 +10,7 @@ export const heroClassicContent = {
   title: "Cannabis you can count on, 24/7 lockers in Belfast",
   subtitle:
     "Reserve curated flower, carts, and edibles online — collect from climate-controlled lockers the moment you're ready.",
-  primaryCta: { label: "Browse products", href: "/" } satisfies HeroLink,
+  primaryCta: { label: "Browse products", href: "/products" } satisfies HeroLink,
   secondaryCta: { label: "How lockers work", href: "/#lockers" } satisfies HeroLink,
   highlight: "Now shipping subscription refills across NI",
   stats: [
@@ -30,7 +30,7 @@ export const homeHeroContent = {
     "Sealed disguise packaging with scent & appearance masking",
     "Privacy-safe delivery straight to the locker"
   ],
-  primaryCta: { label: "Shop now", href: "/search" } satisfies HeroLink,
+  primaryCta: { label: "Shop now", href: "/products" } satisfies HeroLink,
   secondaryCta: { label: "How it works", href: "/how-it-works" } satisfies HeroLink,
   alignment: "left" as const
 };
@@ -161,7 +161,7 @@ export const featuredCollectionsContent: FeaturedCollection[] = [
     title: "Flowers",
     label: "Now shipping",
     subtitle: "New batches across NI lockers",
-    href: "/search/flower",
+    href: "/products?category=flowers",
     imageUrl: "https://cms.greenhub420.co.uk/uploads/Rainbow_Runtz_07747a3ee4.jpg",
     imageAlt: "Curated flower jars",
     tone: "green"
@@ -170,7 +170,7 @@ export const featuredCollectionsContent: FeaturedCollection[] = [
     title: "Pre-rolls",
     label: "Infused minis",
     subtitle: "Five-pack slow burn cones",
-    href: "/search/pre-rolls",
+    href: "/products?category=pre-rolls",
     imageUrl: "https://cms.greenhub420.co.uk/uploads/20260312152800_3_2_ec9202b7d0.jpg",
     imageAlt: "Infused pre-roll tins",
     tone: "orange"
@@ -179,7 +179,7 @@ export const featuredCollectionsContent: FeaturedCollection[] = [
     title: "Vapes",
     label: "Locker ready",
     subtitle: "Live resin carts in stock",
-    href: "/search/Vapes",
+    href: "/products?category=vapes",
     imageUrl: "https://cms.greenhub420.co.uk/uploads/123_3e71adf87c.jpg",
     imageAlt: "Gold vaporizer carts",
     tone: "cream"
