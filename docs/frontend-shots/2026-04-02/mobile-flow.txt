@@ -1,0 +1,8 @@
+file 'mobile-01-register.png'
+duration 1.2
+file 'mobile-02-search.png'
+duration 1.2
+file 'mobile-03-product.png'
+duration 1.2
+file 'mobile-04-checkout.png'
+duration 1.2

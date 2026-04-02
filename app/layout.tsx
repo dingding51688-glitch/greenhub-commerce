@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
-import { AppHeader } from "@/components/AppHeader";
+import { DesktopHeader, Footer } from "@/components/navigation";
 
 export const metadata: Metadata = {
   title: "Bloom Vapor Dashboard",
@@ -14,8 +14,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-surface text-white">
         <AuthProvider>
           <div className="min-h-screen flex flex-col">
-            <AppHeader />
+            <DesktopHeader />
             <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
+            <Footer />
           </div>
         </AuthProvider>
       </body>

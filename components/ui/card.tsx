@@ -13,8 +13,8 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 
 const paddingMap = {
   sm: "p-sm",
-  md: "p-md",
-  lg: "p-lg"
+  md: "p-lg",
+  lg: "p-2xl"
 };
 
 const variantMap: Record<CardVariant, string> = {

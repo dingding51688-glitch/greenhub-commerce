@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Button, Card } from "@/components/ui";
 import { paymentRecommendations, PaymentPlan } from "@/data/fixtures/marketing";
 
@@ -32,11 +31,11 @@ const PlanCard = ({ plan, featured }: { plan: PaymentPlan; featured?: boolean })
         </li>
       ))}
     </ul>
-    <Link href={plan.cta.href} className="mt-6 block">
+    <a href={plan.cta.href} className="mt-6 block">
       <Button variant={featured ? "primary" : "secondary"} fullWidth>
         {plan.cta.label}
       </Button>
-    </Link>
+    </a>
   </Card>
 );
 
@@ -64,7 +63,9 @@ export function PaymentRecommendation(props: Partial<PaymentRecommendationProps>
           ))}
         </div>
       </div>
-      {content.footnote && <p className="text-xs text-ink-500">{content.footnote}</p>}
+      {content.footnote && (
+        <p className="text-xs text-ink-500">{content.footnote}</p>
+      )}
     </section>
   );
 }

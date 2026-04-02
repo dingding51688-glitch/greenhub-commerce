@@ -1,8 +1,0 @@
-> bloom-vapor@0.2.0 test /root/.openclaw/workspace/greenhub420
-> vitest run
-
-✓ components/ui/__tests__/card.test.tsx (1 test)
-✓ components/ui/__tests__/button.test.tsx (2 tests)
-✓ components/ui/__tests__/input.test.tsx (2 tests)
-Test Files  3 passed (3)
-     Tests  5 passed (5)

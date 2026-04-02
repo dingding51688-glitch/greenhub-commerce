@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Card, Button } from "@/components/ui";
 import { featuredProducts } from "@/data/fixtures/marketing";
 import type { ProductCardData } from "@/lib/types";
@@ -35,11 +34,11 @@ export function ProductCollectionGrid(props: Partial<ProductCollectionGridProps>
           {content.description && <p className="mt-2 text-ink-400">{content.description}</p>}
         </div>
         {content.primaryCta && (
-          <Link href={content.primaryCta.href} className="w-full sm:w-auto">
+          <a href={content.primaryCta.href} className="w-full sm:w-auto">
             <Button variant="secondary" className="w-full">
               {content.primaryCta.label}
             </Button>
-          </Link>
+          </a>
         )}
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -56,9 +55,7 @@ export function ProductCollectionGrid(props: Partial<ProductCollectionGridProps>
               </div>
             )}
             <div className="space-y-1">
-              {product.category && (
-                <p className="text-xs uppercase tracking-wide text-ink-500">{product.category}</p>
-              )}
+              <p className="text-xs uppercase tracking-wide text-ink-500">{product.category}</p>
               <h3 className="text-lg font-semibold text-white">{product.title}</h3>
               {product.description && <p className="text-sm text-ink-400">{product.description}</p>}
             </div>

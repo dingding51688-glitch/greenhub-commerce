@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import useSWR from "swr";
 import { StateMessage } from "@/components/StateMessage";
+import { Skeleton } from "@/components/Skeleton";
 import { apiMutate, swrFetcher } from "@/lib/api";
 import type { WalletBalanceResponse, CheckoutResponse } from "@/lib/types";
 
@@ -32,12 +33,18 @@ export default function CheckoutPage() {
   const [paymentMode, setPaymentMode] = useState<"wallet" | "topup">("wallet");
   const [submitting, setSubmitting] = useState(false);
   const [alert, setAlert] = useState<Alert>(null);
+  const [lockerReady, setLockerReady] = useState(false);
 
   const { data: balanceData } = useSWR<WalletBalanceResponse>(
     token ? "/api/wallet/balance" : null,
     swrFetcher,
     { refreshInterval: 60_000 }
   );
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLockerReady(true), 600);
+    return () => clearTimeout(timer);
+  }, []);
 
   const total = useMemo(
     () => cart.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0),
@@ -191,6 +198,7 @@ export default function CheckoutPage() {
             </div>
           )}
 
+          {lockerReady ? (
           <div className="rounded-3xl border border-white/10 bg-card p-4">
             <h3 className="text-lg font-semibold">Locker details</h3>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -217,6 +225,13 @@ export default function CheckoutPage() {
               We only collect a postcode and notes—dispatch will match you with the nearest locker manually.
             </p>
           </div>
+          ) : (
+            <div className="rounded-3xl border border-white/10 bg-card p-4">
+              <Skeleton className="h-32 w-full" />
+              <Skeleton className="mt-2 h-10 w-full" />
+              <Skeleton className="mt-2 h-10 w-full" />
+            </div>
+          )}
         </div>
 
         <div className="space-y-4">

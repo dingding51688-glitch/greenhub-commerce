@@ -5,7 +5,11 @@ newsite/
 oldsite-*/
 uploads/*.zip
 
-# Node / Next.js artifacts
+# Auto-generated ignores
 node_modules/
 .next/
-.DS_Store
+.turbo/
+.vercel/
+.openclaw/
+.clawhub/
+memory/

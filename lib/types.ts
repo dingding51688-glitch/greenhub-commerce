@@ -88,3 +88,39 @@ export type ProductCardData = {
   badge?: string;
   imageUrl?: string;
 };
+
+export type WeightOption = {
+  id: number;
+  label: string;
+  price: number;
+  unitPrice: string;
+  featured?: boolean;
+};
+
+export type ProductRecord = {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  description: string;
+  heroBadge?: string | null;
+  priceFrom: number;
+  strain: string;
+  thc?: string | null;
+  potency?: string | null;
+  rating?: number | null;
+  reviews?: number | null;
+  weightOptions?: WeightOption[];
+};
+
+export type ProductsResponse = {
+  data: ProductRecord[];
+  meta?: {
+    pagination?: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+};

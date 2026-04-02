@@ -1,6 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui";
-import { heroClassicContent, HeroLink, HeroStat } from "@/data/fixtures/marketing";
+import { heroClassicContent, HeroLink } from "@/data/fixtures/marketing";
 
 export type HeroClassicProps = {
   eyebrow?: string;
@@ -9,14 +11,14 @@ export type HeroClassicProps = {
   highlight?: string;
   primaryCta?: HeroLink;
   secondaryCta?: HeroLink;
-  stats?: HeroStat[];
+  stats?: { label: string; value: string }[];
 };
 
 export function HeroClassic(props: Partial<HeroClassicProps>) {
   const content = { ...heroClassicContent, ...props } as HeroClassicProps;
 
   return (
-    <section className="relative isolate overflow-hidden rounded-3xl border border-white/5 bg-night-950 px-6 py-14 shadow-surface sm:px-10">
+    <section className="relative isolate overflow-hidden rounded-3xl bg-night-950 px-6 py-14 shadow-surface sm:px-10">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(124,58,237,0.45),_transparent_55%)]" aria-hidden="true" />
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col gap-8 text-center">
         {content.highlight && (
@@ -37,15 +39,15 @@ export function HeroClassic(props: Partial<HeroClassicProps>) {
         </div>
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
           {content.primaryCta && (
-            <Link href={content.primaryCta.href} className="w-full sm:w-auto">
-              <Button size="lg" className="w-full">
+            <Link href={content.primaryCta.href}>
+              <Button size="lg" className="w-full sm:w-auto">
                 {content.primaryCta.label}
               </Button>
             </Link>
           )}
           {content.secondaryCta && (
-            <Link href={content.secondaryCta.href} className="w-full sm:w-auto">
-              <Button variant="ghost" size="lg" className="w-full">
+            <Link href={content.secondaryCta.href}>
+              <Button variant="ghost" size="lg" className="w-full sm:w-auto">
                 {content.secondaryCta.label}
               </Button>
             </Link>

@@ -24,7 +24,7 @@ export function HowItWorksLocker(props: Partial<HowItWorksLockerProps>) {
         {content.tip && (
           <div className="hidden rounded-2xl border border-jade-400/50 bg-jade-400/10 px-4 py-3 text-left text-sm text-jade-200 sm:block">
             <p className="text-xs uppercase tracking-wide text-jade-400">{content.tip.label}</p>
-            <p>{content.tip.content}</p>
+            <p className="text-jade-200">{content.tip.content}</p>
           </div>
         )}
       </div>
