@@ -46,12 +46,20 @@ Location: `components/sections/`
 
 | Component | Props | Notes |
 | --- | --- | --- |
-| `HeroClassic` | `title`, optional `subtitle`, `highlight`, CTA links, stats array | Default copy pulled from `data/fixtures/marketing.ts`. Designed for hero banner with gradient background. |
-| `HowItWorksLocker` | `title`, `steps` (icon/title/description), optional tip bubble | Renders 3-column flow on desktop, stacked on mobile. |
-| `ProductCollectionGrid` | `eyebrow`, `title`, `description`, `products`, `primaryCta` | Uses `ProductCardData` placeholders (image/title/category/price). |
-| `PaymentRecommendation` | `recommendation`, `secondary[]`, `footnote` | Displays featured subscription + secondary plans. |
+| `HeroClassic` (`components/sections/HeroClassic.tsx`) | `title`, optional `subtitle`, `highlight`, CTA links, stats array | Default copy pulled from `data/fixtures/marketing.ts`. Designed for hero banner with gradient background. |
+| `HowItWorksLocker` (`components/sections/HowItWorksLocker.tsx`) | `title`, `steps` (icon/title/description), optional tip bubble | Renders 3-column flow on desktop, stacked on mobile. |
+| `ProductCollectionGrid` (`components/sections/ProductCollectionGrid.tsx`) | `eyebrow`, `title`, `description`, `products`, `primaryCta` | Uses `ProductCardData` placeholders (image/title/category/price). |
+| `PaymentRecommendation` (`components/sections/PaymentRecommendation.tsx`) | `recommendation`, `secondary[]`, `footnote` | Displays featured subscription + secondary plans. |
 
-Default content for these sections lives in `data/fixtures/marketing.ts`. Feature teams can override props or inject live data.
+Default content for these sections lives in `data/fixtures/marketing.ts`. Feature teams can override props or inject live data:
+
+```tsx
+import { HeroClassic, ProductCollectionGrid } from "@/components/sections";
+import { heroClassicContent, featuredProducts } from "@/data/fixtures/marketing";
+
+<HeroClassic {...heroClassicContent} />
+<ProductCollectionGrid products={featuredProducts} primaryCta={{ label: "See menu", href: "/menu" }} />
+```
 
 ## 5. Collaboration Rules
 1. Other branches must `git fetch origin && git rebase origin/feature/fe-theme-tokens` before adding UI work; reuse tokens/components instead of hardcoding colors.

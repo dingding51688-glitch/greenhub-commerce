@@ -78,3 +78,13 @@ export type CheckoutResponse = {
     totalAmount: number;
   };
 };
+
+export type ProductCardData = {
+  id: string;
+  title: string;
+  category?: string;
+  description?: string;
+  price?: string;
+  badge?: string;
+  imageUrl?: string;
+};
