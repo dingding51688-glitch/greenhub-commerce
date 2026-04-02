@@ -27,8 +27,8 @@ Location: `components/ui/`
 | Component | Props | Notes |
 | --- | --- | --- |
 | `Button` | `variant` (`primary` \| `secondary` \| `ghost`), `size` (`sm/md/lg`), `fullWidth` | Uses plum/jade tokens + focus ring. |
-| `Card` | `variant` (`elevated` \| `outlined`), `padding`, slot props (`title/description/footer`) | Standard panel for dashboards & tiles. |
-| `Input` | `isInvalid` flag | Dark-surface input with tokenized borders/focus states. |
+| `Card` | `variant` (`elevated` \| `outlined`), `padding`, slot props (`title/description/footer`) | Standard panel for dashboards & tiles. Padding map: `sm → p-sm`, `md → p-md`, `lg → p-lg`. |
+| `Input` | `isInvalid`, `disabled` | Dark-surface input with tokenized borders/focus states. `disabled` adds `opacity-60 cursor-not-allowed` and suppresses focus ring. |
 
 Usage example:
 ```tsx
@@ -41,12 +41,25 @@ import { Button, Card, Input } from "@/components/ui";
 - Shadows: `shadow-surface` for cards, `shadow-ring` for focus outlines.
 - Radius: `rounded-lg` uses `--gh-radius-lg`.
 
-## 4. Collaboration Rules
+## 4. Section Components
+Location: `components/sections/`
+
+| Component | Props | Notes |
+| --- | --- | --- |
+| `HeroClassic` | `title`, optional `subtitle`, `highlight`, CTA links, stats array | Default copy pulled from `data/fixtures/marketing.ts`. Designed for hero banner with gradient background. |
+| `HowItWorksLocker` | `title`, `steps` (icon/title/description), optional tip bubble | Renders 3-column flow on desktop, stacked on mobile. |
+| `ProductCollectionGrid` | `eyebrow`, `title`, `description`, `products`, `primaryCta` | Uses `ProductCardData` placeholders (image/title/category/price). |
+| `PaymentRecommendation` | `recommendation`, `secondary[]`, `footnote` | Displays featured subscription + secondary plans. |
+
+Default content for these sections lives in `data/fixtures/marketing.ts`. Feature teams can override props or inject live data.
+
+## 5. Collaboration Rules
 1. Other branches must `git fetch origin && git rebase origin/feature/fe-theme-tokens` before adding UI work; reuse tokens/components instead of hardcoding colors.
-2. If new token/component is needed, update this document first, then add to `globals.css` + `tailwind.config.ts` + `components/ui/` in the same PR.
+2. If new token/component/section is needed, update this document first, then add to `globals.css` / `tailwind.config.ts` / `components/ui` or `components/sections` within the same PR.
 3. Components/ui is the single source for primitives; downstream features should compose from there.
 
-## 5. Testing Checklist
+## 6. Testing Checklist
 - `pnpm lint` — ensure ESLint passes after adopting tokens & components.
-- `pnpm dev` — smoke test interactive states (hover/focus for buttons/inputs).
+- `pnpm test` — run Vitest suite (Buttons/Card/Input coverage).
+- `pnpm dev` — smoke test interactive states (hover/focus) when wiring sections.
 - Document link must be included in PR descriptions.
