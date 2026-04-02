@@ -11,12 +11,14 @@ export default function HowItWorksPage() {
   return (
     <div className="space-y-10 pb-20">
       <HeroClassic
+        highlight="HOME / HOW IT WORKS"
         eyebrow="Locker Playbook"
         title="Order online, collect from private lockers in minutes"
         subtitle="Follow three simple steps to secure your slot, confirm payment, and grab your parcel whenever it suits your evening."
-        highlight="Members-only beta"
         primaryCta={{ label: "Create an account", href: "/register" }}
         secondaryCta={{ label: "Shop the menu", href: "/products" }}
+        tone="soft"
+        alignment="left"
         stats={[
           { label: "Locker sites", value: "50+" },
           { label: "Avg. prep", value: "18 min" },

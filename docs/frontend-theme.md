@@ -53,6 +53,8 @@ Fixtures for the kit live in `data/fixtures/marketing.ts`.
 
 ## 6. Navigation Shell (`components/navigation/`)
 - `DesktopHeader` + `MobileDrawer` now consume `primaryNav`, `drawerSections`, `drawerQuickLinks`, `ctaButtons` from `data/fixtures/navigation.ts`. Routing active state handled via `match` rules.
+- Header parity: both breakpoints share a circular logo badge (`#1E2D22` background, "GH" monogram) plus stacked copy (“GREEN HUB” / “DISTRIBUTOR”). Right-aligned icon set = account (→ `/login`), bag (→ `/checkout`), hamburger (opens drawer). Text nav links are moved into the drawer to mirror the legacy site composition.
+- Drawer header mirrors the same logo block and keeps CTA + section fixtures inside the sheet.
 - `Footer` pulls `marketingLinks`, `footerColumns`, `socialLinks`, `footerContact`.
 - **Adding a new link?** Update `data/fixtures/navigation.ts` (e.g., add to `marketingLinks`), not the components.
 
@@ -61,8 +63,15 @@ Screenshots stored under `docs/frontend-shots/2026-04-02/`:
 - `reference-mobile.svg` — stylised capture of legacy greenhub420.co.uk mobile hero/CTA.
 - `new-mobile.svg` — updated UI snapshot for the rebuilt theme.
 
+Automation + capture runbook now lives in `docs/tests/frontend-shots.md`. Follow it to regenerate PNGs (Playwright CLI + `pnpm screenshot:mobile`).
+
 _(Playwright screenshot against the production site failed due to missing system libraries; SVG mockups are included to document visual parity.)_
 
-## 8. Testing
+## 8. Product cards
+- `ProductCategoryCard` drives the homepage FLOWERS / PRE-ROLLS / VAPES row. Each card stacks a #1E2D22 badge + copy on the left and product art on the right, with a split background (top vs bottom colors) and arrow badge. Tone presets: `green` (`#101c11 → #182818`), `orange` (`#2c1608 → #3c200b`), `cream` (`#332515 → #251c11`). Replace the placeholder “GH” logo with the official asset once supplied (see TODO in fixtures).
+- `ProductCollectionGrid` adopts the same split-background layout for live menu items. Category label + title/description stay on the left, image or placeholder badge on the right, arrow badge bottom-left. Palette automatically alternates between green/orange entries.
+- Product art currently references CMS URLs; if higher fidelity renders arrive, update `featuredCollectionsContent` or the Strapi product records. Missing imagery defaults to an initial badge.
+
+## 9. Testing
 - Unit tests for the section kit live in `components/sections/__tests__/` (HeroClassic, HowItWorksLocker, PaymentRecommendation, ProductCollectionGrid).
 - Run `pnpm test` (Vitest) + `pnpm lint` to validate changes.

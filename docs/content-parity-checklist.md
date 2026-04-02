@@ -9,3 +9,20 @@
 | FAQ | Hero / Groups | ✅ HOME / FAQ 文案、Contact/Support CTA、分组问答与旧站一致 | `faqGroups` fixtures 按 Lockers/Payments/Support 分组，`HeroClassic` soft 变体 + details 手风琴复制旧站展开样式。 | 2026-04-02 |
 | Terms | Hero / TOC / Sections | ✅ UI 已对齐，文案为占位待 Legal 提供正式稿 | `termsSections` 存占位段落 + 注释；收到新条款后更新 fixtures 并 rerun lint/test。 | 2026-04-02 |
 | Shipping | Hero / Timeline / Locker tips / Refund & Support CTA | ✅ 复刻旧站 timeline、locker etiquette、refund policy、support CTA | `shippingTimeline`、`lockerUsageTips`、`returnPolicies`、`supportSteps` 数据逐字；`ShippingPage` 增加 breadcrumb + soft tone hero。 | 2026-04-02 |
+| How it works? | Hero / Locker steps / FAQ / Payment CTA | ✅ Hero breadcrumb + steps + FAQ + PaymentRecommendation 与旧站同步 | `HowItWorksPage` 使用 `HeroClassic` soft 变体、`HowItWorksLocker` 默认数据、`howItWorksFaq` 与旧站 copy 一致。 | 2026-04-02 |
+| Shop All | Hero / Category tabs / Filters / Cards | ✅ Breadcrumb + tabs + strain 筛选 + 新卡片布局 | `/products` 使用 category+strain query，同步 Strapi 请求并 fallback mock；`ProductCard` 复刻图片/评分/THC/CTA。 | 2026-04-02 |
+| Flowers | Hero / Category tabs / Cards | ✅ `/products?category=flowers` 继承 Shop All 结构 & 花类说明 copy | Category filter 绑定 `filters[category]=$eq=flowers`；无数据时回退 mock。 | 2026-04-02 |
+| Pre-rolls | Hero / Category tabs / Cards | ✅ `/products?category=pre-rolls` 复刻预卷说明 & 卡片 | 同步 query param + fallback 文案。 | 2026-04-02 |
+| Vapes | Hero / Category tabs / Cards | ✅ `/products?category=vapes` 复刻 vape 文案 & 卡片 | 数据缺失时展示 mock cart，等待 Strapi 图。 | 2026-04-02 |
+
+## FE-PARITY-PLAN（关键页面状态）
+
+| 页面 | 状态 | 参考素材 | 备注 |
+| --- | --- | --- | --- |
+| Home | Done | 待提供（需 mobile hero + featured 截图） | Hero/Featured/How it works 已 1:1 替换，文案来自 2026-04-02 旧站；截图待抓取后放入 `docs/frontend-shots/2026-04-02/home-hero.png` 等。 |
+| Shop All | Done | 待提供（参考图待上传） | `/products` hero + category tabs + strain filters + 新卡片布局完成，文案基于 2026-04-02 参考稿；等待官方截图存档。 |
+| Flowers | Done | 待提供（参考图待上传） | `/products?category=flowers` 文案、筛选、卡片继承 Shop All 结构并使用花类 copy；待截图。 |
+| Pre-rolls | Done | 待提供（参考图待上传） | `/products?category=pre-rolls` hero + 卡片 parity，Mock 数据说明已写入 fixtures，待 Strapi 正式字段。 |
+| Vapes | Done | 待提供（参考图待上传） | `/products?category=vapes` hero + 卡片 parity，缺少官方图像时使用 cms 远程图；待截图。 |
+| How it works? | Done | 待提供（建议保存 how-it-works-hero.png） | `/how-it-works` Hero breadcrumb、Locker steps、FAQ、Payment CTA 已 parity；待抓移动端截图后补入 `docs/frontend-shots/2026-04-02/`。 |
+| Contact | Done | 待提供（建议保存 contact-hero.png） | HeroClassic + channels + InPost Flow 已 parity；截图未存档，后续可抓移动端截屏入库。 |

@@ -1,84 +1,155 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import clsx from "clsx";
 import useSWR from "swr";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/ProductCard";
 import Button from "@/components/ui/button";
 import { Skeleton } from "@/components/Skeleton";
 import { swrFetcher } from "@/lib/api";
-import type { ProductsResponse } from "@/lib/types";
+import type { ProductRecord, ProductsResponse } from "@/lib/types";
+import {
+  productCategoryContent,
+  productListingFallbacks,
+  type ProductCategoryKey
+} from "@/data/fixtures/products";
 
-const STRAIN_FILTERS = ["all", "Hybrid", "Indica", "Sativa"];
+const STRAIN_FILTERS = ["all", "Hybrid", "Indica", "Sativa"] as const;
+const CATEGORY_TABS: ProductCategoryKey[] = ["shop-all", "flowers", "pre-rolls", "vapes"];
+
+function resolveCategory(value: string | null): ProductCategoryKey {
+  if (value && CATEGORY_TABS.includes(value as ProductCategoryKey)) {
+    return value as ProductCategoryKey;
+  }
+  return "shop-all";
+}
 
 export default function ProductsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const initialStrain = searchParams.get("strain") || "all";
-  const [strain, setStrain] = useState(initialStrain);
+  const category = resolveCategory(searchParams.get("category"));
+  const strainParam = searchParams.get("strain") || "all";
+  const strain = STRAIN_FILTERS.includes(strainParam as (typeof STRAIN_FILTERS)[number]) ? strainParam : "all";
 
-  const params = new URLSearchParams({
+  const requestParams = new URLSearchParams({
     "pagination[pageSize]": "12",
     "sort[0]": "createdAt:desc",
     "populate[weightOptions]": "*"
   });
   if (strain !== "all") {
-    params.set("filters[strain][$eq]", strain);
+    requestParams.set("filters[strain][$eq]", strain);
+  }
+  const categoryFilter = productCategoryContent[category].filter;
+  if (categoryFilter) {
+    requestParams.set(`filters[${categoryFilter.field}][$eq]`, categoryFilter.value);
   }
 
-  const key = `/api/products?${params.toString()}`;
+  const key = `/api/products?${requestParams.toString()}`;
   const { data, isLoading } = useSWR<ProductsResponse>(key, swrFetcher);
   const products = useMemo(() => data?.data ?? [], [data]);
 
+  const displayProducts = useMemo<ProductRecord[]>(() => {
+    if (products.length > 0) {
+      if (!categoryFilter) {
+        return products;
+      }
+      return products.filter((product) => product.category === categoryFilter.value || !product.category);
+    }
+    if (!categoryFilter) {
+      return productListingFallbacks;
+    }
+    return productListingFallbacks.filter((product) => product.category === categoryFilter.value);
+  }, [products, categoryFilter]);
+
+  const handleCategoryChange = (value: ProductCategoryKey) => {
+    const next = new URLSearchParams(searchParams.toString());
+    if (value === "shop-all") {
+      next.delete("category");
+    } else {
+      next.set("category", value);
+    }
+    const query = next.toString();
+    router.replace(query ? `/products?${query}` : "/products", { scroll: false });
+  };
+
   const handleFilterChange = (value: string) => {
-    setStrain(value);
     const next = new URLSearchParams(searchParams.toString());
     if (value === "all") {
       next.delete("strain");
     } else {
       next.set("strain", value);
     }
-    router.replace(`/products?${next.toString()}`, { scroll: false });
+    const query = next.toString();
+    router.replace(query ? `/products?${query}` : "/products", { scroll: false });
   };
 
+  const hero = productCategoryContent[category];
+
   return (
-    <section className="space-y-6 pb-16">
-      <header className="space-y-3">
-        <p className="text-xs uppercase tracking-[0.35em] text-ink-500">Menu</p>
-        <h1 className="text-3xl font-semibold text-white">Browse the full locker menu</h1>
+    <div className="space-y-8 pb-20">
+      <section className="space-y-4 rounded-3xl border border-white/10 bg-night-950/80 p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">{hero.breadcrumb}</p>
+        <div className="space-y-3">
+          <h1 className="text-3xl font-semibold text-white">{hero.title}</h1>
+          <p className="text-sm text-ink-400">{hero.description}</p>
+          {hero.helper && <p className="text-xs text-ink-500">{hero.helper}</p>}
+        </div>
+      </section>
+
+      <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-night-950/60 p-4">
+        <div className="flex flex-wrap gap-2">
+          {CATEGORY_TABS.map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              className={clsx(
+                "rounded-full px-4 py-2 text-sm font-semibold transition",
+                category === tab ? "bg-white text-night-900" : "text-ink-400 hover:text-white"
+              )}
+              onClick={() => handleCategoryChange(tab)}
+            >
+              {tab === "shop-all" ? "Shop All" : tab.replace("-", " ")}
+            </button>
+          ))}
+        </div>
         <div className="flex flex-wrap gap-2">
           {STRAIN_FILTERS.map((option) => (
             <button
               key={option}
               type="button"
-              className={`rounded-full border px-4 py-2 text-sm ${
-                strain === option ? "border-plum-500 text-white" : "border-ink-700 text-ink-400"
-              }`}
+              className={clsx(
+                "rounded-full border px-4 py-2 text-xs uppercase tracking-[0.2em]",
+                strain === option ? "border-white text-white" : "border-ink-700 text-ink-400"
+              )}
               onClick={() => handleFilterChange(option)}
             >
-              {option === "all" ? "All strains" : option}
+              {option === "all" ? "All" : option}
             </button>
           ))}
         </div>
-      </header>
+      </div>
 
       {isLoading && (
         <div className="space-y-2">
-          <p className="text-sm text-ink-500">Loading latest inventory…</p>
+          <p className="text-sm text-ink-500">Loading locker inventory…</p>
           <div className="grid gap-4 md:grid-cols-2">
             {Array.from({ length: 6 }).map((_, idx) => (
-              <Skeleton key={idx} className="h-48" />
+              <Skeleton key={idx} className="h-64" />
             ))}
           </div>
         </div>
       )}
-      {!isLoading && products.length === 0 && (
-        <p className="text-sm text-ink-500">No products available right now. Check back later tonight.</p>
+
+      {!isLoading && displayProducts.length === 0 && (
+        <div className="rounded-3xl border border-white/10 bg-night-950/60 p-6 text-center text-sm text-ink-400">
+          No products available for this filter. Try All strains or another category later tonight.
+        </div>
       )}
 
-      {!isLoading && (
+      {!isLoading && displayProducts.length > 0 && (
         <div className="grid gap-4 md:grid-cols-2">
-          {products.map((product) => (
+          {displayProducts.map((product) => (
             <ProductCard key={product.documentId} product={product} />
           ))}
         </div>
@@ -91,6 +162,6 @@ export default function ProductsPage() {
           <a href="mailto:concierge@greenhub420.co.uk">Contact concierge</a>
         </Button>
       </div>
-    </section>
+    </div>
   );
 }

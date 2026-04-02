@@ -150,29 +150,39 @@ export type FeaturedCollection = {
   title: string;
   href: string;
   imageUrl: string;
-  bgGradient: string;
-  tagline?: string;
+  label?: string;
+  subtitle?: string;
+  imageAlt?: string;
+  tone?: "green" | "orange" | "cream";
 };
 
 export const featuredCollectionsContent: FeaturedCollection[] = [
   {
     title: "Flowers",
+    label: "Now shipping",
+    subtitle: "New batches across NI lockers",
     href: "/search/flower",
     imageUrl: "https://cms.greenhub420.co.uk/uploads/Rainbow_Runtz_07747a3ee4.jpg",
-    bgGradient: "#0d5b3f,#13a86b"
+    imageAlt: "Curated flower jars",
+    tone: "green"
   },
   {
     title: "Pre-rolls",
-    tagline: "Infused minis",
+    label: "Infused minis",
+    subtitle: "Five-pack slow burn cones",
     href: "/search/pre-rolls",
     imageUrl: "https://cms.greenhub420.co.uk/uploads/20260312152800_3_2_ec9202b7d0.jpg",
-    bgGradient: "#af5a13,#f2a33a"
+    imageAlt: "Infused pre-roll tins",
+    tone: "orange"
   },
   {
     title: "Vapes",
+    label: "Locker ready",
+    subtitle: "Live resin carts in stock",
     href: "/search/Vapes",
     imageUrl: "https://cms.greenhub420.co.uk/uploads/123_3e71adf87c.jpg",
-    bgGradient: "#0d5b3f,#13a86b"
+    imageAlt: "Gold vaporizer carts",
+    tone: "cream"
   }
 ];
 

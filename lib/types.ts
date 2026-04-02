@@ -97,6 +97,11 @@ export type WeightOption = {
   featured?: boolean;
 };
 
+export type ProductImage = {
+  url: string;
+  alternativeText?: string | null;
+};
+
 export type ProductRecord = {
   id: number;
   documentId: string;
@@ -110,6 +115,8 @@ export type ProductRecord = {
   potency?: string | null;
   rating?: number | null;
   reviews?: number | null;
+  category?: string | null;
+  coverImage?: ProductImage | null;
   weightOptions?: WeightOption[];
 };
 
