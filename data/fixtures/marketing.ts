@@ -22,7 +22,7 @@ export const heroClassicContent = {
 
 export const homeHeroContent = {
   highlight: "HOME",
-  eyebrow: "Online order · Locker pickup",
+  eyebrow: "ONLINE ORDER · LOCKER PICKUP",
   title: "Order Online & Pick Up at InPost Lockers",
   subtitle: "According to the postcode you provide, the parcel will be delivered to the nearest InPost locker.",
   bullets: [
@@ -30,8 +30,13 @@ export const homeHeroContent = {
     "Sealed disguise packaging with scent & appearance masking",
     "Privacy-safe delivery straight to the locker"
   ],
-  primaryCta: { label: "Shop now", href: "/products" } satisfies HeroLink,
-  secondaryCta: { label: "How it works", href: "/how-it-works" } satisfies HeroLink,
+  primaryCta: { label: "SHOP NOW", href: "/products" } satisfies HeroLink,
+  secondaryCta: { label: "HOW IT WORKS", href: "/how-it-works" } satisfies HeroLink,
+  stats: [
+    { label: "Locker pickup", value: "24/7" },
+    { label: "Members served", value: "3.1k" },
+    { label: "Avg. rating", value: "4.9/5" }
+  ],
   alignment: "left" as const
 };
 
@@ -159,28 +164,28 @@ export type FeaturedCollection = {
 export const featuredCollectionsContent: FeaturedCollection[] = [
   {
     title: "Flowers",
-    label: "Now shipping",
-    subtitle: "New batches across NI lockers",
+    label: "NOW SHIPPING",
+    subtitle: "Drop-ready eighths across NI",
     href: "/products?category=flowers",
-    imageUrl: "https://cms.greenhub420.co.uk/uploads/Rainbow_Runtz_07747a3ee4.jpg",
+    imageUrl: "https://cdn.greenhub420.co.uk/ui-parity/flowers-card.png",
     imageAlt: "Curated flower jars",
     tone: "green"
   },
   {
     title: "Pre-rolls",
-    label: "Infused minis",
-    subtitle: "Five-pack slow burn cones",
+    label: "INFUSED MINIS",
+    subtitle: "Resin-dipped five packs",
     href: "/products?category=pre-rolls",
-    imageUrl: "https://cms.greenhub420.co.uk/uploads/20260312152800_3_2_ec9202b7d0.jpg",
+    imageUrl: "https://cdn.greenhub420.co.uk/ui-parity/pre-rolls-card.png",
     imageAlt: "Infused pre-roll tins",
     tone: "orange"
   },
   {
     title: "Vapes",
-    label: "Locker ready",
-    subtitle: "Live resin carts in stock",
+    label: "LOCKER READY",
+    subtitle: "Live resin carts en route",
     href: "/products?category=vapes",
-    imageUrl: "https://cms.greenhub420.co.uk/uploads/123_3e71adf87c.jpg",
+    imageUrl: "https://cdn.greenhub420.co.uk/ui-parity/vapes-card.png",
     imageAlt: "Gold vaporizer carts",
     tone: "cream"
   }

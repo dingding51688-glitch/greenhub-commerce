@@ -12,6 +12,7 @@ export type HeroClassicProps = {
   primaryCta?: HeroLink;
   secondaryCta?: HeroLink;
   stats?: { label: string; value: string }[];
+  bullets?: string[];
   alignment?: "left" | "center";
   tone?: "hero" | "soft";
 };
@@ -57,6 +58,22 @@ export function HeroClassic(props: Partial<HeroClassicProps>) {
           </h1>
           {content.subtitle && (
             <p className="text-base text-[rgba(255,255,255,0.8)] sm:text-lg">{content.subtitle}</p>
+          )}
+          {content.bullets && content.bullets.length > 0 && (
+            <ul
+              className={`space-y-2 text-sm text-[rgba(255,255,255,0.85)] ${
+                alignment === "left" ? "" : "sm:mx-auto sm:max-w-2xl"
+              }`}
+            >
+              {content.bullets.map((bullet) => (
+                <li key={bullet} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border border-white/30 text-[11px] text-white">
+                    ✓
+                  </span>
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
         <div

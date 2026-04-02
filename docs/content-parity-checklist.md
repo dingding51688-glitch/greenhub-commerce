@@ -15,6 +15,7 @@
 | Pre-rolls | Hero / Category tabs / Cards | ✅ `/products?category=pre-rolls` 复刻预卷说明 & 卡片 | 同步 query param + fallback 文案。 | 2026-04-02 |
 | Vapes | Hero / Category tabs / Cards | ✅ `/products?category=vapes` 复刻 vape 文案 & 卡片 | 数据缺失时展示 mock cart，等待 Strapi 图。 | 2026-04-02 |
 | Home | Removed sections | ✅ 客户指定的 Featured products / How lockers work / Recommended payment 已隐藏 | `/app/page.tsx` 仅保留 Hero + FeaturedCollections，便于与旧站结构一致。 | 2026-04-02 |
+| Home | Hero copy / bullets / CTA / stats | ✅ HeroClassic 呈现 HOME 面包屑、3 条 bullet、SHOP NOW/ HOW IT WORKS CTA 及 3 组统计 | `homeHeroContent` 与截图一致（全部大写文案+24/7 / 3.1k / 4.9/5 stats），`HeroClassic` 新增 bullets 渲染。 | 2026-04-02 |
 
 ## FE-PARITY-PLAN（关键页面状态）
 

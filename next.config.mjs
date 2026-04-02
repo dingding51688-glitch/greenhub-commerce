@@ -8,6 +8,10 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "cms.greenhub420.co.uk"
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.greenhub420.co.uk"
       }
     ]
   }
