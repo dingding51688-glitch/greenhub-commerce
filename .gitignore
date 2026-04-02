@@ -4,3 +4,8 @@
 newsite/
 oldsite-*/
 uploads/*.zip
+
+# Node / Next.js artifacts
+node_modules/
+.next/
+.DS_Store
