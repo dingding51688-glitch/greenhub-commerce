@@ -1,0 +1,44 @@
+{
+  "active": true,
+  "name": "White Rhino",
+  "flag": "https://flagcdn.com/w640/us.png",
+  "sort_order": 3,
+  "variants": [
+    {
+      "label": "28g",
+      "price_gbp": 220,
+      "grams": 28
+    },
+    {
+      "label": "62.5g",
+      "price_gbp": 450,
+      "grams": 62.5
+    },
+    {
+      "label": "125g",
+      "price_gbp": 825,
+      "grams": 125
+    },
+    {
+      "label": "250g",
+      "price_gbp": 1500,
+      "grams": 250
+    },
+    {
+      "label": "500g",
+      "price_gbp": 2700,
+      "grams": 500
+    },
+    {
+      "label": "1000g",
+      "price_gbp": 5000,
+      "grams": 1000
+    }
+  ],
+  "country": "United States",
+  "images": [
+    "/uploads/图片_20260226102050_17_9.jpg"
+  ],
+  "id": "White Rhino",
+  "description": ""
+}
