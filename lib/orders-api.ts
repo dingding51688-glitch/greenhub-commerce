@@ -1,5 +1,7 @@
 import { getStoredToken } from "@/lib/auth-store";
-import type { OrderRecord } from "@/lib/types";
+import type { OrderRecord as OrderRecordType } from "@/lib/types";
+
+export type OrderRecord = OrderRecordType;
 
 const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
