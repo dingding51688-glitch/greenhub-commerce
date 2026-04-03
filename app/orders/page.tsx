@@ -63,7 +63,7 @@ export default function OrdersPage() {
   const selectedFilter = FILTERS.find((filter) => filter.id === filterId) ?? FILTERS[0];
   const filteredOrders = useMemo(() => {
     if (selectedFilter.id === "all") return orders;
-    const statuses = new Set(selectedFilter.statuses);
+    const statuses = new Set<string>(selectedFilter.statuses as readonly string[]);
     return orders.filter((order) => statuses.has(order.status));
   }, [orders, selectedFilter]);
 
