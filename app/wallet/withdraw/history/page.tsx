@@ -59,7 +59,7 @@ export default function WithdrawalHistoryPage() {
   const selectedFilter = FILTERS.find((filter) => filter.id === filterId) ?? FILTERS[0];
   const filteredRows = useMemo(() => {
     if (selectedFilter.id === "all") return withdrawals;
-    const statuses = new Set(selectedFilter.statuses);
+    const statuses = new Set<string>(selectedFilter.statuses as readonly string[]);
     return withdrawals.filter((row) => statuses.has(row.status));
   }, [withdrawals, selectedFilter]);
 
