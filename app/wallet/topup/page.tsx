@@ -401,9 +401,15 @@ function NowPaymentsPanel({ intent, status, countdown, payment, paymentStatus }:
       <div className="grid gap-4 sm:grid-cols-[2fr,1fr]">
         <div className="space-y-2 rounded-2xl border border-white/15 bg-white/5 p-3 text-xs text-white/80">
           <p className="text-[11px] uppercase tracking-[0.3em] text-white/40">Pay address</p>
-          <p className="font-mono text-sm text-white break-all">{payment.payAddress}</p>
+          <p className="font-mono text-sm text-white break-all">{payment.payAddress || "—"}</p>
           <div className="flex gap-3 text-[11px]">
-            <button className="text-emerald-300 underline" onClick={() => copyValue(payment.payAddress)}>Copy address</button>
+            <button
+              className="text-emerald-300 underline disabled:text-white/30"
+              onClick={() => payment.payAddress && copyValue(payment.payAddress)}
+              disabled={!payment.payAddress}
+            >
+              Copy address
+            </button>
             <button className="text-emerald-300 underline" onClick={() => copyValue(String(payment.payAmount))}>Copy amount</button>
           </div>
         </div>
