@@ -52,6 +52,16 @@ const METHOD_OPTIONS = [
 
 type MethodId = (typeof METHOD_OPTIONS)[number]["id"];
 
+type NowPaymentDetails = {
+  invoiceUrl?: string | null;
+  qrCode?: string | null;
+  payAddress?: string | null;
+  payAmount: number;
+  payCurrency?: string | null;
+  priceAmount: number;
+  priceCurrency: string;
+};
+
 const doneStatuses = new Set(["confirmed", "failed", "expired", "refunded"]);
 
 export default function WalletTopupPage() {
@@ -148,6 +158,19 @@ export default function WalletTopupPage() {
   }, [intent, method]);
 
   const countdown = useCountdown(status?.expiresAt);
+  const paymentDetails = useMemo<NowPaymentDetails | null>(() => {
+    if (!intent) return null;
+    return {
+      invoiceUrl: intent.invoiceUrl || status?.invoiceUrl,
+      qrCode: status?.qrCode ?? null,
+      payAddress: status?.payAddress ?? null,
+      payAmount: status?.amountCrypto ?? intent.amount,
+      payCurrency: status?.cryptoCurrency ?? status?.network ?? chain,
+      priceAmount: status?.amountFiat ?? intent.amount,
+      priceCurrency: status?.fiatCurrency ?? "GBP"
+    };
+  }, [intent, status, chain]);
+  const paymentStatusLabel = status?.status ?? null;
 
   if (!token) {
     return (

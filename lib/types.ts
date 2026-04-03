@@ -275,6 +275,7 @@ export type TopupRecord = {
   cryptoCurrency?: string | null;
   network?: string | null;
   payAddress?: string | null;
+  qrCode?: string | null;
   invoiceUrl?: string | null;
   expiresAt?: string | null;
   bonusUsdt?: number | null;
