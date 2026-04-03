@@ -24,7 +24,7 @@ const payoutConfigs = {
       { key: "accountName", label: "Account name", placeholder: "GreenHub Ops", required: true },
       { key: "accountNumber", label: "Account number", placeholder: "00000000", required: true },
       { key: "sortCode", label: "Sort code", placeholder: "00-00-00", required: true },
-      { key: "bankName", label: "Bank name", placeholder: "Starling" }
+      { key: "bankName", label: "Bank name", placeholder: "Starling", required: false }
     ]
   },
   crypto: {
@@ -40,7 +40,7 @@ const payoutConfigs = {
     description: "Move balance to another concierge handle or internal account.",
     fields: [
       { key: "handle", label: "Recipient handle", placeholder: "@greenhub", required: true },
-      { key: "memo", label: "Memo", placeholder: "Transfer to concierge" }
+      { key: "memo", label: "Memo", placeholder: "Transfer to concierge", required: false }
     ]
   }
 } as const;
