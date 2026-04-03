@@ -24,6 +24,32 @@ export type WalletTransactionsResponse = {
   data: WalletTransaction[];
 };
 
+export type WithdrawalRequest = {
+  id: number;
+  reference: string;
+  amount: number;
+  currency: string;
+  payoutMethod: string;
+  payoutDetails?: Record<string, unknown> | null;
+  status: string;
+  fee?: number | null;
+  notes?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type WithdrawalListResponse = {
+  data: WithdrawalRequest[];
+  meta?: {
+    pagination?: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+};
+
 export type NotificationRecord = {
   id: number;
   title: string;
@@ -49,8 +75,8 @@ export type OrderItem = {
   title: string;
   quantity: number;
   unitPrice: number;
-  weight?: string | null;
   lineTotal: number;
+  weight?: string | null;
 };
 
 export type OrderRecord = {
@@ -61,6 +87,11 @@ export type OrderRecord = {
   totalAmount: number;
   currency: string;
   createdAt?: string;
+  updatedAt?: string;
+  lockerPostcode?: string | null;
+  lockerEta?: string | null;
+  paymentOption?: string | null;
+  walletDebit?: number | null;
   items?: OrderItem[];
 };
 
@@ -130,4 +161,110 @@ export type ProductsResponse = {
       total: number;
     };
   };
+};
+
+export type StrapiMediaAttributes = {
+  url: string;
+  alternativeText?: string | null;
+  name?: string;
+  formats?: Record<string, { url: string }>;
+};
+
+export type StrapiMedia = {
+  id: number;
+  attributes: StrapiMediaAttributes;
+};
+
+export type StrapiSingleResponse<T> = {
+  data: {
+    id: number;
+    attributes: T;
+  } | null;
+};
+
+export type StrapiListResponse<T> = {
+  data: Array<{
+    id: number;
+    attributes: T;
+  }>;
+};
+
+export type AdminProductRecord = {
+  id: number;
+  title: string;
+  slug: string;
+  description?: string;
+  heroBadge?: string;
+  priceFrom: number;
+  strain?: string;
+  thc?: string;
+  potency?: string;
+  origin?: string;
+  originFlag?: string;
+  weightOptions?: Array<{
+    id?: number;
+    label: string;
+    price: number;
+    unitPrice?: string;
+    featured?: boolean;
+  }>;
+  featuredImage?: {
+    id: number;
+    url: string;
+    name?: string;
+  } | null;
+  gallery?: Array<{
+    id: number;
+    url: string;
+    name?: string;
+  }>;
+  collection?: {
+    id: number;
+    title?: string;
+  } | null;
+};
+
+export type CollectionRecord = {
+  title: string;
+  slug?: string;
+};
+
+export type TopupTier = {
+  id: number;
+  title: string;
+  description?: string | null;
+  minAmountUsdt: number;
+  maxAmountUsdt?: number | null;
+  bonusPercent?: number | null;
+  isActive?: boolean;
+};
+
+export type TopupIntentMeta = {
+  id: number;
+  orderCode: string;
+  invoiceUrl?: string;
+  amount: number;
+  chain: string;
+};
+
+export type TopupIntentResponse = {
+  success: boolean;
+  topup: TopupIntentMeta;
+};
+
+export type TopupRecord = {
+  id?: number;
+  orderCode: string;
+  status: string;
+  amountFiat: number;
+  fiatCurrency: string;
+  amountCrypto?: number | null;
+  cryptoCurrency?: string | null;
+  network?: string | null;
+  payAddress?: string | null;
+  invoiceUrl?: string | null;
+  expiresAt?: string | null;
+  bonusUsdt?: number | null;
+  createdAt?: string;
+  updatedAt?: string;
 };

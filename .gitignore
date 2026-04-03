@@ -1,15 +1,11 @@
 # Local Netlify folder
 .netlify
 .env
+.env.local
+.env.*.local
+.clawhub/
+.openclaw/
+memory/
 newsite/
 oldsite-*/
 uploads/*.zip
-
-# Auto-generated ignores
-node_modules/
-.next/
-.turbo/
-.vercel/
-.openclaw/
-.clawhub/
-memory/

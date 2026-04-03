@@ -1,9 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import Card from "@/components/ui/card";
 import Button from "@/components/ui/button";
 import type { ProductRecord } from "@/lib/types";
 import { getProductListingMeta } from "@/data/fixtures/products";
+import { FavoriteToggle } from "@/components/FavoriteToggle";
 
 interface ProductCardProps {
   product: ProductRecord;
@@ -36,15 +39,24 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
   return (
     <Card className="flex flex-col gap-4 bg-night-950/70 p-5">
       <div className="flex flex-col gap-4 sm:flex-row">
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-night-900/50 sm:w-40">
+        <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-[radial-gradient(circle_at_top,#0d1b13,#050505)] sm:w-40 sm:flex-none">
           {imageUrl ? (
-            <Image src={imageUrl} alt={imageAlt} width={320} height={320} className="h-40 w-full object-cover" />
+            <Image
+              src={imageUrl}
+              alt={imageAlt}
+              fill
+              sizes="(min-width: 640px) 160px, 100vw"
+              className="object-contain p-4"
+            />
           ) : (
-            <div className="flex h-40 w-full items-center justify-center bg-night-900 text-sm text-ink-500">Locker shot</div>
+            <div className="absolute inset-0 flex items-center justify-center text-sm text-white/60">Locker shot</div>
           )}
-          <span className="absolute left-3 top-3 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">
+          <span className="absolute left-3 top-3 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white/80">
             {potency}
           </span>
+          <div className="absolute right-3 top-3">
+            <FavoriteToggle product={product} />
+          </div>
         </div>
         <div className="flex flex-1 flex-col gap-3">
           <div className="space-y-2">

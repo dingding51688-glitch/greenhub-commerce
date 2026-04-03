@@ -48,7 +48,7 @@ export type ProductCardMeta = {
 
 export const productListingMeta: Record<string, ProductCardMeta> = {
   "cereal-milk": {
-    imageUrl: "https://cms.greenhub420.co.uk/uploads/cereal_milk_d6cd5de421.jpg",
+    imageUrl: "/images/products/cereal-milk.jpg",
     imageAlt: "Cereal Milk flower",
     origin: "🇬🇧 Belfast lab",
     rating: 4.9,

@@ -87,15 +87,12 @@ export default function ProductsPage() {
   const hero = productCategoryContent[category];
 
   return (
-    <div className="space-y-8 pb-20">
-      <section className="space-y-4 rounded-3xl border border-white/10 bg-night-950/80 p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">{hero.breadcrumb}</p>
-        <div className="space-y-3">
-          <h1 className="text-3xl font-semibold text-white">{hero.title}</h1>
-          <p className="text-sm text-ink-400">{hero.description}</p>
-          {hero.helper && <p className="text-xs text-ink-500">{hero.helper}</p>}
-        </div>
-      </section>
+    <div className="space-y-6 pb-20">
+      <div className="overflow-x-auto px-6 py-3">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/80 whitespace-nowrap">
+          {hero.breadcrumb}
+        </p>
+      </div>
 
       <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-night-950/60 p-4">
         <div className="flex flex-wrap gap-2">
@@ -104,8 +101,8 @@ export default function ProductsPage() {
               key={tab}
               type="button"
               className={clsx(
-                "rounded-full px-4 py-2 text-sm font-semibold transition",
-                category === tab ? "bg-white text-night-900" : "text-ink-400 hover:text-white"
+                "rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition",
+                category === tab ? "bg-night-900 text-white" : "bg-night-50 text-night-600 hover:text-night-900"
               )}
               onClick={() => handleCategoryChange(tab)}
             >
@@ -120,7 +117,9 @@ export default function ProductsPage() {
               type="button"
               className={clsx(
                 "rounded-full border px-4 py-2 text-xs uppercase tracking-[0.2em]",
-                strain === option ? "border-white text-white" : "border-ink-700 text-ink-400"
+                strain === option
+                  ? "border-night-900 bg-night-900 text-white"
+                  : "border-night-200 bg-night-50 text-night-500 hover:text-night-800"
               )}
               onClick={() => handleFilterChange(option)}
             >
