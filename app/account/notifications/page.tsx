@@ -13,12 +13,12 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { swrFetcher } from "@/lib/api";
 
 const prefSchema = z.object({
-  enableSystem: z.boolean().default(true),
-  enableEmail: z.boolean().default(true),
-  enableTelegram: z.boolean().default(false),
-  enableSms: z.boolean().default(false),
-  quietHoursStart: z.string().default("22:00"),
-  quietHoursEnd: z.string().default("08:00")
+  enableSystem: z.boolean(),
+  enableEmail: z.boolean(),
+  enableTelegram: z.boolean(),
+  enableSms: z.boolean(),
+  quietHoursStart: z.string(),
+  quietHoursEnd: z.string()
 });
 
 export type NotificationPreferenceForm = z.infer<typeof prefSchema>;
