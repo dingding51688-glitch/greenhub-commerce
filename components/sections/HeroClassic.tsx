@@ -12,17 +12,28 @@ export type HeroClassicProps = {
   primaryCta?: HeroLink;
   secondaryCta?: HeroLink;
   stats?: { label: string; value: string }[];
+  bullets?: string[];
+  alignment?: "left" | "center";
+  tone?: "default" | "soft";
 };
 
 export function HeroClassic(props: Partial<HeroClassicProps>) {
   const content = { ...heroClassicContent, ...props } as HeroClassicProps;
+  const alignment = content.alignment ?? "center";
+  const tone = content.tone ?? "default";
+  const sectionClasses = [
+    "relative isolate overflow-hidden rounded-[40px] border border-white/10 px-6 py-12 shadow-card sm:px-12",
+    tone === "soft" ? "bg-[radial-gradient(circle_at_10%_0%,rgba(45,82,62,0.5),rgba(4,10,7,0.95))]" : "bg-hero-gradient"
+  ].join(" ");
+  const textAlignment = alignment === "left" ? "items-start text-left" : "items-center text-center";
+  const ctaAlignment = alignment === "left" ? "sm:justify-start" : "sm:justify-center";
 
   return (
-    <section className="relative isolate overflow-hidden rounded-[40px] border border-white/10 bg-hero-gradient px-6 py-12 shadow-card sm:px-12">
+    <section className={sectionClasses}>
       <div className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(circle at 20% -10%, rgba(19,168,107,0.45), transparent 55%)" }} aria-hidden="true" />
-      <div className="relative z-10 mx-auto flex max-w-4xl flex-col gap-8 text-center">
+      <div className={`relative z-10 mx-auto flex max-w-4xl flex-col gap-8 ${textAlignment}`}>
         {content.highlight && (
-          <span className="inline-flex items-center justify-center self-center rounded-pill border border-white/20 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-[rgba(255,255,255,0.7)]">
+          <span className={`inline-flex items-center justify-center rounded-pill border border-white/20 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-[rgba(255,255,255,0.7)] ${alignment === "left" ? "self-start" : "self-center"}`}>
             {content.highlight}
           </span>
         )}
@@ -38,8 +49,18 @@ export function HeroClassic(props: Partial<HeroClassicProps>) {
           {content.subtitle && (
             <p className="text-base text-[rgba(255,255,255,0.8)] sm:text-lg">{content.subtitle}</p>
           )}
+          {content.bullets && content.bullets.length > 0 && (
+            <ul className="space-y-2 text-sm text-white/80">
+              {content.bullets.map((bullet) => (
+                <li key={bullet} className={`flex w-full items-start gap-3 text-left ${alignment === "center" ? "justify-center" : ""}`}>
+                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-300" aria-hidden="true" />
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+        <div className={`flex w-full flex-col gap-3 sm:flex-row ${ctaAlignment}`}>
           {content.primaryCta && (
             <Link href={content.primaryCta.href} className="w-full sm:w-auto">
               <Button size="lg" className="w-full">

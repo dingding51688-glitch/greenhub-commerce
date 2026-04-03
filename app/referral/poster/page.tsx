@@ -4,7 +4,7 @@ import { forwardRef, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
 import Link from "next/link";
 import { toJpeg, toPng } from "html-to-image";
-import QRCode from "qrcode.react";
+import { QRCodeCanvas } from "qrcode.react";
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
@@ -303,7 +303,7 @@ const PosterPreview = forwardRef<HTMLDivElement, PosterPreviewProps>(
             <p className="text-xs text-white/50">{footerNote}</p>
           </div>
           <div className="ml-auto rounded-3xl border border-white/20 bg-white/5 p-4">
-            <QRCode value={inviteUrl} size={layout === "portrait" ? 150 : 130} bgColor="transparent" fgColor={template.text} includeMargin={false} level="H" />
+            <QRCodeCanvas value={inviteUrl} size={layout === "portrait" ? 150 : 130} bgColor="transparent" fgColor={template.text} includeMargin={false} level="H" />
           </div>
         </div>
       </div>
