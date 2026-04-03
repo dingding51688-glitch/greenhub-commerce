@@ -50,6 +50,8 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
     );
   }
 
+  const items = order.items ?? [];
+
   return (
     <section className="space-y-6">
       <div className="rounded-[40px] border border-white/10 bg-night-950/80 p-6 shadow-card">
@@ -65,8 +67,11 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
 
       <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5">
         <p className="text-xs uppercase tracking-[0.3em] text-white/40">Items</p>
-        <ul className="mt-3 space-y-3">
-          {order.items.map((item) => (
+        {items.length === 0 ? (
+          <p className="mt-3 text-sm text-white/60">No line items available for this order.</p>
+        ) : (
+          <ul className="mt-3 space-y-3">
+            {items.map((item) => (
             <li key={`${item.productId}-${item.weight}`} className="rounded-2xl border border-white/10 px-4 py-3">
               <div className="flex items-center justify-between text-sm text-white/80">
                 <span>{item.title || `Product ${item.productId}`}</span>
@@ -77,8 +82,9 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
                 <span>{currency.format(item.unitPrice)}</span>
               </div>
             </li>
-          ))}
-        </ul>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
