@@ -282,6 +282,7 @@ function HistoryTable({
   page: number;
   onPageChange: (page: number) => void;
 }) {
+  const pageCount = meta?.pageCount ?? 0;
   return (
     <div className="mt-6 space-y-4">
       <div className="divide-y divide-white/10 overflow-hidden rounded-3xl border border-white/10">
@@ -300,7 +301,7 @@ function HistoryTable({
           ))
         )}
       </div>
-      {meta?.pageCount && meta.pageCount > 1 && (
+      {pageCount > 1 && (
         <div className="flex items-center gap-2 text-sm text-white/70">
           <button
             className="rounded-full border border-white/15 px-3 py-1 disabled:opacity-40"
@@ -310,12 +311,12 @@ function HistoryTable({
             Prev
           </button>
           <span>
-            Page {page} / {meta.pageCount}
+            Page {page} / {pageCount}
           </span>
           <button
             className="rounded-full border border-white/15 px-3 py-1 disabled:opacity-40"
-            onClick={() => onPageChange(Math.min(meta.pageCount, page + 1))}
-            disabled={meta.pageCount ? page >= meta.pageCount : false}
+            onClick={() => onPageChange(Math.min(pageCount, page + 1))}
+            disabled={page >= pageCount}
           >
             Next
           </button>
