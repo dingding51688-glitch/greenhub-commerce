@@ -221,7 +221,7 @@ function TemplateControls({ templateId, layout, accent, setTemplateId, setLayout
       <div className="space-y-2">
         <p className="text-xs uppercase tracking-[0.35em] text-white/50">Templates</p>
         <div className="grid gap-3">
-          {(Object.values(templates) as typeof templates["locker"][]).map((tpl) => (
+          {(Object.values(templates) as Array<(typeof templates)[keyof typeof templates]>).map((tpl) => (
             <button
               key={tpl.id}
               className={`rounded-2xl border px-4 py-3 text-left text-sm transition ${templateId === tpl.id ? "border-white bg-white/10 text-white" : "border-white/10 text-white/70 hover:border-white/30"}`}
@@ -259,7 +259,7 @@ function TemplateControls({ templateId, layout, accent, setTemplateId, setLayout
 }
 
 type PosterPreviewProps = {
-  template: typeof templates["locker"];
+  template: (typeof templates)[keyof typeof templates];
   layout: "portrait" | "landscape";
   dimensions: { width: number; height: number };
   accent: string;
