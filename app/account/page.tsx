@@ -37,7 +37,7 @@ const profileSchema = z.object({
       message: "Enter a valid Telegram handle"
     }),
   preferredLocker: z.string().optional().or(z.literal("")),
-  marketingOptIn: z.boolean().default(false)
+  marketingOptIn: z.boolean()
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
