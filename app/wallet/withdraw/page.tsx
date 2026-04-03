@@ -74,22 +74,26 @@ export default function WalletWithdrawPage() {
   const receiveAmount = Math.max(0, amount - fee);
   const amountValid = amount >= MIN_WITHDRAWAL && amount <= available;
 
-  const currentDetails = useMemo(() => {
+  const detailsState = useMemo(() => {
     switch (method) {
       case "bank":
-        return [bankDetails, setBankDetails] as const;
+        return bankDetails;
       case "crypto":
-        return [cryptoDetails, setCryptoDetails] as const;
+        return cryptoDetails;
       case "wallet":
       default:
-        return [walletDetails, setWalletDetails] as const;
+        return walletDetails;
     }
   }, [method, bankDetails, cryptoDetails, walletDetails]);
 
-  const [detailsState, setDetailsState] = currentDetails;
-
   const handleFieldChange = (key: string, value: string) => {
-    setDetailsState((prev: Record<string, string>) => ({ ...prev, [key]: value }));
+    if (method === "bank") {
+      setBankDetails((prev) => ({ ...prev, [key]: value }));
+    } else if (method === "crypto") {
+      setCryptoDetails((prev) => ({ ...prev, [key]: value }));
+    } else {
+      setWalletDetails((prev) => ({ ...prev, [key]: value }));
+    }
   };
 
   const handleNext = () => {
