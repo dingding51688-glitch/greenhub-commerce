@@ -32,6 +32,7 @@ export type NotificationRecord = {
   id: number;
   title: string;
   message: string;
+  type?: string;
   read: boolean;
   createdAt: string;
   metadata?: {
