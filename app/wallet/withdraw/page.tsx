@@ -85,6 +85,7 @@ export default function WalletWithdrawPage() {
         return walletDetails;
     }
   }, [method, bankDetails, cryptoDetails, walletDetails]);
+  const detailsRecord = detailsState as Record<string, string>;
 
   const handleFieldChange = (key: string, value: string) => {
     if (method === "bank") {
@@ -103,7 +104,7 @@ export default function WalletWithdrawPage() {
     }
     if (step === 2) {
       const config = payoutConfigs[method];
-      const missing = config.fields.filter((field) => field.required && !detailsState[field.key]?.toString().trim());
+      const missing = config.fields.filter((field) => field.required && !detailsRecord[field.key]?.toString().trim());
       if (missing.length) {
         setError(`Fill ${missing.map((f) => f.label).join(", ")}`);
         return;
@@ -127,7 +128,7 @@ export default function WalletWithdrawPage() {
       return;
     }
     const config = payoutConfigs[method];
-    const missing = config.fields.filter((field) => field.required && !detailsState[field.key]?.toString().trim());
+    const missing = config.fields.filter((field) => field.required && !detailsRecord[field.key]?.toString().trim());
     if (missing.length) {
       setError(`Fill ${missing.map((f) => f.label).join(", ")}`);
       return;
@@ -139,7 +140,7 @@ export default function WalletWithdrawPage() {
         amount,
         currency: "GBP",
         payoutMethod: method,
-        payoutDetails: detailsState,
+        payoutDetails: detailsRecord,
         note: note.trim() || undefined
       });
       setResult(response.request);
@@ -201,7 +202,7 @@ export default function WalletWithdrawPage() {
                 setMethod(next);
                 setError(null);
               }}
-              details={detailsState}
+              details={detailsRecord}
               onDetailChange={handleFieldChange}
             />
           )}
@@ -211,7 +212,7 @@ export default function WalletWithdrawPage() {
               fee={fee}
               receiveAmount={receiveAmount}
               method={method}
-              details={detailsState}
+              details={detailsRecord}
               note={note}
               onNoteChange={setNote}
             />
