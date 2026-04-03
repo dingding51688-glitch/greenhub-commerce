@@ -3,8 +3,8 @@
 import { forwardRef, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { toJpeg, toPng } from "html-to-image";
-import { QRCodeCanvas } from "qrcode.react";
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
@@ -12,6 +12,11 @@ import { StateMessage } from "@/components/StateMessage";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { getReferralSummary, type ReferralSummary } from "@/lib/referral-api";
 import { deriveTransferId } from "@/lib/wallet-utils";
+
+const QRCode = dynamic(
+  () => import("qrcode.react").then((mod) => mod.QRCodeCanvas ?? mod.default),
+  { ssr: false }
+);
 
 const fallbackSummary: ReferralSummary = {
   code: "LOCKER25",
@@ -303,7 +308,7 @@ const PosterPreview = forwardRef<HTMLDivElement, PosterPreviewProps>(
             <p className="text-xs text-white/50">{footerNote}</p>
           </div>
           <div className="ml-auto rounded-3xl border border-white/20 bg-white/5 p-4">
-            <QRCodeCanvas value={inviteUrl} size={layout === "portrait" ? 150 : 130} bgColor="transparent" fgColor={template.text} includeMargin={false} level="H" />
+            <QRCode value={inviteUrl} size={layout === "portrait" ? 150 : 130} bgColor="transparent" fgColor={template.text} includeMargin={false} level="H" />
           </div>
         </div>
       </div>
