@@ -70,7 +70,7 @@ export default function ReferralPosterPage() {
   const [headline, setHeadline] = useState("Order lockers. Earn cash.");
   const [subline, setSubline] = useState("£0.30 per click + 10% lifetime share");
   const [footerNote, setFooterNote] = useState("Scan to claim locker priority. Use code for extra perks.");
-  const [accent, setAccent] = useState(templates["locker"].accent);
+  const [accent, setAccent] = useState<string>(templates["locker"].accent);
   const [showAvatar, setShowAvatar] = useState(false);
   const [downloadToast, setDownloadToast] = useState<string | null>(null);
 
