@@ -18,11 +18,7 @@ import { getStoredReferralCode } from "@/lib/referral-tracking";
 const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
 const formSchema = z.object({
-  lockerPostcode: z.string().min(4, "Enter locker postcode"),
-  pickupWindow: z.string().min(3, "Provide pickup window").optional(),
-  contactName: z.string().min(2, "Name required"),
-  contactPhone: z.string().min(7, "Phone required"),
-  telegramHandle: z.string().optional(),
+  dropoffPostcode: z.string().min(4, "Enter your postcode"),
   paymentOption: z.enum(["wallet", "nowpayments", "locker"])
 });
 
@@ -36,7 +32,6 @@ export default function CheckoutPage() {
   const presetWeight = searchParams.get("weight");
   const presetQty = Math.max(1, Number(searchParams.get("qty") || "1"));
   const [quantity, setQuantity] = useState(presetQty);
-  const [step, setStep] = useState(1);
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -66,29 +61,10 @@ export default function CheckoutPage() {
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      lockerPostcode: "",
-      pickupWindow: "",
-      contactName: "",
-      contactPhone: "",
-      telegramHandle: "",
+      dropoffPostcode: "",
       paymentOption: "wallet"
     }
   });
-
-  const fieldsPerStep: Record<number, (keyof CheckoutFormValues)[]> = {
-    1: ["lockerPostcode", "pickupWindow"],
-    2: ["contactName", "contactPhone", "telegramHandle"],
-    3: ["paymentOption"]
-  };
-
-  const goNext = async () => {
-    const fields = fieldsPerStep[step];
-    const valid = await form.trigger(fields);
-    if (!valid) return;
-    setStep((prev) => Math.min(3, prev + 1));
-  };
-
-  const goPrev = () => setStep((prev) => Math.max(1, prev - 1));
 
   const onSubmit = async (values: CheckoutFormValues) => {
     if (!product || !selectedOption) {
@@ -108,11 +84,7 @@ export default function CheckoutPage() {
             weight: selectedOption.label
           }
         ],
-        lockerPostcode: values.lockerPostcode,
-        pickupWindow: values.pickupWindow,
-        contactName: values.contactName,
-        contactPhone: values.contactPhone,
-        telegramHandle: values.telegramHandle,
+        dropoffPostcode: values.dropoffPostcode,
         paymentOption: values.paymentOption,
         referralCode: referralCode || undefined
       };
@@ -130,7 +102,7 @@ export default function CheckoutPage() {
     return (
       <StateMessage
         title="Please sign in"
-        body="Log in to select lockers and place orders."
+        body="Log in to share your postcode and place orders."
         actionLabel="Go to login"
         onAction={() => router.push("/login")}
       />
@@ -165,66 +137,25 @@ export default function CheckoutPage() {
         </div>
       )}
 
-      <div className="flex items-center gap-4 text-xs uppercase tracking-[0.35em] text-white/50">
-        {["Locker", "Contact", "Payment"].map((label, index) => {
-          const idx = index + 1;
-          const isActive = step === idx;
-          const isCompleted = step > idx;
-          return (
-            <div key={label} className="flex items-center gap-2">
-              <span
-                className={`flex h-8 w-8 items-center justify-center rounded-full border ${
-                  isCompleted ? "border-emerald-400 text-emerald-200" : isActive ? "border-white text-white" : "border-white/30 text-white/50"
-                }`}
-              >
-                {idx}
-              </span>
-              <span className={isActive ? "text-white" : "text-white/50"}>{label}</span>
-              {idx < 3 && <div className="h-px w-10 bg-white/20" />}
-            </div>
-          );
-        })}
-      </div>
-
       <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
         <div className="space-y-4 rounded-[40px] border border-white/10 bg-night-950/70 p-6">
-          {step === 1 && (
-            <StepCard title="Locker selection" body="Tell concierge where you want to collect.">
-              <FormField label="Locker postcode" error={form.formState.errors.lockerPostcode?.message}>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="BT1 1AA"
-                  {...form.register("lockerPostcode")}
-                />
-              </FormField>
-              <FormField label="Pickup window" error={form.formState.errors.pickupWindow?.message}>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="Tonight 20:00-22:00"
-                  {...form.register("pickupWindow")}
-                />
-              </FormField>
-            </StepCard>
-          )}
+          <header className="space-y-2">
+            <p className="text-xs uppercase tracking-[0.3em] text-white/50">Postcode drop</p>
+            <h1 className="text-2xl font-semibold text-white">We pick the nearest locker</h1>
+            <p className="text-sm text-white/70">Share the postcode closest to you. Concierge assigns the locker and texts you once it’s stocked.</p>
+          </header>
 
-          {step === 2 && (
-            <StepCard title="Contact & billing" body="Concierge needs one contact method for locker support.">
-              <FormField label="Full name" error={form.formState.errors.contactName?.message}>
-                <input type="text" className={inputClass} placeholder="Jane Doe" {...form.register("contactName")} />
-              </FormField>
-              <FormField label="Phone" error={form.formState.errors.contactPhone?.message}>
-                <input type="tel" className={inputClass} placeholder="+44 7700 900000" {...form.register("contactPhone")} />
-              </FormField>
-              <FormField label="Telegram handle" error={form.formState.errors.telegramHandle?.message}>
-                <input type="text" className={inputClass} placeholder="@greenhub_member" {...form.register("telegramHandle")} />
-              </FormField>
-            </StepCard>
-          )}
+          <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField label="Postcode" error={form.formState.errors.dropoffPostcode?.message}>
+              <input
+                type="text"
+                className={inputClass}
+                placeholder="BT1 1AA"
+                {...form.register("dropoffPostcode")}
+              />
+            </FormField>
 
-          {step === 3 && (
-            <StepCard title="Payment" body="Choose how you want to settle this drop.">
+            <FormField label="Payment" error={form.formState.errors.paymentOption?.message}>
               <div className="space-y-3">
                 {[
                   { value: "wallet", label: "Wallet balance" },
@@ -234,7 +165,9 @@ export default function CheckoutPage() {
                   <label
                     key={option.value}
                     className={`flex cursor-pointer items-center gap-3 rounded-3xl border px-4 py-3 ${
-                      form.watch("paymentOption") === option.value ? "border-white text-white" : "border-white/10 text-white/70"
+                      form.watch("paymentOption") === option.value
+                        ? "border-white text-white"
+                        : "border-white/10 text-white/70"
                     }`}
                   >
                     <input type="radio" value={option.value} {...form.register("paymentOption")} />
@@ -242,26 +175,12 @@ export default function CheckoutPage() {
                   </label>
                 ))}
               </div>
-            </StepCard>
-          )}
+            </FormField>
 
-          <div className="flex gap-3">
-            {step > 1 && (
-              <Button type="button" variant="ghost" onClick={goPrev} className="flex-1">
-                Back
-              </Button>
-            )}
-            {step < 3 && (
-              <Button type="button" onClick={goNext} className="flex-1">
-                Continue
-              </Button>
-            )}
-            {step === 3 && (
-              <Button type="button" onClick={form.handleSubmit(onSubmit)} disabled={submitting} className="flex-1">
-                {submitting ? "Submitting…" : "Place order"}
-              </Button>
-            )}
-          </div>
+            <Button type="submit" disabled={submitting} className="w-full">
+              {submitting ? "Submitting…" : "Place order"}
+            </Button>
+          </form>
         </div>
 
         <aside className="space-y-4">
@@ -314,7 +233,7 @@ export default function CheckoutPage() {
           </div>
           <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
             <p className="font-semibold text-white">Need help?</p>
-            <p className="mt-1">Visit the support hub for locker swaps, payment escalations, or concierge chat links. First-time locker user? Read the onboarding guide.</p>
+            <p className="mt-1">Visit the support hub for locker swaps, payment escalations, or concierge chat links. First-time customer? Read the onboarding guide.</p>
             <div className="mt-3 space-y-2">
               <Button asChild variant="ghost" className="w-full">
                 <a href="/support">Open support hub</a>
@@ -327,16 +246,6 @@ export default function CheckoutPage() {
         </aside>
       </div>
     </section>
-  );
-}
-
-function StepCard({ title, body, children }: { title: string; body: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-[32px] border border-white/10 bg-night-900/60 p-5">
-      <p className="text-xs uppercase tracking-[0.3em] text-white/40">{title}</p>
-      <p className="text-sm text-white/60">{body}</p>
-      <div className="mt-4 space-y-4">{children}</div>
-    </div>
   );
 }
 

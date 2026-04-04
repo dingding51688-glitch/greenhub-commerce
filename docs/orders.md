@@ -38,7 +38,7 @@ Hover states on desktop lift the border; on mobile the CTA sits below the summar
 Top of the page displays:
 - Total orders (count of fetched list or fallback sample)
 - Wallet spend (sum of `totalAmount`)
-- Last locker (locker postcode + timestamp of the latest order)
+- Last postcode (saved dropoff postcode + timestamp of the latest order)
 
 These values update as soon as data/filters change.
 

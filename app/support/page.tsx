@@ -74,7 +74,7 @@ export default function SupportPage() {
       <header className="rounded-[40px] border border-white/10 bg-night-950/80 p-6">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Concierge support</p>
         <h1 className="mt-2 text-3xl font-semibold text-white">We’re on locker duty 09:00–21:00 GMT daily</h1>
-        <p className="mt-2 text-sm text-white/70">Telegram is fastest for locker swaps. Email or SMS for escalations. In emergencies, text HELP + locker ID.</p>
+        <p className="mt-2 text-sm text-white/70">Share your postcode at checkout and wait for our SMS; Telegram is fastest once we assign the locker. Email or SMS for escalations. In emergencies, text HELP + order ref.</p>
         <div className="mt-3 flex flex-wrap gap-3">
           <Button asChild variant="secondary" size="sm">
             <Link href="/guide/locker">Locker onboarding guide</Link>

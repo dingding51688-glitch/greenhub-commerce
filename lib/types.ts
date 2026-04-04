@@ -88,7 +88,11 @@ export type OrderRecord = {
   currency: string;
   createdAt?: string;
   updatedAt?: string;
-  lockerPostcode?: string | null;
+  dropoffPostcode?: string | null;
+  lockerAddress?: string | null;
+  lockerAccessCode?: string | null;
+  lockerNotes?: string | null;
+  lockerAssignedAt?: string | null;
   lockerEta?: string | null;
   paymentOption?: string | null;
   walletDebit?: number | null;
@@ -149,19 +153,6 @@ export type ProductRecord = {
   category?: string | null;
   coverImage?: ProductImage | null;
   weightOptions?: WeightOption[];
-};
-
-export type FavoriteProduct = {
-  productId: number;
-  slug: string;
-  title: string;
-  description?: string | null;
-  strain?: string | null;
-  thc?: string | null;
-  potency?: string | null;
-  priceFrom?: number | null;
-  coverImage?: ProductImage | null;
-  addedAt: string;
 };
 
 export type ProductsResponse = {
@@ -275,7 +266,6 @@ export type TopupRecord = {
   cryptoCurrency?: string | null;
   network?: string | null;
   payAddress?: string | null;
-  qrCode?: string | null;
   invoiceUrl?: string | null;
   expiresAt?: string | null;
   bonusUsdt?: number | null;

@@ -1,0 +1,88 @@
+* Host philip-gotta-bibliographic-edge.trycloudflare.com:443 was resolved.
+* IPv6: 2606:4700::6810:e784, 2606:4700::6810:e684
+* IPv4: 104.16.230.132, 104.16.231.132
+*   Trying 104.16.230.132:443...
+* Connected to philip-gotta-bibliographic-edge.trycloudflare.com (104.16.230.132) port 443
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/ssl/certs/ca-certificates.crt
+*  CApath: /etc/ssl/certs
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [19 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2548 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [80 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [52 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [52 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384 / X25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=trycloudflare.com
+*  start date: Feb 11 18:11:54 2026 GMT
+*  expire date: May 12 19:11:35 2026 GMT
+*  subjectAltName: host "philip-gotta-bibliographic-edge.trycloudflare.com" matched cert's "*.trycloudflare.com"
+*  issuer: C=US; O=Google Trust Services; CN=WE1
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA256
+*   Certificate level 1: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 2: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using ecdsa-with-SHA384
+} [5 bytes data]
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://philip-gotta-bibliographic-edge.trycloudflare.com/api/orders/ORD-1775295285051-2/locker
+* [HTTP/2] [1] [:method: PUT]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: philip-gotta-bibliographic-edge.trycloudflare.com]
+* [HTTP/2] [1] [:path: /api/orders/ORD-1775295285051-2/locker]
+* [HTTP/2] [1] [user-agent: curl/8.5.0]
+* [HTTP/2] [1] [accept: */*]
+* [HTTP/2] [1] [content-type: application/json]
+* [HTTP/2] [1] [x-admin-token: 08e2cbc8c4479dd0a6745220cebbaf2d8c26f0026c8df1ebc9cce7316ea88a47]
+* [HTTP/2] [1] [content-length: 90]
+} [5 bytes data]
+> PUT /api/orders/ORD-1775295285051-2/locker HTTP/2
+> Host: philip-gotta-bibliographic-edge.trycloudflare.com
+> User-Agent: curl/8.5.0
+> Accept: */*
+> Content-Type: application/json
+> x-admin-token: 08e2cbc8c4479dd0a6745220cebbaf2d8c26f0026c8df1ebc9cce7316ea88a47
+> Content-Length: 90
+> 
+} [90 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [230 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [230 bytes data]
+* old SSL session ID is stale, removing
+{ [5 bytes data]
+< HTTP/2 200 
+< date: Sat, 04 Apr 2026 09:36:25 GMT
+< content-type: application/json; charset=utf-8
+< content-length: 202
+< cf-ray: 9e6f540e6a11eb1c-MAN
+< cf-cache-status: DYNAMIC
+< server: cloudflare
+< strict-transport-security: max-age=31536000; includeSubDomains
+< vary: Origin
+< access-control-allow-credentials: true
+< content-security-policy: connect-src 'self' https:;img-src 'self' data: blob: https://market-assets.strapi.io;media-src 'self' data: blob:;default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline'
+< referrer-policy: no-referrer
+< x-content-type-options: nosniff
+< x-dns-prefetch-control: off
+< x-download-options: noopen
+< x-frame-options: SAMEORIGIN
+< x-permitted-cross-domain-policies: none
+< x-powered-by: Strapi <strapi.io>
+< 
+{ [202 bytes data]
+* Connection #0 to host philip-gotta-bibliographic-edge.trycloudflare.com left intact
+{"success":true,"order":{"id":7,"reference":"ORD-1775295285051-2","lockerAddress":"123 Locker St","lockerAccessCode":"CODE123","lockerNotes":"24/7 access","lockerAssignedAt":"2026-04-04T09:36:22.905Z"}}

@@ -8,7 +8,7 @@ export const ordersFixture: OrderRecord[] = [
     totalAmount: 185,
     currency: "GBP",
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
-    lockerPostcode: "BT7 1NN",
+    dropoffPostcode: "BT7 1NN",
     paymentOption: "wallet",
     items: [
       {
@@ -36,7 +36,7 @@ export const ordersFixture: OrderRecord[] = [
     totalAmount: 95,
     currency: "GBP",
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),
-    lockerPostcode: "BT1 3AB",
+    dropoffPostcode: "BT1 3AB",
     paymentOption: "nowpayments",
     items: [
       {
@@ -56,7 +56,7 @@ export const ordersFixture: OrderRecord[] = [
     totalAmount: 60,
     currency: "GBP",
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-    lockerPostcode: "BT9 5DL",
+    dropoffPostcode: "BT9 5DL",
     paymentOption: "wallet",
     items: [
       {
