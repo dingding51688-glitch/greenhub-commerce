@@ -7,8 +7,8 @@ const prepSteps = [
     detail: "Top up at least £20 and copy your Transfer ID. You’ll need it in every payment reference."
   },
   {
-    title: "Pick your locker",
-    detail: "At checkout enter the postcode closest to you. We hold lockers for 120 minutes once the parcel is ready."
+    title: "Share your postcode",
+    detail: "At checkout just enter the postcode closest to you. Concierge matches the nearest locker and holds it for 120 minutes once the parcel is ready."
   },
   {
     title: "Choose payment",

@@ -1,7 +1,5 @@
 import { getStoredToken } from "@/lib/auth-store";
-import type { OrderRecord as OrderRecordType } from "@/lib/types";
-
-export type OrderRecord = OrderRecordType;
+import type { OrderRecord } from "@/lib/types";
 
 const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
@@ -41,12 +39,9 @@ export type OrderItemInput = {
 
 export type CreateOrderPayload = {
   items: OrderItemInput[];
-  lockerPostcode?: string;
-  pickupWindow?: string;
-  contactName?: string;
-  contactPhone?: string;
-  telegramHandle?: string;
+  dropoffPostcode: string;
   paymentOption?: string;
+  referralCode?: string;
 };
 
 export type OrderItem = {

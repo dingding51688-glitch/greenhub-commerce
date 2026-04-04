@@ -17,6 +17,8 @@ const withDevCustomerId = (path: string) => {
   }
 };
 
+const PUBLIC_ENDPOINT_PREFIXES = ["/api/products", "/api/collections"];
+
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   if (!BASE_URL) {
     throw new Error("NEXT_PUBLIC_API_BASE_URL is not configured");
@@ -27,7 +29,10 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   if (!headers.has("Accept")) headers.set("Accept", "application/json");
   const runtimeToken = getStoredToken();
   const authToken = runtimeToken || API_TOKEN;
-  if (authToken) headers.set("Authorization", `Bearer ${authToken}`);
+  const shouldSkipAuth = PUBLIC_ENDPOINT_PREFIXES.some((prefix) => finalPath.startsWith(prefix));
+  if (!shouldSkipAuth && authToken) {
+    headers.set("Authorization", `Bearer ${authToken}`);
+  }
 
   const normalizedBase = BASE_URL.replace(/\/$/, "");
   const response = await fetch(`${normalizedBase}${finalPath}`, {

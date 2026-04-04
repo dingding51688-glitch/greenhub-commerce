@@ -1,7 +1,12 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:1338";
+import { resolveServerBase } from "@/lib/server-base";
+
+const RAW_API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const FALLBACK_DIRECT = process.env.STRAPI_DIRECT_URL || "http://127.0.0.1:1337";
+const API_BASE = RAW_API_BASE ? resolveServerBase(RAW_API_BASE, { fallback: FALLBACK_DIRECT }) : FALLBACK_DIRECT;
 
 export async function serverFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const url = `${API_BASE}${path}`;
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const url = `${API_BASE}${normalizedPath}`;
   const res = await fetch(url, {
     ...init,
     headers: {

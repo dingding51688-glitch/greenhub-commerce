@@ -63,7 +63,7 @@ export default function OrdersPage() {
   const selectedFilter = FILTERS.find((filter) => filter.id === filterId) ?? FILTERS[0];
   const filteredOrders = useMemo(() => {
     if (selectedFilter.id === "all") return orders;
-    const statuses = new Set<string>(selectedFilter.statuses as readonly string[]);
+    const statuses = new Set(selectedFilter.statuses);
     return orders.filter((order) => statuses.has(order.status));
   }, [orders, selectedFilter]);
 
@@ -74,7 +74,7 @@ export default function OrdersPage() {
     .slice()
     .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())[0];
 
-  const lastLocker = latestOrder?.lockerPostcode || "Assigned on pickup";
+  const lastPostcode = latestOrder?.dropoffPostcode || "Assigned";
   const lastOrderAt = latestOrder?.createdAt ? DATE_FMT.format(new Date(latestOrder.createdAt)) : "—";
 
   if (!token) {
@@ -82,7 +82,7 @@ export default function OrdersPage() {
       <section className="space-y-6 px-4 py-10">
         <StateMessage
           title="Please sign in"
-          body="Log in to review locker orders and invoices."
+          body="Log in to review your orders and invoices."
           actionLabel="Go to login"
           onAction={() => router.push("/login")}
         />
@@ -94,11 +94,11 @@ export default function OrdersPage() {
     <section className="space-y-8 px-4 py-10">
       <header className="space-y-3">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Orders</p>
-        <h1 className="text-3xl font-semibold text-white">Locker history</h1>
-        <p className="text-sm text-white/70">Track every locker booking, payment, and dispatch in one place.</p>
+        <h1 className="text-3xl font-semibold text-white">Order history</h1>
+        <p className="text-sm text-white/70">Track every postcode request, payment, and dispatch in one place.</p>
       </header>
 
-      <SummaryRow totalOrders={totalOrders} totalSpend={totalSpend} lastLocker={lastLocker} lastOrderAt={lastOrderAt} />
+      <SummaryRow totalOrders={totalOrders} totalSpend={totalSpend} lastPostcode={lastPostcode} lastOrderAt={lastOrderAt} />
 
       <FilterRow
         filterId={filterId}
@@ -128,7 +128,7 @@ export default function OrdersPage() {
         <StateMessage
           variant="empty"
           title={filterId === "all" ? "No orders yet" : "Nothing matches this filter"}
-          body="Browse the menu to start a locker order."
+          body="Browse the menu to start a postcode request."
           actionLabel="Shop now"
           onAction={() => router.push("/products")}
         />
@@ -148,18 +148,18 @@ export default function OrdersPage() {
 function SummaryRow({
   totalOrders,
   totalSpend,
-  lastLocker,
+  lastPostcode,
   lastOrderAt
 }: {
   totalOrders: number;
   totalSpend: number;
-  lastLocker: string;
+  lastPostcode: string;
   lastOrderAt: string;
 }) {
   const cards = [
     { label: "Total orders", value: totalOrders.toString() },
     { label: "Wallet spend", value: GBP.format(totalSpend) },
-    { label: "Last locker", value: `${lastLocker} · ${lastOrderAt}` }
+    { label: "Last postcode", value: `${lastPostcode} · ${lastOrderAt}` }
   ];
   return (
     <div className="grid gap-4 md:grid-cols-3">
@@ -282,7 +282,7 @@ function OrderCard({ order }: { order: OrderRecord }) {
         )}
       </div>
       <div className="flex flex-wrap items-center gap-3 text-xs text-white/60">
-        <span>Pickup: {order.lockerPostcode || "Assigned"}</span>
+        <span>Postcode: {order.dropoffPostcode || "Assigned"}</span>
         {order.paymentOption && <span>Payment: {order.paymentOption}</span>}
         <Link
           href={`/orders/${order.reference}`}

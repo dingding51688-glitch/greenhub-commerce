@@ -1,6 +1,8 @@
+import { resolveServerBase } from "@/lib/server-base";
 import { NextResponse } from "next/server";
 
-const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const RAW_AUTH_BASE = process.env.NEXT_PUBLIC_AUTH_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const AUTH_BASE = RAW_AUTH_BASE ? resolveServerBase(RAW_AUTH_BASE) : "";
 
 export async function GET(request: Request) {
   if (!AUTH_BASE) {
