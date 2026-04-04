@@ -4,8 +4,8 @@ import path from "node:path";
 
 const BASE_URL = process.env.QA_BASE_URL || "https://parade-displays-saturn-courier.trycloudflare.com";
 const STRAPI_BASE_URL = process.env.QA_STRAPI_BASE_URL || process.env.STRAPI_BASE_URL || BASE_URL;
-const ACCOUNT = process.env.QA_ACCOUNT || "test2@greenhub.co.uk";
-const PASSWORD = process.env.QA_PASSWORD || "TestPass123!";
+const ACCOUNT = process.env.QA_ACCOUNT;
+const PASSWORD = process.env.QA_PASSWORD;
 const ADMIN_TOKEN = process.env.QA_ADMIN_TOKEN || process.env.ADMIN_API_TOKEN;
 const evidenceRoot = path.resolve("./docs/tests/evidence/2026-04-04/gui-postcode");
 const harPath = path.join(evidenceRoot, "gui-postcode.har");
@@ -22,6 +22,10 @@ const screenshots = {
 const escapeRegExp = (value) => value.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
 
 await fs.mkdir(evidenceRoot, { recursive: true });
+
+if (!ACCOUNT || !PASSWORD) {
+  throw new Error("QA_ACCOUNT and QA_PASSWORD must be set in the environment");
+}
 
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({
