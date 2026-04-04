@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import Button from "@/components/ui/button";
 import { StateMessage } from "@/components/StateMessage";
+import { Skeleton } from "@/components/Skeleton";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useNotifications } from "@/components/providers/NotificationProvider";
 import {
@@ -15,6 +16,7 @@ import {
   type CommissionTransaction,
   type ReferralEvent,
   type ReferralSummary,
+  type ReferredCustomer,
 } from "@/lib/referral-api";
 import { consumeClickError, getLastTrackedClickTime } from "@/lib/referral-tracking";
 
@@ -27,6 +29,7 @@ const fallbackSummary: ReferralSummary = {
   activeLockers: 5,
   bonusEarned: 180,
   clicks: 320,
+  validClicks: 95,
   clickPayoutTotal: 96,
   registrations: 18,
   topups: 9,
@@ -34,6 +37,11 @@ const fallbackSummary: ReferralSummary = {
   ctr: 0.12,
   impressions: 2600,
   monthCommission: 42,
+  totalOrderValue: 2120,
+  totalConverted: 18,
+  totalCommission: 340.5,
+  thirtyDayCommission: 52.3,
+  customers: [],
 };
 
 const fallbackInvites: ReferralEvent[] = [
@@ -79,8 +87,6 @@ export default function ReferralPage() {
   const commissionRows = commissionError ? fallbackCommissions : commissionData?.data || [];
   const commissionMeta = commissionData?.meta?.pagination;
   const commissionAlert = notifications.find((notification) => notification.type === "commission_award" && !notification.read);
-  const clickCommission = summary.clickPayoutTotal;
-  const purchaseCommission = Math.max(0, summary.bonusEarned - summary.clickPayoutTotal);
 
   const shareText = encodeURIComponent("Join my Bloom locker. Use my invite link for priority drops!");
   const shareUrl = encodeURIComponent(summary.link);
@@ -98,21 +104,12 @@ export default function ReferralPage() {
     }
   };
 
-
   useEffect(() => {
     const ts = getLastTrackedClickTime();
     if (ts) setLastClickTime(ts);
     const hasError = consumeClickError();
     if (hasError) setClickWarning(true);
   }, []);
-  const statCards = useMemo(
-    () => [
-      { label: "Clicks", value: summary.clicks.toString(), sub: `CTR ${(summary.ctr * 100).toFixed(1)}%` },
-      { label: "Registrations / Topups", value: `${summary.registrations} / ${summary.topups}`, sub: `Conversion ${(summary.conversionRate * 100).toFixed(1)}%` },
-      { label: "Lifetime commission", value: currency.format(summary.bonusEarned), sub: `£${clickCommission.toFixed(2)} clicks · £${purchaseCommission.toFixed(2)} orders` },
-    ],
-    [summary, clickCommission, purchaseCommission]
-  );
 
   if (!token) {
     return (
@@ -127,35 +124,35 @@ export default function ReferralPage() {
 
   return (
     <section className="space-y-8">
+      {/* Header + Invite Link */}
       <header className="rounded-[40px] border border-white/10 bg-night-950/80 p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">Referral locker</p>
             <h1 className="text-3xl font-semibold text-white">Share your invite, earn commission</h1>
-            <p className="text-sm text-white/60">Each locker you activate earns 10% credit after their first drop.</p>
+            <p className="text-sm text-white/60">
+              Every referred customer earns you <strong>10% of every order</strong> they place — no cap, no expiry.
+              Plus <strong>£0.30</strong> per unique click.
+            </p>
           </div>
           <div className="rounded-3xl border border-white/15 bg-white/5 p-4 text-sm text-white/80">
             <p className="text-xs uppercase tracking-[0.3em] text-white/40">Invite link</p>
             <p className="mt-1 break-words font-mono text-white">{summary.link}</p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <Button size="sm" onClick={handleCopy}>
-                Copy link
+              <Button size="sm" onClick={handleCopy}>Copy link</Button>
+              <Button asChild variant="secondary" size="sm">
+                <a href={telegramShare} target="_blank" rel="noreferrer">Share Telegram</a>
               </Button>
               <Button asChild variant="secondary" size="sm">
-                <a href={telegramShare} target="_blank" rel="noreferrer">
-                  Share Telegram
-                </a>
-              </Button>
-              <Button asChild variant="secondary" size="sm">
-                <a href={whatsappShare} target="_blank" rel="noreferrer">
-                  Share WhatsApp
-                </a>
+                <a href={whatsappShare} target="_blank" rel="noreferrer">Share WhatsApp</a>
               </Button>
             </div>
             {copyToast && <p className="mt-2 text-xs text-emerald-200">{copyToast}</p>}
           </div>
         </div>
       </header>
+
+      {/* Alerts */}
       {commissionAlert && (
         <div className="rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
           <p className="font-semibold">{commissionAlert.title}</p>
@@ -164,24 +161,78 @@ export default function ReferralPage() {
       )}
       {clickWarning && (
         <div className="rounded-3xl border border-yellow-400/40 bg-yellow-400/10 p-3 text-sm text-yellow-100">
-          We couldn’t record the latest click. Please refresh and try again.
+          We couldn&apos;t record the latest click. Please refresh and try again.
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        {statCards.map((card) => (
-          <div key={card.label} className="rounded-3xl border border-white/10 bg-card p-4">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/50">{card.label}</p>
-            <p className="mt-2 text-3xl font-semibold text-white">{card.value}</p>
-            {card.sub && <p className="text-sm text-white/60">{card.sub}</p>}
-          </div>
-        ))}
-      </div>
-      <p className="text-sm text-white/60">Every unique click pays £0.30. Every friend checkout generates 10% wallet credit — rewards never expire.</p>
-      {lastClickTime && (
-        <p className="text-xs text-white/50">Last click recorded {new Date(lastClickTime).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}</p>
+      {/* Summary Cards */}
+      {summaryLoading ? (
+        <div className="grid gap-4 sm:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="rounded-3xl border border-white/10 bg-card p-4">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="mt-2 h-8 w-24" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-5">
+          <SummaryCard label="Total clicks" value={summary.clicks.toString()} sub={`${summary.validClicks} valid (paid)`} />
+          <SummaryCard label="Valid clicks" value={summary.validClicks.toString()} sub={`£${summary.clickPayoutTotal.toFixed(2)} earned`} />
+          <SummaryCard label="Commission earned" value={currency.format(summary.totalCommission)} sub={`${currency.format(summary.thirtyDayCommission)} last 30 days`} />
+          <SummaryCard label="Total referred spend" value={currency.format(summary.totalOrderValue)} sub={`${summary.totalConverted} customer${summary.totalConverted !== 1 ? "s" : ""}`} />
+          <SummaryCard label="Active lockers" value={summary.activeLockers.toString()} sub={`${summary.registrations} registered`} />
+        </div>
       )}
 
+      <p className="text-sm text-white/60">
+        Every unique click pays £0.30. Every friend&apos;s checkout generates <strong>10% wallet credit</strong> — rewards never expire.
+      </p>
+      {lastClickTime && (
+        <p className="text-xs text-white/50">
+          Last click recorded {new Date(lastClickTime).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}
+        </p>
+      )}
+
+      {/* Referred Customers Table */}
+      {summary.customers && summary.customers.length > 0 && (
+        <div className="rounded-[40px] border border-white/10 bg-night-950/70 p-6">
+          <p className="mb-4 text-xs uppercase tracking-[0.3em] text-white/50">Referred customers</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-white/80">
+              <thead className="text-white/50">
+                <tr>
+                  <th className="py-2">Customer</th>
+                  <th>Orders</th>
+                  <th>Total spend</th>
+                  <th>Commission</th>
+                  <th>Last order</th>
+                </tr>
+              </thead>
+              <tbody>
+                {summary.customers.map((customer) => (
+                  <tr key={customer.id} className="border-t border-white/10">
+                    <td className="py-2">{customer.email}</td>
+                    <td>{customer.orders}</td>
+                    <td>{currency.format(customer.orderValue)}</td>
+                    <td>{currency.format(customer.commission)}</td>
+                    <td>
+                      {customer.lastOrderAt
+                        ? new Date(customer.lastOrderAt).toLocaleString("en-GB", {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          })
+                        : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Invites + Commission History */}
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-[40px] border border-white/10 bg-night-950/70 p-6">
           <div className="mb-4 flex items-center justify-between">
@@ -220,12 +271,13 @@ export default function ReferralPage() {
         </div>
       </div>
 
+      {/* How it works */}
       <div className="rounded-[40px] border border-white/10 bg-night-950/60 p-6">
         <h2 className="text-2xl font-semibold text-white">How referrals work</h2>
         <ol className="mt-3 list-decimal space-y-2 pl-6 text-sm text-white/70">
-          <li>Share your invite link with trusted friends.</li>
-          <li>They verify with concierge, unlocking their first locker.</li>
-          <li>After their first successful drop, 10% of their spend appears in your wallet.</li>
+          <li>Share your invite link with friends.</li>
+          <li>Each unique click earns you <strong>£0.30</strong> instantly.</li>
+          <li>When they register and place orders, you earn <strong>10% of every order</strong> — forever.</li>
         </ol>
         <div className="mt-4 flex flex-wrap gap-3">
           <Button asChild>
@@ -240,10 +292,21 @@ export default function ReferralPage() {
   );
 }
 
+/* ──────────── Sub-components ──────────── */
+
+function SummaryCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <div className="rounded-3xl border border-white/10 bg-card p-4">
+      <p className="text-xs uppercase tracking-[0.3em] text-white/50">{label}</p>
+      <p className="mt-2 text-3xl font-semibold text-white">{value}</p>
+      {sub && <p className="text-sm text-white/60">{sub}</p>}
+    </div>
+  );
+}
 
 function CommissionTable({ rows }: { rows: CommissionTransaction[] }) {
   if (rows.length === 0) {
-    return <StateMessage variant="empty" title="No commissions yet" body="Share your link or remind friends to top up." />;
+    return <StateMessage variant="empty" title="No commissions yet" body="Share your link — commissions appear when friends order." />;
   }
   return (
     <div className="overflow-x-auto">
@@ -310,9 +373,7 @@ function HistoryTable({
           >
             Prev
           </button>
-          <span>
-            Page {page} / {pageCount}
-          </span>
+          <span>Page {page} / {pageCount}</span>
           <button
             className="rounded-full border border-white/15 px-3 py-1 disabled:opacity-40"
             onClick={() => onPageChange(Math.min(pageCount, page + 1))}

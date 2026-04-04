@@ -21,6 +21,15 @@ async function referralFetch<T>(path: string, init?: RequestInit): Promise<T> {
   return (payload?.data ?? payload) as T;
 }
 
+export type ReferredCustomer = {
+  id: number;
+  email: string;
+  orders: number;
+  orderValue: number;
+  commission: number;
+  lastOrderAt: string | null;
+};
+
 export type ReferralSummary = {
   code: string;
   link: string;
@@ -28,6 +37,7 @@ export type ReferralSummary = {
   activeLockers: number;
   bonusEarned: number;
   clicks: number;
+  validClicks: number;
   clickPayoutTotal: number;
   registrations: number;
   topups: number;
@@ -35,10 +45,15 @@ export type ReferralSummary = {
   ctr: number;
   impressions?: number;
   monthCommission?: number;
+  totalOrderValue: number;
+  totalConverted: number;
+  totalCommission: number;
+  thirtyDayCommission: number;
+  customers: ReferredCustomer[];
 };
 
 export async function getReferralSummary() {
-  return referralFetch<ReferralSummary>("/api/referrals/me");
+  return referralFetch<ReferralSummary>("/api/account/referrals/summary");
 }
 
 export type ReferralEvent = {
