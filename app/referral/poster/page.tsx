@@ -124,15 +124,15 @@ export default function ReferralPosterPage() {
   const shareHref = `https://t.me/share/url?url=${encodeURIComponent(inviteUrl)}&text=${shareText}`;
 
   return (
-    <section className="space-y-8 px-4 py-10">
-      <header className="space-y-3">
-        <p className="text-xs uppercase tracking-[0.35em] text-white/50">Referral toolkit</p>
-        <h1 className="text-3xl font-semibold text-white">Generate a shareable poster</h1>
-        <p className="text-sm text-white/70">Drop your invite link + Transfer ID into eye-catching artwork ready for Telegram, Discord, or Instagram stories.</p>
+    <section className="space-y-6 px-4 py-8">
+      <header className="space-y-2">
+        <Link href="/referral" className="text-xs text-white/40 hover:text-white/60">← Back to referral dashboard</Link>
+        <h1 className="text-2xl font-semibold text-white sm:text-3xl">Generate a shareable poster</h1>
+        <p className="text-sm leading-relaxed text-white/70">Drop your invite link + Transfer ID into eye-catching artwork ready for Telegram, Discord, or Instagram stories.</p>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-        <div className="space-y-5 rounded-[32px] border border-white/10 bg-card p-6 shadow-card">
+      <div className="grid gap-4 lg:grid-cols-[2fr,1fr]">
+        <div className="space-y-5 rounded-3xl border border-white/10 bg-card p-4 shadow-card sm:p-6">
           <TemplateControls
             templateId={templateId}
             layout={layout}
@@ -163,12 +163,12 @@ export default function ReferralPosterPage() {
             </label>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <Button onClick={() => handleDownload("png")}>Download PNG</Button>
-            <Button variant="secondary" onClick={() => handleDownload("jpeg")}>
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+            <Button onClick={() => handleDownload("png")} className="w-full min-h-[48px] sm:w-auto">Download PNG</Button>
+            <Button variant="secondary" onClick={() => handleDownload("jpeg")} className="w-full min-h-[48px] sm:w-auto">
               Download JPEG
             </Button>
-            <Button variant="ghost" asChild>
+            <Button variant="ghost" asChild className="w-full min-h-[48px] sm:w-auto">
               <a href={shareHref} target="_blank" rel="noreferrer">
                 Share to Telegram
               </a>
@@ -177,7 +177,7 @@ export default function ReferralPosterPage() {
           </div>
         </div>
 
-        <div className="space-y-5 rounded-[32px] border border-white/10 bg-card p-6 text-sm text-white/70">
+        <div className="space-y-4 rounded-3xl border border-white/10 bg-card p-4 text-sm text-white/70 sm:space-y-5 sm:p-6">
           <p className="text-xs uppercase tracking-[0.35em] text-white/40">Card preview</p>
           <p>Invite link: <span className="font-mono text-white">{inviteUrl}</span></p>
           <p>Transfer ID: <span className="font-mono text-white">{transferId || "—"}</span></p>
@@ -188,7 +188,7 @@ export default function ReferralPosterPage() {
         </div>
       </div>
 
-      <div className="overflow-auto">
+      <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
         <div className="flex justify-center">
           <PosterPreview
             ref={posterRef}
@@ -245,7 +245,7 @@ function TemplateControls({ templateId, layout, accent, setTemplateId, setLayout
           <select
             value={layout}
             onChange={(e) => setLayout(e.target.value as "portrait" | "landscape")}
-            className="rounded-full border border-white/20 bg-transparent px-4 py-2 text-white"
+            className="min-h-[44px] w-full rounded-full border border-white/20 bg-transparent px-4 py-2 text-white"
           >
             <option value="portrait" className="bg-black">Portrait</option>
             <option value="landscape" className="bg-black">Landscape</option>

@@ -139,30 +139,30 @@ export default function CommissionHubPage() {
 
   return (
     <section className="space-y-8">
-      <header className="rounded-[40px] border border-white/10 bg-night-950/80 p-6">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <header className="rounded-3xl border border-white/10 bg-night-950/80 p-4 sm:rounded-[40px] sm:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">Commission Hub</p>
-            <h1 className="text-3xl font-semibold text-white">Share products and earn cash rewards</h1>
+            <h1 className="text-2xl font-semibold text-white sm:text-3xl">Share products and earn cash rewards</h1>
             <p className="text-sm text-white/60">Invite trusted friends and earn every time they buy.</p>
           </div>
-          <div className="rounded-3xl border border-white/15 bg-white/5 p-4 text-sm text-white/80">
+          <div className="rounded-2xl border border-white/15 bg-white/5 p-4 text-sm text-white/80 sm:rounded-3xl">
             <p className="text-xs uppercase tracking-[0.3em] text-white/40">Invite link</p>
-            <p className="mt-1 break-words font-mono text-white">{summaryLink || "Link pending"}</p>
+            <p className="mt-1 break-all font-mono text-sm text-white">{summaryLink || "Link pending"}</p>
             <p className="mt-2 text-xs text-white/60">Referral code: {referralCode || "—"}</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Button size="sm" onClick={handleCopy} disabled={!summaryLink}>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <Button size="sm" onClick={handleCopy} disabled={!summaryLink} className="min-h-[44px] w-full sm:w-auto">
                 Copy link
               </Button>
               {telegramShare ? (
-                <Button asChild variant="secondary" size="sm">
+                <Button asChild variant="secondary" size="sm" className="min-h-[44px] w-full sm:w-auto">
                   <a href={telegramShare} target="_blank" rel="noreferrer">
                     Share Telegram
                   </a>
                 </Button>
               ) : null}
               {whatsappShare ? (
-                <Button asChild variant="secondary" size="sm">
+                <Button asChild variant="secondary" size="sm" className="min-h-[44px] w-full sm:w-auto">
                   <a href={whatsappShare} target="_blank" rel="noreferrer">
                     Share WhatsApp
                   </a>
@@ -187,11 +187,11 @@ export default function CommissionHubPage() {
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-3">
         {statCards.map((card) => (
-          <div key={card.label} className="rounded-3xl border border-white/10 bg-card p-4">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/50">{card.label}</p>
-            <p className="mt-2 text-3xl font-semibold text-white">{card.value}</p>
+          <div key={card.label} className="rounded-2xl border border-white/10 bg-card p-4 sm:rounded-3xl">
+            <p className="text-[11px] uppercase tracking-[0.25em] text-white/50 sm:text-xs sm:tracking-[0.3em]">{card.label}</p>
+            <p className="mt-1.5 text-2xl font-semibold text-white sm:mt-2 sm:text-3xl">{card.value}</p>
             {card.sub && <p className="text-sm text-white/60">{card.sub}</p>}
           </div>
         ))}
@@ -205,9 +205,9 @@ export default function CommissionHubPage() {
 
       <TasksPanel tasks={tasks} />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-[40px] border border-white/10 bg-night-950/70 p-6">
-          <div className="mb-4 flex items-center justify-between">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-3xl border border-white/10 bg-night-950/70 p-4 sm:rounded-[40px] sm:p-6">
+          <div className="mb-3 flex items-center justify-between sm:mb-4">
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">Conversions</p>
           </div>
           <HistoryTable
@@ -223,11 +223,11 @@ export default function CommissionHubPage() {
             }))}
           />
         </div>
-        <div className="rounded-[40px] border border-white/10 bg-night-950/70 p-6">
-          <div className="mb-4 flex items-center justify-between">
+        <div className="rounded-3xl border border-white/10 bg-night-950/70 p-4 sm:rounded-[40px] sm:p-6">
+          <div className="mb-3 flex items-center justify-between sm:mb-4">
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">Commission history</p>
             <Button size="sm" variant="ghost" onClick={() => router.push("/dashboard")}>
-              View dashboard
+              Dashboard
             </Button>
           </div>
           <CommissionTable rows={history} />
@@ -242,8 +242,8 @@ export default function CommissionHubPage() {
 function TasksPanel({ tasks }: { tasks: CommissionHubTask[] }) {
   if (!tasks.length) return null;
   return (
-    <div className="rounded-[40px] border border-white/10 bg-night-950/70 p-6">
-      <p className="mb-4 text-xs uppercase tracking-[0.3em] text-white/50">Tasks</p>
+    <div className="rounded-3xl border border-white/10 bg-night-950/70 p-4 sm:rounded-[40px] sm:p-6">
+      <p className="mb-3 text-xs uppercase tracking-[0.3em] text-white/50 sm:mb-4">Tasks</p>
       <div className="space-y-3">
         {tasks.map((task) => (
           <article key={task.id} className="rounded-3xl border border-white/10 bg-[#0b0b0b] p-4">
@@ -278,9 +278,9 @@ function CommissionTable({ rows }: { rows: CommissionTransaction[] }) {
     return <StateMessage variant="empty" title="No commissions yet" body="Share your link or remind friends to top up." />;
   }
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left text-sm text-white/80">
-        <thead className="text-white/50">
+    <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+      <table className="w-full min-w-[400px] text-left text-sm text-white/80">
+        <thead className="text-[11px] uppercase tracking-wider text-white/50 sm:text-xs">
           <tr>
             <th className="py-2">Amount</th>
             <th>Type</th>
@@ -291,10 +291,10 @@ function CommissionTable({ rows }: { rows: CommissionTransaction[] }) {
         <tbody>
           {rows.map((row) => (
             <tr key={row.id} className="border-t border-white/10">
-              <td className="py-2">{currency.format(row.amount ?? 0)}</td>
-              <td>{row.type || "Commission"}</td>
-              <td>{row.sourceInvitee || "—"}</td>
-              <td>
+              <td className="py-2 pr-2">{currency.format(row.amount ?? 0)}</td>
+              <td className="pr-2">{row.type || "Commission"}</td>
+              <td className="max-w-[120px] truncate pr-2">{row.sourceInvitee || "—"}</td>
+              <td className="whitespace-nowrap">
                 {row.createdAt
                   ? new Date(row.createdAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })
                   : "—"}
@@ -365,18 +365,18 @@ function formatStatus(label: string) {
 
 function HowItWorksCard() {
   return (
-    <div className="rounded-[40px] border border-white/10 bg-night-950/60 p-6">
-      <h2 className="text-2xl font-semibold text-white">How referrals work</h2>
-      <ol className="mt-3 list-decimal space-y-2 pl-6 text-sm text-white/70">
+    <div className="rounded-3xl border border-white/10 bg-night-950/60 p-4 sm:rounded-[40px] sm:p-6">
+      <h2 className="text-xl font-semibold text-white sm:text-2xl">How referrals work</h2>
+      <ol className="mt-3 list-decimal space-y-2 pl-6 text-sm leading-relaxed text-white/70">
         <li>Share your invite link with trusted friends.</li>
         <li>They sign up and browse the product catalogue.</li>
         <li>When they place an order, 10% of their spend is credited to your account.</li>
       </ol>
-      <div className="mt-4 flex flex-wrap gap-3">
-        <Button asChild>
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-3">
+        <Button asChild className="w-full min-h-[48px] sm:w-auto">
           <a href="/contact">Contact support</a>
         </Button>
-        <Button variant="ghost" asChild>
+        <Button variant="ghost" asChild className="w-full min-h-[48px] sm:w-auto">
           <Link href="/referral/poster">Poster generator</Link>
         </Button>
       </div>

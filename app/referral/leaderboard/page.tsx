@@ -30,27 +30,27 @@ export default function ReferralLeaderboardPage() {
   };
 
   return (
-    <section className="space-y-8 px-4 py-10">
-      <header className="rounded-[40px] border border-white/10 bg-[linear-gradient(135deg,#050505,#0e1017)] p-6 text-white">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <section className="space-y-6 px-4 py-8">
+      <header className="rounded-3xl border border-white/10 bg-[linear-gradient(135deg,#050505,#0e1017)] p-4 text-white sm:rounded-[40px] sm:p-6">
+        <div className="flex flex-col gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">Referral leaderboard</p>
-            <h1 className="text-3xl font-semibold">{heroCopy.title}</h1>
-            <p className="text-sm text-white/70">{heroCopy.body}</p>
+            <h1 className="text-2xl font-semibold sm:text-3xl">{heroCopy.title}</h1>
+            <p className="text-sm leading-relaxed text-white/70">{heroCopy.body}</p>
             <p className="text-xs text-white/50">{heroCopy.nextReset}</p>
           </div>
-          <div className="flex flex-wrap gap-3 text-sm">
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 text-sm scrollbar-none sm:mx-0 sm:flex-wrap sm:px-0">
             {ranges.map((option) => (
               <button
                 key={option.id}
                 onClick={() => setRange(option.id)}
-                className={`rounded-full border px-4 py-2 ${range === option.id ? "border-white bg-white/10 text-white" : "border-white/15 text-white/70 hover:border-white/40"}`}
+                className={`shrink-0 rounded-full border px-4 py-2.5 font-medium ${range === option.id ? "border-white bg-white/10 text-white" : "border-white/15 text-white/70 hover:border-white/40"}`}
               >
                 {option.label}
               </button>
             ))}
-            <Button asChild>
-              <Link href="/referral">Go to referral tools</Link>
+            <Button asChild className="shrink-0 min-h-[44px]">
+              <Link href="/referral">Referral tools</Link>
             </Button>
           </div>
         </div>
@@ -68,7 +68,7 @@ export default function ReferralLeaderboardPage() {
 
       <LeaderboardTable rows={topTen} rangeLabel={ranges.find((r) => r.id === range)?.label || "This month"} />
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3">
         <div className="rounded-3xl border border-white/10 bg-card p-4 text-sm text-white/80">
           <p className="text-xs uppercase tracking-[0.3em] text-white/50">Rising stars</p>
           <ul className="mt-3 space-y-2">
@@ -123,24 +123,24 @@ function LeaderboardTable({ rows, rangeLabel }: LeaderboardTableProps) {
   const rest = rows.slice(3);
 
   return (
-    <section className="rounded-[40px] border border-white/10 bg-card p-6 shadow-card">
-      <div className="mb-4 flex items-center justify-between">
+    <section className="rounded-3xl border border-white/10 bg-card p-4 shadow-card sm:rounded-[40px] sm:p-6">
+      <div className="mb-3 flex flex-col gap-1 sm:mb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-white/50">Top 10</p>
-          <h2 className="text-2xl font-semibold text-white">{rangeLabel} ranking</h2>
+          <h2 className="text-xl font-semibold text-white sm:text-2xl">{rangeLabel} ranking</h2>
         </div>
-        <p className="text-xs text-white/60">Commission shown is lifetime (right column shows recent)</p>
+        <p className="text-[11px] text-white/60 sm:text-xs">Lifetime commission (right = recent)</p>
       </div>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-3">
         {podium.map((entry) => (
           <PodiumCard key={entry.rank} entry={entry} />
         ))}
       </div>
-      <div className="mt-6 overflow-x-auto">
-        <table className="w-full text-left text-sm text-white/80">
-          <thead className="text-white/50">
+      <div className="-mx-4 mt-4 overflow-x-auto px-4 sm:mx-0 sm:mt-6 sm:px-0">
+        <table className="w-full min-w-[480px] text-left text-sm text-white/80">
+          <thead className="text-[11px] uppercase tracking-wider text-white/50 sm:text-xs">
             <tr>
-              <th className="py-2">Rank</th>
+              <th className="py-2">#</th>
               <th>Ambassador</th>
               <th>City</th>
               <th>Orders</th>
