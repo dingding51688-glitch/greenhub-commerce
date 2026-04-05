@@ -163,7 +163,7 @@ export default function AccountSecurityPage() {
       <header className="rounded-3xl border border-white/10 bg-card p-6 shadow-card">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Account security</p>
         <h1 className="text-3xl font-semibold text-white">Keep your locker safe</h1>
-        <p className="mt-2 text-sm text-white/60">Security reminder: avoid saving passwords on shared devices and enable concierge approvals for sensitive changes.</p>
+        <p className="mt-2 hidden text-sm text-white/60 sm:block">Security reminder: avoid saving passwords on shared devices and enable concierge approvals for sensitive changes.</p>
       </header>
 
       <div className="rounded-3xl border border-white/10 bg-night-950/80 p-6">
