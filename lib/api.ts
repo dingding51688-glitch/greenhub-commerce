@@ -44,7 +44,9 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
     const message = payload?.error?.message || response.statusText || "Request failed";
-    throw new Error(message);
+    const error = new Error(message) as Error & { status?: number };
+    error.status = response.status;
+    throw error;
   }
   return payload as T;
 }

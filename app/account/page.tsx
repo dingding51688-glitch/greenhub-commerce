@@ -70,23 +70,57 @@ const withdrawSchema = z.object({
 });
 type WithdrawFormValues = z.infer<typeof withdrawSchema>;
 
+/* ── SWR config: don't retry on 401/403 ── */
+const noRetryOnAuth = {
+  shouldRetryOnError: (error: Error & { status?: number }) => {
+    if (error?.status === 401 || error?.status === 403) return false;
+    return true;
+  },
+};
+
 /* ━━━━━━━━━━━━━━━━━━━━━ Main page ━━━━━━━━━━━━━━━━━━━━━ */
 export default function AccountPage() {
-  const { token, userEmail, profile, refreshProfile } = useAuth();
+  const { token, userEmail, profile, refreshProfile, logout } = useAuth();
   const router = useRouter();
+  const [redirecting, setRedirecting] = useState(false);
+
+  /* Auto-redirect to login if unauthenticated */
+  useEffect(() => {
+    if (token || redirecting) return;
+    const timer = setTimeout(() => { setRedirecting(true); router.push("/login"); }, 3000);
+    return () => clearTimeout(timer);
+  }, [token, redirecting, router]);
 
   /* ── data fetching ── */
   const { data: customerProfile, error: customerError, isLoading: customerLoading, mutate: refreshCustomer } =
-    useSWR<CustomerProfileResponse>(token ? "/api/account/profile" : null, swrFetcher);
+    useSWR<CustomerProfileResponse>(token ? "/api/account/profile" : null, swrFetcher, noRetryOnAuth);
   const { data: balanceData, error: balanceError, isLoading: balanceLoading, mutate: refreshBalance } =
-    useSWR<WalletBalanceResponse>(token ? "/api/wallet/balance" : null, swrFetcher, { refreshInterval: 60_000 });
+    useSWR<WalletBalanceResponse>(token ? "/api/wallet/balance" : null, swrFetcher, { refreshInterval: 60_000, ...noRetryOnAuth });
   const { data: txData, error: txError, isLoading: txLoading, mutate: refreshTx } =
-    useSWR<WalletTransactionsResponse>(token ? "/api/wallet/transactions?page=1&pageSize=10" : null, swrFetcher, { refreshInterval: 90_000 });
+    useSWR<WalletTransactionsResponse>(token ? "/api/wallet/transactions?page=1&pageSize=10" : null, swrFetcher, { refreshInterval: 90_000, ...noRetryOnAuth });
   const { data: commissionData, error: commissionError, isLoading: commissionLoading } =
-    useSWR<ReferralSummary>(token ? "referral-summary" : null, getReferralSummary);
+    useSWR<ReferralSummary>(token ? "referral-summary" : null, getReferralSummary, noRetryOnAuth);
+
+  /* Handle stale/expired token: if profile returns 401/403, log out */
+  useEffect(() => {
+    const status = (customerError as Error & { status?: number })?.status;
+    if (status === 401 || status === 403) {
+      logout();
+    }
+  }, [customerError, logout]);
 
   if (!token) {
-    return <StateMessage title="Please sign in" body="Log in to access your Account Center." actionLabel="Go to login" onAction={() => router.push("/login")} />;
+    return (
+      <section className="mx-auto mt-20 max-w-md space-y-6 rounded-[40px] border border-white/10 bg-night-950/80 p-8 text-center shadow-card">
+        <h2 className="text-2xl font-semibold text-white">Sign in to continue</h2>
+        <p className="text-sm text-white/60">Log in or create an account to access your Account Center.</p>
+        {!redirecting && <p className="text-xs text-white/40">Redirecting to login in a few seconds…</p>}
+        <div className="flex flex-wrap justify-center gap-3">
+          <Button onClick={() => router.push("/login")}>Log in</Button>
+          <Button variant="secondary" onClick={() => router.push("/register")}>Create account</Button>
+        </div>
+      </section>
+    );
   }
 
   return (
