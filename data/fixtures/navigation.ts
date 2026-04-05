@@ -28,7 +28,7 @@ export type MenuCTAGroup = {
 };
 
 export const menuCtas: MenuCTAGroup = {
-  primary: { label: "Browse products", href: "/products" },
+  primary: { label: "Commission hub", href: "/account/commission" },
   secondary: { label: "Recharge balance", href: "/wallet/topup" }
 };
 
@@ -48,8 +48,7 @@ export const drawerSections: DrawerSection[] = [
     title: "Account",
     links: [
       { label: "Overview", href: "/account", match: "prefix" },
-      { label: "Account balance", href: "/wallet", match: "prefix" },
-      { label: "Commission hub", href: "/referral", match: "prefix" }
+      { label: "Account balance", href: "/wallet", match: "prefix" }
     ]
   }
   // Legacy logistics quick links were removed to match the 420.co.uk drawer (menu + account only).

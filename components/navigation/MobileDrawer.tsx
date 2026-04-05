@@ -26,6 +26,7 @@ export function MobileDrawer({ open, onClose, sections, ctas, navItems }: Mobile
   const isAuthenticated = Boolean(token);
   const notificationBadge = unreadCount > 0 ? (unreadCount > 99 ? "99+" : `${unreadCount}`) : null;
   const defaultAccordion = useMemo(() => navItems.find((item) => item.children)?.label ?? null, [navItems]);
+  const commissionTarget = ctas.primary?.href ?? "/account/commission";
   const [expanded, setExpanded] = useState<string | null>(defaultAccordion);
 
   useEffect(() => {
@@ -41,6 +42,11 @@ export function MobileDrawer({ open, onClose, sections, ctas, navItems }: Mobile
   const goToNotifications = () => {
     router.push("/account/notifications");
     onClose();
+  };
+
+  const handleCommissionCTA = () => {
+    onClose();
+    router.push(isAuthenticated ? commissionTarget : "/login");
   };
 
   const handleSignOut = () => {
@@ -154,10 +160,12 @@ export function MobileDrawer({ open, onClose, sections, ctas, navItems }: Mobile
           ))}
         </div>
         <div className="mt-auto space-y-3">
-          <Button asChild fullWidth>
-            <a href={ctas.primary.href} onClick={onClose}>
-              {ctas.primary.label}
-            </a>
+          <Button
+            fullWidth
+            onClick={handleCommissionCTA}
+            className="font-semibold uppercase tracking-[0.12em]"
+          >
+            {ctas.primary.label}
           </Button>
           {isAuthenticated ? (
             <button
