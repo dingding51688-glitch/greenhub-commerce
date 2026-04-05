@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { AUTH_TOKEN_KEY } from "@/lib/auth-store";
+import { resolveServerBase } from "@/lib/server-base";
 
-const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
+const RAW_AUTH_BASE = process.env.NEXT_PUBLIC_AUTH_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
 
 function requireBase() {
-  if (!AUTH_BASE) throw new Error("NEXT_PUBLIC_AUTH_BASE_URL missing");
+  if (!RAW_AUTH_BASE) throw new Error("NEXT_PUBLIC_AUTH_BASE_URL missing");
 }
 
 function getToken() {
@@ -18,7 +19,8 @@ export async function GET() {
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const response = await fetch(`${AUTH_BASE}/api/customers/me?populate=lockerPreferences`, {
+  const base = resolveServerBase(RAW_AUTH_BASE);
+  const response = await fetch(`${base}/api/account/profile`, {
     headers: {
       Authorization: `Bearer ${token}`
     },
@@ -35,7 +37,8 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = await request.json();
-  const response = await fetch(`${AUTH_BASE}/api/customers/me`, {
+  const base = resolveServerBase(RAW_AUTH_BASE);
+  const response = await fetch(`${base}/api/account/profile`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

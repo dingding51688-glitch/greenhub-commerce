@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   }
   const body = await request.json().catch(() => ({}));
   const base = resolveServerBase(RAW_AUTH_BASE);
-  const response = await fetch(`${base}/api/auth/change-password`, {
+  const response = await fetch(`${base}/api/account/change-email`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
