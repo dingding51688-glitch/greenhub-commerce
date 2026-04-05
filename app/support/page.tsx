@@ -11,7 +11,7 @@ import { contactChannels, contactHeroDetails } from "@/data/fixtures/marketing";
 import { faqCategories } from "@/data/fixtures/faq";
 
 const ticketSchema = z.object({
-  topic: z.enum(["locker", "payment", "order", "other"]),
+  topic: z.enum(["delivery", "payment", "order", "other"]),
   message: z.string().min(20, "Please include at least 20 characters"),
   orderRef: z.string().optional().or(z.literal("")),
 });
@@ -19,17 +19,17 @@ const ticketSchema = z.object({
 type TicketFormValues = z.infer<typeof ticketSchema>;
 
 const faqTopics = [
-  { title: "Locker issues", answer: "Text HELP + locker ID to our SMS hotline (+44 7441 902134) and we reroute within 15 minutes. Include a photo if the locker looks tampered." },
-  { title: "Payments & wallet", answer: "Wallet top-ups post instantly; bank / crypto confirmations can take up to 30 min. Send receipts to support@greenhub.app if you do not see a balance update." },
-  { title: "Order tracking", answer: "Check /orders for live status. If a locker is stuck in ‘preparing’, ping Telegram concierge with your reference and we fast-track the drop." },
+  { title: "Delivery issues", answer: "Text HELP + your order reference to our SMS hotline (+44 7441 902134) and we reroute within 15 minutes. Include a photo if the parcel looks tampered." },
+  { title: "Payments & balance", answer: "Account top-ups post instantly; bank / crypto confirmations can take up to 30 min. Send receipts to support@greenhub.app if you don't see a balance update." },
+  { title: "Order tracking", answer: "Check /orders for live status. If an order is stuck in 'preparing', message support on Telegram with your reference and we'll expedite it." },
 ];
 
-const lockerFaq = faqCategories.find((category) => category.id === "locker")?.entries.slice(0, 1) ?? [];
+const deliveryFaq = faqCategories.find((category) => category.id === "delivery")?.entries.slice(0, 1) ?? [];
 const paymentFaq = faqCategories.find((category) => category.id === "payment")?.entries.slice(0, 1) ?? [];
 
 const supportFaq = [
   ...faqTopics,
-  ...lockerFaq.map((faq) => ({ title: faq.question, answer: faq.answer })),
+  ...deliveryFaq.map((faq) => ({ title: faq.question, answer: faq.answer })),
   ...paymentFaq.map((faq) => ({ title: faq.question, answer: faq.answer }))
 ];
 
@@ -43,7 +43,7 @@ export default function SupportPage() {
     formState: { errors, isSubmitting },
   } = useForm<TicketFormValues>({
     resolver: zodResolver(ticketSchema),
-    defaultValues: { topic: "locker", message: "", orderRef: "" },
+    defaultValues: { topic: "delivery", message: "", orderRef: "" },
   });
 
   const handleCopy = async (value: string) => {
@@ -60,9 +60,8 @@ export default function SupportPage() {
   const onSubmit = async (values: TicketFormValues) => {
     setFormStatus(null);
     try {
-      // TODO: hook into Strapi support endpoint. For now we simulate a submission delay.
       await new Promise((resolve) => setTimeout(resolve, 1200));
-      setFormStatus({ type: "success", message: "Ticket received — concierge replies within 2 hours." });
+      setFormStatus({ type: "success", message: "Ticket received — support replies within 2 hours." });
       reset();
     } catch (error: any) {
       setFormStatus({ type: "error", message: error?.message || "Failed to submit ticket" });
@@ -72,12 +71,12 @@ export default function SupportPage() {
   return (
     <section className="space-y-8">
       <header className="rounded-[40px] border border-white/10 bg-night-950/80 p-6">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/50">Concierge support</p>
-        <h1 className="mt-2 text-3xl font-semibold text-white">We’re on locker duty 09:00–21:00 GMT daily</h1>
-        <p className="mt-2 text-sm text-white/70">Share your postcode at checkout and wait for our SMS; Telegram is fastest once we assign the locker. Email or SMS for escalations. In emergencies, text HELP + order ref.</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-white/50">Customer support</p>
+        <h1 className="mt-2 text-3xl font-semibold text-white">We&apos;re available 09:00–21:00 GMT daily</h1>
+        <p className="mt-2 text-sm text-white/70">Telegram is fastest for order queries. Email or SMS for escalations. In emergencies, text HELP + your order reference.</p>
         <div className="mt-3 flex flex-wrap gap-3">
           <Button asChild variant="secondary" size="sm">
-            <Link href="/guide/locker">Locker onboarding guide</Link>
+            <Link href="/how-it-works">Getting started guide</Link>
           </Button>
           <Button asChild variant="secondary" size="sm">
             <Link href="/guide/payment">Payment guide</Link>
@@ -133,7 +132,7 @@ export default function SupportPage() {
       </div>
 
       <div className="rounded-[40px] border border-white/10 bg-night-950/70 p-6">
-        <h2 className="text-2xl font-semibold text-white">Locker & payment FAQ</h2>
+        <h2 className="text-2xl font-semibold text-white">Delivery & payment FAQ</h2>
         <div className="mt-4 space-y-3">
           {supportFaq.map((item) => (
             <details key={item.title} className="rounded-3xl border border-white/10 bg-white/5 p-4">
@@ -148,13 +147,13 @@ export default function SupportPage() {
 
       <div className="rounded-[40px] border border-white/10 bg-night-950/70 p-6">
         <h2 className="text-2xl font-semibold text-white">Submit a ticket</h2>
-        <p className="text-sm text-white/60">We reply within 2 hours during concierge hours. Locker emergencies? Text the hotline instead.</p>
+        <p className="text-sm text-white/60">We reply within 2 hours during support hours. Urgent? Text the hotline instead.</p>
         <form className="mt-4 space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <label className="block text-xs uppercase tracking-[0.3em] text-white/50">
             Topic
             <select {...register("topic")} className="mt-1 w-full rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-sm text-white">
-              <option value="locker" className="bg-night-900 text-white">Locker / pickup</option>
-              <option value="payment" className="bg-night-900 text-white">Payment / recharge</option>
+              <option value="delivery" className="bg-night-900 text-white">Delivery / pickup</option>
+              <option value="payment" className="bg-night-900 text-white">Payment / top-up</option>
               <option value="order" className="bg-night-900 text-white">Order tracking</option>
               <option value="other" className="bg-night-900 text-white">Other</option>
             </select>

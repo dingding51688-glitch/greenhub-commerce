@@ -3,8 +3,8 @@ import Card from "@/components/ui/card";
 import { contactChannels, contactHeroDetails, inPostFlow } from "@/data/fixtures/marketing";
 
 export const metadata = {
-  title: "Contact GreenHub concierge",
-  description: "Same-day responses via Telegram, email, and SMS for locker access, delivery updates, or wholesale help."
+  title: "Contact GreenHub support",
+  description: "Same-day responses via Telegram, email, and SMS for order queries, delivery updates, or wholesale help."
 };
 
 export default function ContactPage() {
@@ -14,8 +14,8 @@ export default function ContactPage() {
         highlight="HOME / CONTACT"
         eyebrow="Contact"
         title="Talk directly to the Green Hub team"
-        subtitle="Same-day responses, 7 days a week. Ping us about locker access, delivery ETA, or wholesale inventory."
-        primaryCta={{ label: "Chat on Telegram", href: "https://t.me/greenhub_concierge" }}
+        subtitle="Same-day responses, 7 days a week. Ping us about orders, delivery ETA, or wholesale inventory."
+        primaryCta={{ label: "Chat on Telegram", href: "https://t.me/greenhub_support" }}
         secondaryCta={{ label: "Email support", href: "mailto:support@greenhub.app" }}
         alignment="left"
         tone="soft"
@@ -57,7 +57,7 @@ function ContactChannels() {
       <header className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">Channels</p>
         <h2 className="text-3xl font-semibold text-white">Need a different route?</h2>
-        <p className="text-sm text-ink-400">Pick the concierge line that fits your scenario — Telegram for live chat, email for detailed threads, SMS for urgent locker help.</p>
+        <p className="text-sm text-ink-400">Pick the support channel that fits your scenario — Telegram for live chat, email for detailed threads, SMS for urgent pickup help.</p>
       </header>
       <div className="grid gap-4 md:grid-cols-2">
         {contactChannels.map((channel) => (

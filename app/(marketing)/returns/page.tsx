@@ -5,7 +5,7 @@ import { returnPolicies, supportSteps } from "@/data/fixtures/marketing";
 
 export const metadata = {
   title: "Returns & refund policy",
-  description: "Understand how GreenHub processes locker refunds, replacements, and support tickets."
+  description: "Understand how GreenHub processes refunds, replacements, and support tickets."
 };
 
 export default function ReturnsPage() {
@@ -13,10 +13,10 @@ export default function ReturnsPage() {
     <div className="space-y-10 pb-20">
       <HeroClassic
         eyebrow="Returns"
-        title="Locker orders protected with rapid refunds"
-        subtitle="Report issues within 2 hours for wallet credits or replacement drops."
+        title="Orders protected with rapid refunds"
+        subtitle="Report issues within 2 hours for account credits or replacements."
         primaryCta={{ label: "File a ticket", href: "/contact" }}
-        secondaryCta={{ label: "Chat on Telegram", href: "https://t.me/greenhub_concierge" }}
+        secondaryCta={{ label: "Chat on Telegram", href: "https://t.me/greenhub_support" }}
         highlight="Turnaround < 4h"
       />
 
@@ -71,15 +71,15 @@ function SupportSteps() {
 function SupportCta() {
   return (
     <section className="rounded-3xl border border-white/5 bg-night-950/80 p-6 text-center shadow-surface sm:p-10">
-      <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">Need concierge?</p>
-      <h2 className="mt-2 text-3xl font-semibold text-white">We refund within 4 hours once we have locker proof</h2>
-      <p className="mt-2 text-sm text-ink-400">Provide your order reference, locker code, and any photos when you reach out.</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">Need help?</p>
+      <h2 className="mt-2 text-3xl font-semibold text-white">We refund within 4 hours once we have evidence</h2>
+      <p className="mt-2 text-sm text-ink-400">Provide your order reference and any photos when you reach out.</p>
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
         <Button asChild size="lg">
           <a href="/contact">Go to contact page</a>
         </Button>
         <Button asChild variant="ghost" size="lg">
-          <a href="https://t.me/greenhub_concierge" target="_blank" rel="noreferrer">
+          <a href="https://t.me/greenhub_support" target="_blank" rel="noreferrer">
             Message on Telegram
           </a>
         </Button>

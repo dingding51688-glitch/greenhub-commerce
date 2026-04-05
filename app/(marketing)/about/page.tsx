@@ -4,7 +4,7 @@ import { aboutHighlights, coverageStats, supportCommitments } from "@/data/fixtu
 
 export const metadata = {
   title: "About GreenHub",
-  description: "Why Northern Ireland members choose GreenHub lockers and concierge support."
+  description: "Why Northern Ireland members choose GreenHub for quality products and dedicated support."
 };
 
 export default function AboutPage() {
@@ -12,10 +12,10 @@ export default function AboutPage() {
     <div className="space-y-10 pb-20">
       <HeroClassic
         eyebrow="About"
-        title="Northern Ireland's locker-first cannabis club"
-        subtitle="We blend curated flower, private lockers, and concierge support so you can collect on your schedule."
-        primaryCta={{ label: "View lockers", href: "/how-it-works" }}
-        secondaryCta={{ label: "Meet concierge", href: "/contact" }}
+        title="Northern Ireland's premier online cannabis store"
+        subtitle="We blend curated products, discreet delivery, and dedicated support so you can shop on your schedule."
+        primaryCta={{ label: "How it works", href: "/how-it-works" }}
+        secondaryCta={{ label: "Contact support", href: "/contact" }}
         highlight="Serving 3k+ members"
       />
 
@@ -31,7 +31,7 @@ function HighlightsSection() {
     <section className="space-y-6 rounded-3xl border border-white/5 bg-night-950/80 p-6 shadow-surface sm:p-10">
       <header className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">Why choose GreenHub</p>
-        <h2 className="text-3xl font-semibold text-white">We obsess over lockers, logistics, and people</h2>
+        <h2 className="text-3xl font-semibold text-white">We obsess over quality, logistics, and people</h2>
       </header>
       <div className="grid gap-4 md:grid-cols-2">
         {aboutHighlights.map((item) => (
@@ -52,8 +52,8 @@ function CoverageSection() {
       <div className="flex flex-col gap-6 lg:flex-row">
         <div className="flex-1 space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">Coverage & partners</p>
-          <h2 className="text-3xl font-semibold text-white">Locker network + trusted partners</h2>
-          <p className="text-sm text-ink-400">We deploy lockers where members already spend their evenings and partner with brands that keep parcels safe.</p>
+          <h2 className="text-3xl font-semibold text-white">Delivery network + trusted partners</h2>
+          <p className="text-sm text-ink-400">We place pickup points where members already spend their evenings and partner with couriers that keep parcels safe.</p>
         </div>
         <div className="flex flex-1 flex-col gap-4">
           {coverageStats.map((stat) => (
@@ -74,7 +74,7 @@ function SupportSection() {
     <section className="space-y-6 rounded-3xl border border-white/5 bg-night-950/80 p-6 shadow-surface sm:p-10">
       <header className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">Team & support</p>
-        <h2 className="text-3xl font-semibold text-white">Concierge is NI-based and replies faster than DMs</h2>
+        <h2 className="text-3xl font-semibold text-white">Support is NI-based and replies faster than DMs</h2>
       </header>
       <div className="grid gap-4 md:grid-cols-3">
         {supportCommitments.map((item) => (

@@ -6,7 +6,7 @@ import { termsSections } from "@/data/fixtures/marketing";
 
 export const metadata = {
   title: "Terms & Conditions — GreenHub",
-  description: "Locker membership terms, payment policies, and privacy notes for GreenHub members."
+  description: "Membership terms, payment policies, and privacy notes for GreenHub members."
 };
 
 export default function TermsPage() {
@@ -15,9 +15,9 @@ export default function TermsPage() {
       <HeroClassic
         highlight="HOME / TERMS"
         eyebrow="Terms & Conditions"
-        title="Locker access, payments, and privacy obligations"
-        subtitle="Please review the latest locker membership terms. Reach out to concierge if you need clarification on any clause."
-        primaryCta={{ label: "Contact concierge", href: "/contact" }}
+        title="Account access, payments, and privacy obligations"
+        subtitle="Please review the latest membership terms. Reach out to support if you need clarification on any clause."
+        primaryCta={{ label: "Contact support", href: "/contact" }}
         secondaryCta={{ label: "Support centre", href: "/support" }}
         alignment="left"
         tone="soft"
@@ -75,7 +75,7 @@ function TermsSections() {
           )}
           <div className="pt-2">
             <Link href="/contact" className="text-xs font-semibold uppercase tracking-[0.3em] text-ink-500">
-              Need clarification? Contact concierge →
+              Need clarification? Contact support →
             </Link>
           </div>
           {index < termsSections.length - 1 && <div className="h-px bg-white/5" />}
@@ -84,7 +84,7 @@ function TermsSections() {
 
       <div className="rounded-2xl border border-white/10 bg-night-900/70 p-6 text-center">
         <p className="text-sm text-ink-400">
-          These placeholders will be replaced with the final legal draft. Submit additional clauses or edits via the concierge inbox.
+          These placeholders will be replaced with the final legal draft. Submit additional clauses or edits via the support inbox.
         </p>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link href="mailto:legal@greenhub.app">

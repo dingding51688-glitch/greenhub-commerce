@@ -1,11 +1,11 @@
 import { HeroClassic, HowItWorksLocker } from "@/components/sections";
 import Card from "@/components/ui/card";
 import Button from "@/components/ui/button";
-import { lockerUsageTips, returnPolicies, shippingTimeline, supportSteps } from "@/data/fixtures/marketing";
+import { collectionTips, returnPolicies, shippingTimeline, supportSteps } from "@/data/fixtures/marketing";
 
 export const metadata = {
-  title: "Shipping & locker tips",
-  description: "Understand GreenHub delivery cutoffs, locker SMS timing, and late fee policies."
+  title: "Shipping & delivery guide",
+  description: "Understand GreenHub delivery cutoffs, collection timing, and late fee policies."
 };
 
 export default function ShippingPage() {
@@ -13,11 +13,11 @@ export default function ShippingPage() {
     <div className="space-y-10 pb-20">
       <HeroClassic
         highlight="HOME / SHIPPING"
-        eyebrow="Shipping & locker tips"
-        title="Same-evening lockers across Belfast & Derry"
-        subtitle="Order before 20:00, receive QR + PIN before midnight, and follow the locker etiquette below to avoid late fees."
-        primaryCta={{ label: "View locker map", href: "/how-it-works" }}
-        secondaryCta={{ label: "Talk to concierge", href: "/contact" }}
+        eyebrow="Shipping & delivery guide"
+        title="Same-evening delivery across Belfast & Derry"
+        subtitle="Order before 20:00, receive your collection code before midnight, and follow the etiquette below to avoid late fees."
+        primaryCta={{ label: "How it works", href: "/how-it-works" }}
+        secondaryCta={{ label: "Contact support", href: "/contact" }}
         alignment="left"
         tone="soft"
         stats={[
@@ -29,7 +29,7 @@ export default function ShippingPage() {
 
       <TimelineSection />
 
-      <HowItWorksLocker title={lockerUsageTips.title} steps={lockerUsageTips.steps} tip={lockerUsageTips.tip} />
+      <HowItWorksLocker title={collectionTips.title} steps={collectionTips.steps} tip={collectionTips.tip} />
 
       <ReturnPolicySection />
 
@@ -46,7 +46,7 @@ function TimelineSection() {
       <header className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">Timeline</p>
         <h2 className="text-3xl font-semibold text-white">Evening delivery rhythm</h2>
-        <p className="text-sm text-ink-400">Every order follows the same cadence so you always know when to expect the locker SMS.</p>
+        <p className="text-sm text-ink-400">Every order follows the same cadence so you always know when to expect the collection code.</p>
       </header>
       <div className="grid gap-4 md:grid-cols-3">
         {shippingTimeline.map((milestone) => (
@@ -70,7 +70,7 @@ function ReturnPolicySection() {
       <header className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">Refund policy</p>
         <h2 className="text-3xl font-semibold text-white">How replacements or credits work</h2>
-        <p className="text-sm text-ink-400">Match the locker pickup timer and send photos so concierge can escalate to the courier instantly.</p>
+        <p className="text-sm text-ink-400">Follow the collection window and send photos so support can escalate to the courier instantly.</p>
       </header>
       <div className="grid gap-4 md:grid-cols-2">
         {returnPolicies.map((policy) => (
@@ -90,7 +90,7 @@ function SupportStepsSection() {
     <section className="space-y-4 rounded-3xl border border-white/5 bg-night-950/80 p-6 shadow-surface sm:p-10">
       <header className="space-y-1">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">Support flow</p>
-        <h2 className="text-3xl font-semibold text-white">Locker issue escalation checklist</h2>
+        <h2 className="text-3xl font-semibold text-white">Issue escalation checklist</h2>
       </header>
       <div className="space-y-4">
         {supportSteps.map((step, index) => (
@@ -113,17 +113,17 @@ function SupportCta() {
   return (
     <section className="rounded-3xl border border-white/5 bg-night-950/80 p-6 text-center shadow-surface sm:p-10">
       <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">Need help?</p>
-      <h2 className="mt-2 text-3xl font-semibold text-white">Concierge can reroute lockers or confirm payments</h2>
+      <h2 className="mt-2 text-3xl font-semibold text-white">Support can reroute deliveries or confirm payments</h2>
       <p className="mt-2 text-sm text-ink-400">
-        Message us before the cutoff if you need a different locker or want to pre-pay via wallet/USDT.
+        Message us before the cutoff if you need a different pickup location or want to pre-pay via account balance/USDT.
       </p>
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
         <Button asChild size="lg">
           <a href="/contact">Contact page</a>
         </Button>
         <Button asChild variant="ghost" size="lg">
-          <a href="https://t.me/greenhub_concierge" target="_blank" rel="noreferrer">
-            Telegram concierge
+          <a href="https://t.me/greenhub_support" target="_blank" rel="noreferrer">
+            Telegram support
           </a>
         </Button>
       </div>

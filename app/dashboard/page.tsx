@@ -18,8 +18,8 @@ const fallbackWithdrawals = [
   { id: 1, amount: 120, status: "processing", createdAt: new Date().toISOString() },
 ];
 const fallbackReferral: ReferralSummary = {
-  code: "LOCKER25",
-  link: "https://greenhub420.co.uk/join/LOCKER25",
+  code: "STORE25",
+  link: "https://greenhub420.co.uk/join/STORE25",
   totalInvites: 0,
   activeLockers: 0,
   bonusEarned: 0,
@@ -82,7 +82,7 @@ export default function DashboardPage() {
     return (
       <StateMessage
         title="Please sign in"
-        body="Sign in to see your wallet balance, locker orders, and concierge shortcuts."
+        body="Sign in to see your wallet balance, recent orders, and support shortcuts."
         actionLabel="Go to login"
         onAction={() => router.push("/login")}
       />
@@ -93,8 +93,8 @@ export default function DashboardPage() {
     <section className="space-y-6">
       <div className="rounded-[40px] border border-white/10 bg-night-950/80 p-6">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Welcome back</p>
-        <h1 className="text-3xl font-semibold text-white">{profile?.fullName || "Locker member"}</h1>
-        <p className="mt-1 text-sm text-white/60">Locker network online — Belfast & Derry 24/7 · Concierge on duty until 21:00 GMT.</p>
+        <h1 className="text-3xl font-semibold text-white">{profile?.fullName || "Store member"}</h1>
+        <p className="mt-1 text-sm text-white/60">Store services live — Belfast & Derry 24/7 · Support team on duty until 21:00 GMT.</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Button onClick={() => router.push("/products")}>Go to products</Button>
           <Button variant="ghost" onClick={() => router.push("/support")}>Need support?</Button>
@@ -149,7 +149,7 @@ export default function DashboardPage() {
           ) : ordersError ? (
             <StateMessage variant="error" title="Unable to load orders" body={ordersError.message} actionLabel="Retry" />
           ) : latestOrders.length === 0 ? (
-            <StateMessage variant="empty" title="No orders yet" body="Browse the menu to create your first locker drop." />
+            <StateMessage variant="empty" title="No orders yet" body="Browse the catalog to place your first order." />
           ) : (
             <div className="mt-3 space-y-3">
               {latestOrders.map((order) => (
@@ -205,9 +205,9 @@ export default function DashboardPage() {
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-night-950/70 p-5">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/50">Need concierge?</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-white/50">Need support?</p>
           <h3 className="text-2xl font-semibold text-white">Visit the support hub</h3>
-          <p className="text-sm text-white/60">Locker issues, payment escalations, and ticket submissions live there.</p>
+          <p className="text-sm text-white/60">All support tickets, payment escalations, and delivery questions live there.</p>
           <Button className="mt-3" onClick={() => router.push("/support")}>Open support</Button>
         </div>
       </div>
@@ -220,9 +220,11 @@ function StatusPill({ status }: { status: string }) {
     paid: "bg-emerald-400/10 text-emerald-200 border-emerald-400/40",
     processing: "bg-blue-400/10 text-blue-200 border-blue-400/40",
     pending: "bg-yellow-400/10 text-yellow-200 border-yellow-400/40",
-    locker_active: "bg-brand-500/10 text-brand-200 border-brand-500/40",
+    store_active: "bg-brand-500/10 text-brand-200 border-brand-500/40",
   };
   const key = status?.toLowerCase();
-  const classes = palette[key] || "bg-white/5 text-white/70 border-white/20";
-  return <span className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.3em] ${classes}`}>{status}</span>;
+  const normalized = key;
+  const classes = palette[normalized] || "bg-white/5 text-white/70 border-white/20";
+  const label = status;
+  return <span className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.3em] ${classes}`}>{label}</span>;
 }

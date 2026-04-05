@@ -50,7 +50,7 @@ export default function FaqPage() {
     <section className="space-y-10 pb-20">
       <header className="rounded-[40px] border border-white/10 bg-night-950/80 px-6 py-10 text-white sm:px-12">
         <p className="text-xs uppercase tracking-[0.35em] text-white/50">FAQ</p>
-        <h1 className="mt-2 text-4xl font-semibold">Locker knowledge base</h1>
+        <h1 className="mt-2 text-4xl font-semibold">Help center</h1>
         <p className="mt-2 text-lg text-white/70">Search or browse by topic. Links below open guides, payment walkthroughs, and support threads.</p>
         <div className="mt-6 flex flex-wrap gap-3">
           {faqCategories.map((cat) => (
@@ -67,7 +67,7 @@ export default function FaqPage() {
         </div>
         <div className="mt-6 max-w-2xl">
           <Input
-            placeholder="Search locker, payment, referral questions..."
+            placeholder="Search delivery, payment, referral questions..."
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
@@ -79,7 +79,7 @@ export default function FaqPage() {
       <section className="space-y-4 rounded-3xl border border-white/10 bg-night-950/70 p-6">
         <p className="text-xs uppercase tracking-[0.35em] text-white/50">All questions</p>
         {entries.length === 0 ? (
-          <p className="text-sm text-white/60">No results. Try a different keyword or browse the locker/payment guides.</p>
+          <p className="text-sm text-white/60">No results. Try a different keyword or browse the delivery/payment guides.</p>
         ) : (
           <div className="space-y-3">
             {entries.map((entry) => (
@@ -94,13 +94,13 @@ export default function FaqPage() {
 
       <section className="rounded-3xl border border-white/10 bg-night-950/80 p-6 text-white">
         <h2 className="text-2xl font-semibold">Still unsure?</h2>
-        <p className="mt-2 text-sm text-white/70">Share screenshots + Transfer ID with concierge. Locker issues, payments, or referrals—one URL for all support flows.</p>
+        <p className="mt-2 text-sm text-white/70">Share screenshots + Transfer ID with support. Delivery issues, payments, or referrals — one URL for all support flows.</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Button asChild>
-            <Link href="/support">Contact concierge</Link>
+            <Link href="/support">Contact support</Link>
           </Button>
           <Button asChild variant="secondary">
-            <Link href="/guide/locker">Locker guide</Link>
+            <Link href="/how-it-works">Getting started</Link>
           </Button>
           <Button asChild variant="ghost">
             <Link href="/guide/payment">Payment guide</Link>
