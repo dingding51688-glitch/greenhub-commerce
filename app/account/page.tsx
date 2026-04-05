@@ -109,6 +109,9 @@ export default function AccountPage() {
     }
   }, [customerError, logout]);
 
+  /* Debug banner — only in non-production or when NEXT_PUBLIC_SHOW_AUTH_DEBUG is set */
+  const showDebug = process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_SHOW_AUTH_DEBUG === "1";
+
   /* Still hydrating auth from localStorage — show loading skeleton */
   if (!isReady) {
     return (
@@ -137,6 +140,13 @@ export default function AccountPage() {
 
   return (
     <section className="space-y-8">
+      {/* Debug banner */}
+      {showDebug && (
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3 font-mono text-xs text-amber-200">
+          <p>🔧 Auth Debug: isReady={String(isReady)} | hasToken={String(!!token)} | email={userEmail ?? "null"} | profile={profile?.email ?? "loading..."}</p>
+          <p>API base: {process.env.NEXT_PUBLIC_API_BASE_URL ?? "unset"} | Errors: profile={customerError?.message ?? "none"} balance={balanceError?.message ?? "none"}</p>
+        </div>
+      )}
       {/* ─────── Section 1: Overview ─────── */}
       <OverviewSection
         customer={customerProfile}
