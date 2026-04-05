@@ -12,6 +12,8 @@ export default function VerifyEmailPage() {
   const token = searchParams.get("token");
   const [state, setState] = useState<VerifyState>("loading");
   const [message, setMessage] = useState("");
+  const [rewardGranted, setRewardGranted] = useState(false);
+  const [rewardAmount, setRewardAmount] = useState(0);
 
   useEffect(() => {
     if (!token) {
@@ -36,6 +38,10 @@ export default function VerifyEmailPage() {
         if (response.ok && payload.success) {
           setState("success");
           setMessage(payload.message || "Your email has been verified and updated.");
+          if (payload.rewardGranted) {
+            setRewardGranted(true);
+            setRewardAmount(payload.rewardAmount || 5);
+          }
         } else {
           setState("error");
           setMessage(
@@ -69,6 +75,11 @@ export default function VerifyEmailPage() {
           <p className="text-5xl">✅</p>
           <h1 className="text-2xl font-semibold text-white">Email verified!</h1>
           <p className="text-sm leading-relaxed text-white/70">{message}</p>
+          {rewardGranted && (
+            <div className="rounded-2xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
+              🎉 +£{rewardAmount} verification reward credited to your wallet!
+            </div>
+          )}
           <div className="flex flex-col gap-3">
             <Button asChild className="w-full min-h-[48px]">
               <Link href="/account">Go to account</Link>

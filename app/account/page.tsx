@@ -38,6 +38,8 @@ type CustomerProfileResponse = {
       phone?: string | null;
       telegramHandle?: string | null;
       transferHandle?: string;
+      emailVerifiedAt?: string | null;
+      pendingEmail?: string | null;
     };
   };
 };
@@ -196,9 +198,12 @@ function OverviewSection({
   const attrs = customer?.data?.attributes;
   const userId = customer?.data?.id;
   const transferHandle = attrs?.transferHandle;
+  const emailVerifiedAt = attrs?.emailVerifiedAt;
+  const pendingEmail = attrs?.pendingEmail;
   const [copyToast, setCopyToast] = useState<string | null>(null);
   const [profileAlert, setProfileAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [verifyLoading, setVerifyLoading] = useState(false);
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -278,6 +283,31 @@ function OverviewSection({
             </Field>
             <Field label="Email" error={profileForm.formState.errors.email?.message}>
               <input type="email" readOnly {...profileForm.register("email")} className={inputCls} />
+              <EmailVerificationBadge
+                emailVerifiedAt={emailVerifiedAt}
+                pendingEmail={pendingEmail}
+                verifyLoading={verifyLoading}
+                onRequestVerify={async () => {
+                  setVerifyLoading(true);
+                  try {
+                    const res = await fetch("/api/account/security/request-verification", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (res.ok && data.success) {
+                      setProfileAlert({ type: "success", message: data.message || "Verification email sent! First verification earns £5." });
+                      refreshCustomer();
+                    } else {
+                      setProfileAlert({ type: "error", message: data.error?.message || data.message || "Failed to send verification email" });
+                    }
+                  } catch {
+                    setProfileAlert({ type: "error", message: "Unable to send verification email" });
+                  } finally {
+                    setVerifyLoading(false);
+                  }
+                }}
+              />
             </Field>
             <Field label="Phone" error={profileForm.formState.errors.phone?.message}>
               <input type="tel" placeholder="+44 7700 900000" {...profileForm.register("phone")} className={inputCls} />
@@ -300,6 +330,52 @@ function OverviewSection({
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━ Shared components ━━━━━━━━━━━━━━━━━━━━━ */
+
+function EmailVerificationBadge({
+  emailVerifiedAt,
+  pendingEmail,
+  verifyLoading,
+  onRequestVerify,
+}: {
+  emailVerifiedAt?: string | null;
+  pendingEmail?: string | null;
+  verifyLoading: boolean;
+  onRequestVerify: () => void;
+}) {
+  if (emailVerifiedAt) {
+    return (
+      <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-200">
+        ✓ Verified
+      </span>
+    );
+  }
+
+  return (
+    <div className="mt-1.5 space-y-1">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-400/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber-200">
+          ✗ Not verified
+        </span>
+        <button
+          type="button"
+          onClick={onRequestVerify}
+          disabled={verifyLoading}
+          className="rounded-full border border-white/20 px-3 py-1 text-[11px] font-semibold text-white/70 transition hover:border-white/40 disabled:opacity-50"
+        >
+          {verifyLoading ? "Sending…" : "Verify now"}
+        </button>
+      </div>
+      {pendingEmail && (
+        <p className="text-[11px] text-white/40">
+          Verification sent to {pendingEmail} · <button type="button" onClick={onRequestVerify} disabled={verifyLoading} className="underline">Resend</button>
+        </p>
+      )}
+      {!pendingEmail && (
+        <p className="text-[11px] text-white/40">First verification earns £5 wallet bonus</p>
+      )}
+    </div>
+  );
+}
 
 function Field({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
   return (
