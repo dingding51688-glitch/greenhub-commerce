@@ -22,7 +22,12 @@ export const primaryNav: NavItem[] = [
   { label: "Support", href: "/support", match: "exact" }
 ];
 
-export const ctaButtons: { primary: NavigationCTA; secondary: NavigationCTA } = {
+export type MenuCTAGroup = {
+  primary: NavigationCTA;
+  secondary: NavigationCTA;
+};
+
+export const menuCtas: MenuCTAGroup = {
   primary: { label: "Browse products", href: "/products" },
   secondary: { label: "Recharge balance", href: "/wallet/topup" }
 };

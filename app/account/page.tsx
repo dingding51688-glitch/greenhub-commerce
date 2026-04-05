@@ -3,7 +3,7 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -52,14 +52,14 @@ type CustomerProfileResponse = {
 /* ─── transfer modal schema ─── */
 const transferSchema = z.object({
   handle: z.string().min(3, "Enter recipient handle"),
-  amount: z.coerce.number().min(1, "Min £1"),
+  amount: z.preprocess((v) => Number(v), z.number().min(1, "Min £1")),
   memo: z.string().optional().or(z.literal("")),
 });
 type TransferFormValues = z.infer<typeof transferSchema>;
 
 /* ─── withdraw modal schema ─── */
 const withdrawSchema = z.object({
-  amount: z.coerce.number().min(20, "Min £20"),
+  amount: z.preprocess((v) => Number(v), z.number().min(20, "Min £20")),
   method: z.enum(["bank", "crypto"]),
   bankAccountName: z.string().optional(),
   bankAccountNumber: z.string().optional(),
@@ -99,7 +99,7 @@ export default function AccountPage() {
         refreshCustomer={refreshCustomer}
         refreshProfile={refreshProfile}
         profile={profile}
-        userEmail={userEmail}
+        userEmail={userEmail || undefined}
       />
 
       {/* ─────── Section 2: Balance ─────── */}
@@ -408,16 +408,16 @@ function CommissionSection({ summary, loading, error }: { summary?: ReferralSumm
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm text-white/80">
                   <thead className="text-white/50">
-                    <tr><th className="py-2">ID</th><th>Orders</th><th>Spend</th><th>Commission</th><th>Last order</th></tr>
+                    <tr><th className="py-2">Customer</th><th>Orders</th><th>Spend</th><th>Commission</th><th>Last order</th></tr>
                   </thead>
                   <tbody>
-                    {summary.customers.map((c) => (
-                      <tr key={c.id} className="border-t border-white/10">
-                        <td className="py-2 font-mono text-xs">#{c.id}</td>
+                    {summary.customers.map((c, index) => (
+                      <tr key={c.email || `customer-${index}`} className="border-t border-white/10">
+                        <td className="py-2 font-mono text-xs">{c.email || `Customer ${index + 1}`}</td>
                         <td>{c.orders}</td>
-                        <td>{currency.format(c.orderValue)}</td>
+                        <td>{currency.format(c.totalSpend)}</td>
                         <td>{currency.format(c.commission)}</td>
-                        <td>{c.lastOrderAt ? dateFmt.format(new Date(c.lastOrderAt)) : "—"}</td>
+                        <td>{c.lastOrder ? dateFmt.format(new Date(c.lastOrder)) : "—"}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -436,7 +436,7 @@ function CommissionSection({ summary, loading, error }: { summary?: ReferralSumm
 /* ━━━━━━━━━━━━━━━━━━━━━ Transfer Modal ━━━━━━━━━━━━━━━━━━━━━ */
 function TransferModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
-  const form = useForm<TransferFormValues>({ resolver: zodResolver(transferSchema), defaultValues: { handle: "", amount: 0, memo: "" } });
+  const form = useForm<TransferFormValues>({ resolver: zodResolver(transferSchema) as Resolver<TransferFormValues>, defaultValues: { handle: "", amount: 0, memo: "" } });
 
   const onSubmit = async (values: TransferFormValues) => {
     setStatus(null);
@@ -483,7 +483,7 @@ function TransferModal({ onClose, onSuccess }: { onClose: () => void; onSuccess:
 function WithdrawModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const form = useForm<WithdrawFormValues>({
-    resolver: zodResolver(withdrawSchema),
+    resolver: zodResolver(withdrawSchema) as Resolver<WithdrawFormValues>,
     defaultValues: { amount: 20, method: "bank", bankAccountName: "", bankAccountNumber: "", bankSortCode: "", cryptoAddress: "", cryptoNetwork: "TRC20", note: "" },
   });
   const method = form.watch("method");

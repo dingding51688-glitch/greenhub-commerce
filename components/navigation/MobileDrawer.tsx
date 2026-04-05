@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { DrawerSection, NavigationCTA, NavItem } from "@/data/fixtures/navigation";
+import type { DrawerSection, MenuCTAGroup, NavItem } from "@/data/fixtures/navigation";
 import { NavLink } from "./NavLink";
 import { LogoMark } from "./LogoMark";
 import { BellIcon } from "./BellIcon";
@@ -14,7 +14,7 @@ export type MobileDrawerProps = {
   open: boolean;
   onClose: () => void;
   sections: DrawerSection[];
-  ctas: { primary: NavigationCTA; secondary: NavigationCTA };
+  ctas: MenuCTAGroup;
   navItems: NavItem[];
 };
 

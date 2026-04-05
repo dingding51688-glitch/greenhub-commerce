@@ -7,7 +7,7 @@ import { useState, type FocusEvent } from "react";
 import {
   primaryNav,
   drawerSections,
-  ctaButtons,
+  menuCtas,
   type NavItem
 } from "@/data/fixtures/navigation";
 import { NavLink } from "./NavLink";
@@ -186,7 +186,7 @@ export function DesktopHeader() {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         sections={drawerSections}
-        ctas={ctaButtons}
+        ctas={menuCtas}
         navItems={primaryNav}
       />
     </>
