@@ -2,20 +2,26 @@
 
 import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
-import type { DrawerSection, MENUCTA, NavItem } from "@/data/fixtures/navigation";
+import { useRouter } from "next/navigation";
+import type { DrawerSection, NavigationCTA, NavItem } from "@/data/fixtures/navigation";
 import { NavLink } from "./NavLink";
 import { LogoMark } from "./LogoMark";
+import { BellIcon } from "./BellIcon";
 import { Button } from "@/components/ui";
+import { useNotifications } from "@/components/providers/NotificationProvider";
 
 export type MobileDrawerProps = {
   open: boolean;
   onClose: () => void;
   sections: DrawerSection[];
-  ctas: { primary: MENUCTA; secondary: MENUCTA };
+  ctas: { primary: NavigationCTA; secondary: NavigationCTA };
   navItems: NavItem[];
 };
 
 export function MobileDrawer({ open, onClose, sections, ctas, navItems }: MobileDrawerProps) {
+  const router = useRouter();
+  const { unreadCount } = useNotifications();
+  const notificationBadge = unreadCount > 0 ? (unreadCount > 99 ? "99+" : `${unreadCount}`) : null;
   const defaultAccordion = useMemo(() => navItems.find((item) => item.children)?.label ?? null, [navItems]);
   const [expanded, setExpanded] = useState<string | null>(defaultAccordion);
 
@@ -27,6 +33,11 @@ export function MobileDrawer({ open, onClose, sections, ctas, navItems }: Mobile
 
   const toggle = (label: string) => {
     setExpanded((prev) => (prev === label ? null : label));
+  };
+
+  const goToNotifications = () => {
+    router.push("/account/notifications");
+    onClose();
   };
 
   return (
@@ -49,15 +60,30 @@ export function MobileDrawer({ open, onClose, sections, ctas, navItems }: Mobile
           open ? "translate-x-0" : "translate-x-full"
         )}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <LogoMark size={36} />
-          <button
-            className="rounded-full border border-white/15 p-2 text-white"
-            onClick={onClose}
-            aria-label="Close menu"
-          >
-            <span className="inline-block text-lg leading-none">×</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="relative rounded-full border border-white/15 p-2 text-white transition hover:border-white/40"
+              onClick={goToNotifications}
+              aria-label="Notifications"
+            >
+              {notificationBadge ? (
+                <span className="absolute -right-1.5 -top-1.5 min-w-[1.2rem] rounded-full border border-[#050505] bg-rose-500 px-1.5 text-[10px] font-semibold leading-[1.2] text-white">
+                  {notificationBadge}
+                </span>
+              ) : null}
+              <BellIcon />
+            </button>
+            <button
+              className="rounded-full border border-white/15 p-2 text-white transition hover:border-white/40"
+              onClick={onClose}
+              aria-label="Close menu"
+            >
+              <span className="inline-block text-lg leading-none">×</span>
+            </button>
+          </div>
         </div>
         <div className="flex flex-col gap-6 overflow-y-auto">
           <div className="space-y-2">

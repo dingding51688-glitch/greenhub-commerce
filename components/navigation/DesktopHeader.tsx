@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, type FocusEvent } from "react";
 import {
   primaryNav,
@@ -11,8 +11,10 @@ import {
   type NavItem
 } from "@/data/fixtures/navigation";
 import { NavLink } from "./NavLink";
+import { BellIcon } from "./BellIcon";
 import { MobileDrawer } from "./MobileDrawer";
 import { LogoMark } from "./LogoMark";
+import { useNotifications } from "@/components/providers/NotificationProvider";
 
 function IconLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
   return (
@@ -26,20 +28,27 @@ function IconLink({ href, label, children }: { href: string; label: string; chil
   );
 }
 
-function IconButton({ onClick, label, children }: { onClick: () => void; label: string; children: React.ReactNode }) {
+function IconButton({ onClick, label, children, badge }: { onClick: () => void; label: string; children: React.ReactNode; badge?: string }) {
   return (
     <button
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-white transition hover:border-white/40"
+      className="relative flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-white transition hover:border-white/40"
     >
+      {badge ? (
+        <span className="absolute -right-1.5 -top-1.5 min-w-[1.2rem] rounded-full border border-[#050505] bg-rose-500 px-1.5 text-[10px] font-semibold leading-[1.2] text-white">
+          {badge}
+        </span>
+      ) : null}
       {children}
     </button>
   );
 }
 
 const iconStroke = "stroke-white";
+
+const formatBadge = (count: number) => (count > 99 ? "99+" : `${count}`);
 
 function AccountIcon() {
   return (
@@ -137,6 +146,9 @@ function ShopMenu({ item }: { item: NavItem }) {
 
 export function DesktopHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const router = useRouter();
+  const { unreadCount } = useNotifications();
+  const notificationBadge = unreadCount > 0 ? formatBadge(unreadCount) : undefined;
 
   return (
     <>
@@ -155,6 +167,9 @@ export function DesktopHeader() {
             )}
           </nav>
           <div className="flex items-center gap-2">
+            <IconButton onClick={() => router.push("/account/notifications")} label="Notifications" badge={notificationBadge}>
+              <BellIcon className={iconStroke} />
+            </IconButton>
             <IconLink href="/account" label="Account">
               <AccountIcon />
             </IconLink>
