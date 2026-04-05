@@ -35,6 +35,8 @@ type AuthProfile = {
 };
 
 interface AuthContextValue {
+  /** Whether the auth state has been hydrated from storage. Always check before redirecting on missing token. */
+  isReady: boolean;
   token: string | null;
   userEmail: string | null;
   profile: AuthProfile | null;
@@ -90,6 +92,7 @@ async function fetchProfile(jwt: string) {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [isReady, setIsReady] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [profile, setProfile] = useState<AuthProfile | null>(null);
@@ -100,6 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const storedEmail = getStoredEmail();
     setToken(storedToken);
     setUserEmail(storedEmail);
+    setIsReady(true);
     if (storedToken) {
       fetchProfile(storedToken)
         .then((data) => {
@@ -273,6 +277,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(
     () => ({
+      isReady,
       token,
       userEmail,
       profile,
@@ -286,7 +291,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       removeFavorite,
       isFavorite
     }),
-    [token, userEmail, profile, favorites, login, register, logout, refreshProfile, refreshFavorites, addFavorite, removeFavorite, isFavorite]
+    [isReady, token, userEmail, profile, favorites, login, register, logout, refreshProfile, refreshFavorites, addFavorite, removeFavorite, isFavorite]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

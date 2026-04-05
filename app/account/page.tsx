@@ -80,18 +80,18 @@ const noRetryOnAuth = {
 
 /* ━━━━━━━━━━━━━━━━━━━━━ Main page ━━━━━━━━━━━━━━━━━━━━━ */
 export default function AccountPage() {
-  const { token, userEmail, profile, refreshProfile, logout } = useAuth();
+  const { isReady, token, userEmail, profile, refreshProfile, logout } = useAuth();
   const router = useRouter();
   const [redirecting, setRedirecting] = useState(false);
 
-  /* Auto-redirect to login if unauthenticated */
+  /* Auto-redirect to login — only after auth hydration is complete */
   useEffect(() => {
-    if (token || redirecting) return;
+    if (!isReady || token || redirecting) return;
     const timer = setTimeout(() => { setRedirecting(true); router.push("/login"); }, 3000);
     return () => clearTimeout(timer);
-  }, [token, redirecting, router]);
+  }, [isReady, token, redirecting, router]);
 
-  /* ── data fetching ── */
+  /* ── data fetching (keys are null until token exists, so SWR won't fire prematurely) ── */
   const { data: customerProfile, error: customerError, isLoading: customerLoading, mutate: refreshCustomer } =
     useSWR<CustomerProfileResponse>(token ? "/api/account/profile" : null, swrFetcher, noRetryOnAuth);
   const { data: balanceData, error: balanceError, isLoading: balanceLoading, mutate: refreshBalance } =
@@ -109,6 +109,18 @@ export default function AccountPage() {
     }
   }, [customerError, logout]);
 
+  /* Still hydrating auth from localStorage — show loading skeleton */
+  if (!isReady) {
+    return (
+      <section className="space-y-8">
+        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-48 w-full" />
+        <Skeleton className="h-48 w-full" />
+      </section>
+    );
+  }
+
+  /* Hydrated but no token — user is genuinely not logged in */
   if (!token) {
     return (
       <section className="mx-auto mt-20 max-w-md space-y-6 rounded-[40px] border border-white/10 bg-night-950/80 p-8 text-center shadow-card">
