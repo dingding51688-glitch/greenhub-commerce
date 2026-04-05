@@ -101,13 +101,18 @@ export default function AccountPage() {
   const { data: commissionData, error: commissionError, isLoading: commissionLoading } =
     useSWR<ReferralSummary>(token ? "referral-summary" : null, getReferralSummary, noRetryOnAuth);
 
-  /* Handle stale/expired token: if profile returns 401/403, log out */
+  /* Handle auth errors from profile API */
+  const profileStatus = (customerError as Error & { status?: number })?.status;
+  const profileMessage = customerError?.message || "";
+  const isCustomerMissing = profileStatus === 401 && profileMessage.includes("could not determine customer");
+  const isTokenInvalid = profileStatus === 401 && !isCustomerMissing;
+
   useEffect(() => {
-    const status = (customerError as Error & { status?: number })?.status;
-    if (status === 401 || status === 403) {
+    // Only logout on genuinely invalid tokens, NOT on missing customer records
+    if (isTokenInvalid) {
       logout();
     }
-  }, [customerError, logout]);
+  }, [isTokenInvalid, logout]);
 
   /* Debug banner — only in non-production or when NEXT_PUBLIC_SHOW_AUTH_DEBUG is set */
   const showDebug = process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_SHOW_AUTH_DEBUG === "1";
@@ -134,6 +139,32 @@ export default function AccountPage() {
           <Button onClick={() => router.push("/login")}>Log in</Button>
           <Button variant="secondary" onClick={() => router.push("/register")}>Create account</Button>
         </div>
+      </section>
+    );
+  }
+
+  /* Account not yet provisioned — user exists but no customer record */
+  if (isCustomerMissing) {
+    return (
+      <section className="mx-auto mt-20 max-w-md space-y-6 rounded-[40px] border border-amber-500/20 bg-amber-500/5 p-8 text-center shadow-card">
+        <h2 className="text-2xl font-semibold text-white">Account pending setup</h2>
+        <p className="text-sm text-white/70">
+          Your login works, but your account profile hasn&apos;t been created yet.
+          This usually takes a few minutes after registration.
+        </p>
+        <p className="text-sm text-white/70">
+          If this persists, contact support so we can link your profile manually.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Button onClick={() => refreshCustomer()}>Try again</Button>
+          <Button variant="secondary" onClick={() => router.push("/support")}>Contact support</Button>
+        </div>
+        {showDebug && (
+          <div className="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3 font-mono text-xs text-amber-200 text-left">
+            <p>Debug: user authenticated but no customer record found</p>
+            <p>Email: {userEmail} | Error: {profileMessage}</p>
+          </div>
+        )}
       </section>
     );
   }
