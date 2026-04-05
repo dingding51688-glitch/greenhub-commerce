@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm, type Resolver } from "react-hook-form";
@@ -12,15 +12,13 @@ import Button from "@/components/ui/button";
 import { StateMessage } from "@/components/StateMessage";
 import { Skeleton } from "@/components/Skeleton";
 import { swrFetcher, apiMutate } from "@/lib/api";
-// Removed: getReferralSummary, ReferralSummary, WalletBalanceResponse, WalletTransactionsResponse, WalletTransaction
-// (balance & commission now live in /wallet and /account/commission)
+
 
 /* ─── constants ─── */
-const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
-const dateFmt = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" });
+
 const phoneRegex = /^\+?[0-9]{7,15}$/;
 const telegramRegex = /^@?[a-zA-Z0-9_]{5,32}$/;
-const inputCls = "w-full rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-white/40";
+const inputCls = "w-full rounded-2xl border border-white/15 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none";
 
 /* ─── profile schema ─── */
 const profileSchema = z.object({
@@ -28,8 +26,6 @@ const profileSchema = z.object({
   email: z.string().email(),
   phone: z.string().optional().or(z.literal("")).refine((v) => !v || phoneRegex.test(v), { message: "Enter a valid phone number" }),
   telegramHandle: z.string().optional().or(z.literal("")).refine((v) => !v || telegramRegex.test(v), { message: "Enter a valid Telegram handle" }),
-  preferredLocker: z.string().optional().or(z.literal("")),
-  marketingOptIn: z.boolean(),
 });
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
@@ -41,10 +37,7 @@ type CustomerProfileResponse = {
       email?: string;
       phone?: string | null;
       telegramHandle?: string | null;
-      preferredLocker?: string | null;
-      marketingOptIn?: boolean;
       transferHandle?: string;
-      lockerPreferences?: { data: { id: number; attributes?: { code?: string; label?: string } }[] };
     };
   };
 };
@@ -209,7 +202,7 @@ function OverviewSection({
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    defaultValues: { fullName: "", email: "", phone: "", telegramHandle: "", preferredLocker: "", marketingOptIn: false },
+    defaultValues: { fullName: "", email: "", phone: "", telegramHandle: "" },
   });
 
   useEffect(() => {
@@ -219,17 +212,11 @@ function OverviewSection({
       email: attrs.email || profile?.email || userEmail || "",
       phone: attrs.phone || "",
       telegramHandle: attrs.telegramHandle || "",
-      preferredLocker: attrs.preferredLocker || "",
-      marketingOptIn: Boolean(attrs.marketingOptIn),
+
     });
   }, [customer, profileForm, profile, userEmail, attrs]);
 
-  const lockerOptions = useMemo(() => {
-    return (attrs?.lockerPreferences?.data || []).map((n) => ({
-      value: n.attributes?.code || String(n.id),
-      label: n.attributes?.label || n.attributes?.code || `Area ${n.id}`,
-    }));
-  }, [attrs]);
+
 
   const handleCopyId = async (value: string) => {
     try {
@@ -246,8 +233,7 @@ function OverviewSection({
       await apiMutate<{ data?: unknown }>("/api/account/profile", "PUT", {
         phone: values.phone?.trim() || null,
         telegramHandle: values.telegramHandle ? values.telegramHandle.replace(/^@/, "") : null,
-        preferredLocker: values.preferredLocker || null,
-        marketingOptIn: values.marketingOptIn,
+
       });
       setProfileAlert({ type: "success", message: "Profile updated" });
       await Promise.all([refreshCustomer(), refreshProfile()]);
@@ -257,7 +243,7 @@ function OverviewSection({
   };
 
   return (
-    <div className="rounded-[40px] border border-white/10 bg-card p-6">
+    <div className="rounded-3xl border border-white/10 bg-card p-4 sm:rounded-[40px] sm:p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-white/50">Account Center</p>
@@ -285,8 +271,8 @@ function OverviewSection({
       ) : customerError ? (
         <StateMessage variant="error" title="Unable to load profile" body={customerError.message} actionLabel="Retry" onAction={() => refreshCustomer()} />
       ) : (
-        <form className="mt-4 space-y-4" onSubmit={profileForm.handleSubmit(submitProfile)}>
-          <div className="grid gap-4 sm:grid-cols-2">
+        <form className="mt-5 space-y-5" onSubmit={profileForm.handleSubmit(submitProfile)}>
+          <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Full name" error={profileForm.formState.errors.fullName?.message}>
               <input type="text" readOnly {...profileForm.register("fullName")} className={inputCls} />
             </Field>
@@ -294,31 +280,18 @@ function OverviewSection({
               <input type="email" readOnly {...profileForm.register("email")} className={inputCls} />
             </Field>
             <Field label="Phone" error={profileForm.formState.errors.phone?.message}>
-              <div className="flex gap-2">
-                <input type="tel" placeholder="+44 7700 900000" {...profileForm.register("phone")} className={`${inputCls} flex-1`} />
-                <button type="button" onClick={() => profileForm.setValue("phone", "", { shouldDirty: true })} className="rounded-2xl border border-white/10 px-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/60 transition hover:border-white/30">Clear</button>
-              </div>
+              <input type="tel" placeholder="+44 7700 900000" {...profileForm.register("phone")} className={inputCls} />
             </Field>
             <Field label="Telegram" error={profileForm.formState.errors.telegramHandle?.message}>
               <input type="text" placeholder="@your_handle" {...profileForm.register("telegramHandle")} className={inputCls} />
             </Field>
-            <Field label="Preferred area" error={profileForm.formState.errors.preferredLocker?.message}>
-              <select {...profileForm.register("preferredLocker")} className={inputCls}>
-                <option value="">Select preferred area</option>
-                {lockerOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </Field>
           </div>
-          <label className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80">
-            <input type="checkbox" className="mt-1 h-4 w-4 accent-brand-500" {...profileForm.register("marketingOptIn")} />
-            <span>Opt-in to marketing updates <small className="block text-white/50">New product alerts + exclusive offers.</small></span>
-          </label>
           {profileAlert && (
-            <div className={`rounded-2xl border px-3 py-2 text-sm ${profileAlert.type === "success" ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-100" : "border-red-400/40 bg-red-400/10 text-red-100"}`}>{profileAlert.message}</div>
+            <div className={`rounded-2xl border px-4 py-3 text-sm ${profileAlert.type === "success" ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-100" : "border-red-400/40 bg-red-400/10 text-red-100"}`}>{profileAlert.message}</div>
           )}
-          <div className="flex flex-wrap gap-3">
-            <Button type="submit" disabled={saving}>{saving ? "Saving…" : "Save changes"}</Button>
-            <Button asChild variant="secondary"><Link href="/account/security">Change email or password</Link></Button>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button type="submit" disabled={saving} className="w-full min-h-[48px] text-base sm:w-auto">{saving ? "Saving…" : "Save changes"}</Button>
+            <Button asChild variant="secondary" className="w-full min-h-[48px] text-base sm:w-auto"><Link href="/account/security">Change email or password</Link></Button>
           </div>
         </form>
       )}
@@ -330,9 +303,9 @@ function OverviewSection({
 
 function Field({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
   return (
-    <label className="block text-xs uppercase tracking-[0.3em] text-white/50">
+    <label className="block text-xs font-medium uppercase tracking-[0.3em] text-white/60">
       {label}
-      <div className="mt-1">{children}</div>
+      <div className="mt-1.5">{children}</div>
       {error && <p className="mt-1 text-xs text-red-300">{error}</p>}
     </label>
   );
