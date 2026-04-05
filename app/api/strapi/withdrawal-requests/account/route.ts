@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const STRAPI_DIRECT_URL_VALUE = process.env.STRAPI_DIRECT_URL;
-
-if (!STRAPI_DIRECT_URL_VALUE) {
-  throw new Error("STRAPI_DIRECT_URL is not configured");
+function ensureStrapiDirectUrl() {
+  const value = process.env.STRAPI_DIRECT_URL?.trim();
+  if (!value) {
+    throw new Error("STRAPI_DIRECT_URL is not configured");
+  }
+  return value;
 }
 
-const STRAPI_DIRECT_URL = STRAPI_DIRECT_URL_VALUE as string;
-
-function buildHeaders(request: NextRequest) {
+function buildHeaders(request: NextRequest, directUrl: string) {
   const headers = new Headers();
   for (const key of ["authorization", "cookie", "accept", "accept-language", "user-agent"]) {
     const value = request.headers.get(key);
     if (value) headers.set(key, value);
   }
-  headers.set("host", new URL(STRAPI_DIRECT_URL).host);
+  headers.set("host", new URL(directUrl).host);
   return headers;
 }
 
@@ -44,6 +44,7 @@ function mapPayload(payload: any) {
 }
 
 async function handlePost(request: NextRequest) {
+  const directUrl = ensureStrapiDirectUrl();
   let body: Record<string, unknown>;
   try {
     const incoming = await request.json();
@@ -52,8 +53,8 @@ async function handlePost(request: NextRequest) {
     return NextResponse.json({ error: { message: error?.message || "Invalid payload" } }, { status: 400 });
   }
 
-  const target = new URL("/api/account/withdrawals", STRAPI_DIRECT_URL);
-  const headers = buildHeaders(request);
+  const target = new URL("/api/account/withdrawals", directUrl);
+  const headers = buildHeaders(request, directUrl);
   headers.set("Content-Type", "application/json");
 
   const upstream = await fetch(target, {
@@ -71,9 +72,10 @@ async function handlePost(request: NextRequest) {
 }
 
 async function handleGet(request: NextRequest) {
-  const target = new URL("/api/account/withdrawals", STRAPI_DIRECT_URL);
+  const directUrl = ensureStrapiDirectUrl();
+  const target = new URL("/api/account/withdrawals", directUrl);
   target.search = request.nextUrl.search;
-  const headers = buildHeaders(request);
+  const headers = buildHeaders(request, directUrl);
   const upstream = await fetch(target, { method: "GET", headers, redirect: "manual" });
   const payload = await upstream.json().catch(() => ({}));
   if (upstream.ok) {
