@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { NotificationProvider } from "@/components/providers/NotificationProvider";
 import { DesktopHeader, Footer } from "@/components/navigation";
 
 export const dynamic = "force-dynamic";
@@ -15,11 +16,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="text-white">
         <AuthProvider>
-          <div className="min-h-screen flex flex-col">
-            <DesktopHeader />
-            <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
-            <Footer />
-          </div>
+          <NotificationProvider>
+            <div className="min-h-screen flex flex-col">
+              <DesktopHeader />
+              <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
+              <Footer />
+            </div>
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>
