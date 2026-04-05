@@ -2,6 +2,16 @@ import { getStoredToken } from "@/lib/auth-store";
 
 const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
+export class ReferralApiError extends Error {
+  status?: number;
+
+  constructor(message: string, status?: number) {
+    super(message);
+    this.name = "ReferralApiError";
+    this.status = status;
+  }
+}
+
 async function referralFetch<T>(path: string, init?: RequestInit): Promise<T> {
   if (!AUTH_BASE) throw new Error("NEXT_PUBLIC_AUTH_BASE_URL missing");
   const token = getStoredToken();
@@ -16,7 +26,7 @@ async function referralFetch<T>(path: string, init?: RequestInit): Promise<T> {
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(payload?.error?.message || "Referral request failed");
+    throw new ReferralApiError(payload?.error?.message || "Referral request failed", response.status);
   }
   return (payload?.data ?? payload) as T;
 }
@@ -81,7 +91,7 @@ export async function getReferralEvents(params?: { page?: number; pageSize?: num
 }
 
 export type CommissionTransaction = {
-  id: number;
+  id: number | string;
   amount: number;
   status: string;
   reference?: string;
@@ -111,4 +121,55 @@ export async function getCommissionTransactions(params?: { page?: number; pageSi
 
 export function getReferralCommissions(params?: { page?: number; pageSize?: number }) {
   return getCommissionTransactions(params);
+}
+
+export type CommissionHubSummary = {
+  code?: string | null;
+  link?: string | null;
+  totalInvites?: number;
+  activeLockers?: number;
+  bonusEarned?: number;
+  clicks?: number;
+  validClicks?: number;
+  clickPayoutTotal?: number;
+  registrations?: number;
+  topups?: number;
+  conversionRate?: number;
+  ctr?: number;
+  impressions?: number;
+  monthCommission?: number;
+  totalOrderValue?: number;
+  totalConverted?: number;
+  totalCommission?: number;
+  thirtyDayCommission?: number;
+};
+
+export type CommissionHubTask = {
+  id: number | string;
+  title: string;
+  description?: string;
+  rewardLabel?: string;
+  progress?: number;
+  state?: string;
+};
+
+export type CommissionHubConversion = {
+  id: number | string;
+  email?: string;
+  locker?: string;
+  status?: string;
+  createdAt?: string;
+  orderValue?: number;
+  commission?: number;
+};
+
+export type CommissionHubSnapshot = {
+  summary?: CommissionHubSummary | null;
+  tasks?: CommissionHubTask[];
+  conversions?: CommissionHubConversion[];
+  history?: CommissionTransaction[];
+};
+
+export async function getCommissionHubSnapshot() {
+  return referralFetch<CommissionHubSnapshot>("/api/referrals/commission-hub");
 }

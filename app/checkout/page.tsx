@@ -1,95 +1,87 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import useSWR from "swr";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useCart, type CartItem } from "@/components/providers/CartProvider";
 import { StateMessage } from "@/components/StateMessage";
-import { Skeleton } from "@/components/Skeleton";
 import Button from "@/components/ui/button";
-import { swrFetcher } from "@/lib/api";
-import type { ProductsResponse } from "@/lib/types";
 import { createOrder } from "@/lib/orders-api";
 import { getStoredReferralCode } from "@/lib/referral-tracking";
 
 const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
-const formSchema = z.object({
-  dropoffPostcode: z.string().min(4, "Enter your postcode"),
-  paymentOption: z.enum(["wallet", "nowpayments", "locker"])
-});
+/* ── Form schema ── */
 
+const formSchema = z.object({
+  paymentOption: z.enum(["wallet", "nowpayments"]),
+});
 type CheckoutFormValues = z.infer<typeof formSchema>;
+
+/* ── Page ── */
 
 export default function CheckoutPage() {
   const { token } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const slug = searchParams.get("product");
-  const presetWeight = searchParams.get("weight");
-  const presetQty = Math.max(1, Number(searchParams.get("qty") || "1"));
-  const [quantity, setQuantity] = useState(presetQty);
+  const { items, subtotal, totalItems, clearCart } = useCart();
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const { data: productData, error: productError } = useSWR<ProductsResponse>(
-    slug ? `/api/products?filters[slug][$eq]=${slug}&populate[weightOptions]=*` : null,
-    swrFetcher
-  );
-  const product = productData?.data?.[0];
-
-  const weightOptions = useMemo(() => product?.weightOptions || [], [product]);
-  const [selectedWeight, setSelectedWeight] = useState<string | null>(presetWeight || null);
-
-  useEffect(() => {
-    if (!selectedWeight && weightOptions.length > 0) {
-      setSelectedWeight(weightOptions[0].label);
-    }
-  }, [weightOptions, selectedWeight]);
-
-  const selectedOption = useMemo(
-    () => weightOptions.find((option) => option.label === selectedWeight) || weightOptions[0],
-    [weightOptions, selectedWeight]
-  );
-
-  const unitPrice = selectedOption?.price ?? product?.priceFrom ?? 0;
-  const cartTotal = unitPrice * quantity;
-
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      dropoffPostcode: "",
-      paymentOption: "wallet"
-    }
+    defaultValues: { paymentOption: "wallet" },
   });
 
+  /* ── Guards ── */
+
+  if (!token) {
+    return (
+      <StateMessage
+        title="Please sign in"
+        body="Log in to complete your order."
+        actionLabel="Go to login"
+        onAction={() => router.push("/login")}
+      />
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <StateMessage
+        variant="empty"
+        title="Nothing to check out"
+        body="Your cart is empty. Add some products first."
+        actionLabel="Browse products"
+        onAction={() => router.push("/products")}
+      />
+    );
+  }
+
+  /* ── Submit ── */
+
   const onSubmit = async (values: CheckoutFormValues) => {
-    if (!product || !selectedOption) {
-      setAlert({ type: "error", message: "Missing product selection. Return to product page." });
-      return;
-    }
     setSubmitting(true);
     setAlert(null);
     try {
       const referralCode = getStoredReferralCode();
       const payload = {
-        items: [
-          {
-            productId: product.id,
-            quantity,
-            unitPrice,
-            weight: selectedOption.label
-          }
-        ],
-        dropoffPostcode: values.dropoffPostcode,
+        items: items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          weight: item.weight,
+        })),
         paymentOption: values.paymentOption,
-        referralCode: referralCode || undefined
+        referralCode: referralCode || undefined,
       };
       const response = await createOrder(payload);
-      setAlert({ type: "success", message: `Order ${response.order.reference} created.` });
+      clearCart();
+      setAlert({ type: "success", message: `Order ${response.order.reference} created!` });
       router.push(`/orders/${response.order.reference}`);
     } catch (error: any) {
       setAlert({ type: "error", message: error?.message || "Unable to create order" });
@@ -97,31 +89,6 @@ export default function CheckoutPage() {
       setSubmitting(false);
     }
   };
-
-  if (!token) {
-    return (
-      <StateMessage
-        title="Please sign in"
-        body="Log in to share your postcode and place orders."
-        actionLabel="Go to login"
-        onAction={() => router.push("/login")}
-      />
-    );
-  }
-
-  if (!slug) {
-    return (
-      <StateMessage
-        variant="empty"
-        title="No product selected"
-        body="Start from the product detail page to pick a weight before checkout."
-        actionLabel="Browse menu"
-        onAction={() => router.push("/products")}
-      />
-    );
-  }
-
-  const loadingProduct = !product && !productError;
 
   return (
     <section className="space-y-6">
@@ -138,110 +105,91 @@ export default function CheckoutPage() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
+        {/* ── Left: payment form ── */}
         <div className="space-y-4 rounded-[40px] border border-white/10 bg-night-950/70 p-6">
           <header className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/50">Postcode drop</p>
-            <h1 className="text-2xl font-semibold text-white">We pick the nearest locker</h1>
-            <p className="text-sm text-white/70">Share the postcode closest to you. Concierge assigns the locker and texts you once it’s stocked.</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-white/50">Checkout</p>
+            <h1 className="text-2xl font-semibold text-white">Choose payment method</h1>
+            <p className="text-sm text-white/70">
+              Select how you&apos;d like to pay. Wallet balance is instant;
+              crypto payments are confirmed after 1 network confirmation.
+            </p>
           </header>
 
           <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField label="Postcode" error={form.formState.errors.dropoffPostcode?.message}>
-              <input
-                type="text"
-                className={inputClass}
-                placeholder="BT1 1AA"
-                {...form.register("dropoffPostcode")}
-              />
-            </FormField>
-
-            <FormField label="Payment" error={form.formState.errors.paymentOption?.message}>
-              <div className="space-y-3">
-                {[
-                  { value: "wallet", label: "Wallet balance" },
-                  { value: "nowpayments", label: "NowPayments (USDT)" },
-                  { value: "locker", label: "Locker COD" }
-                ].map((option) => (
-                  <label
-                    key={option.value}
-                    className={`flex cursor-pointer items-center gap-3 rounded-3xl border px-4 py-3 ${
-                      form.watch("paymentOption") === option.value
-                        ? "border-white text-white"
-                        : "border-white/10 text-white/70"
-                    }`}
-                  >
-                    <input type="radio" value={option.value} {...form.register("paymentOption")} />
-                    {option.label}
-                  </label>
-                ))}
-              </div>
-            </FormField>
+            <div className="space-y-3">
+              {[
+                { value: "wallet" as const, label: "Wallet balance", desc: "Instant — deducted from your topped-up balance" },
+                { value: "nowpayments" as const, label: "Crypto (USDT)", desc: "Via NowPayments — confirmation in ~2 min" },
+              ].map((option) => (
+                <label
+                  key={option.value}
+                  className={`flex cursor-pointer flex-col gap-1 rounded-3xl border px-5 py-4 transition ${
+                    form.watch("paymentOption") === option.value
+                      ? "border-emerald-400/60 bg-emerald-400/5 text-white"
+                      : "border-white/10 text-white/70 hover:border-white/20"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      value={option.value}
+                      {...form.register("paymentOption")}
+                      className="accent-emerald-400"
+                    />
+                    <span className="font-semibold">{option.label}</span>
+                  </div>
+                  <p className="ml-6 text-xs text-white/50">{option.desc}</p>
+                </label>
+              ))}
+            </div>
 
             <Button type="submit" disabled={submitting} className="w-full">
-              {submitting ? "Submitting…" : "Place order"}
+              {submitting ? "Placing order…" : `Pay ${currency.format(subtotal)}`}
             </Button>
           </form>
         </div>
 
+        {/* ── Right: order summary ── */}
         <aside className="space-y-4">
-          <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5">
-            <h3 className="text-lg font-semibold text-white">Order summary</h3>
-            {loadingProduct ? (
-              <div className="mt-4 space-y-2">
-                <Skeleton className="h-6 w-40" />
-                <Skeleton className="h-6 w-32" />
-              </div>
-            ) : product ? (
-              <div className="mt-4 space-y-3 text-sm text-white/70">
-                <p className="text-white">{product.title}</p>
-                <div className="flex items-center justify-between text-xs text-white/60">
-                  <span>Weight</span>
-                  <select
-                    className="rounded-2xl border border-white/15 bg-transparent px-3 py-1 text-white"
-                    value={selectedWeight ?? ""}
-                    onChange={(event) => setSelectedWeight(event.target.value)}
-                  >
-                    {weightOptions.map((option) => (
-                      <option key={option.id} value={option.label} className="bg-night-900 text-white">
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex items-center justify-between text-xs text-white/60">
-                  <span>Quantity</span>
-                  <input
-                    type="number"
-                    min={1}
-                    className="w-20 rounded-2xl border border-white/15 bg-transparent px-2 py-1 text-center text-white"
-                    value={quantity}
-                    onChange={(event) => setQuantity(Math.max(1, Number(event.target.value)))}
-                  />
-                </div>
-                <div className="flex items-center justify-between text-xs text-white/60">
-                  <span>Unit price</span>
-                  <span className="text-white">{currency.format(unitPrice)}</span>
-                </div>
-                <div className="flex items-center justify-between text-base font-semibold text-white">
-                  <span>Total</span>
-                  <span>{currency.format(cartTotal)}</span>
-                </div>
-              </div>
-            ) : (
-              <p className="mt-4 text-sm text-red-300">Unable to load product. Return to the menu.</p>
-            )}
-          </div>
-          <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
-            <p className="font-semibold text-white">Need help?</p>
-            <p className="mt-1">Visit the support hub for locker swaps, payment escalations, or concierge chat links. First-time customer? Read the onboarding guide.</p>
-            <div className="mt-3 space-y-2">
-              <Button asChild variant="ghost" className="w-full">
-                <a href="/support">Open support hub</a>
-              </Button>
-              <Button asChild variant="secondary" className="w-full">
-                <a href="/guide/locker">Locker onboarding guide</a>
-              </Button>
+          <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs uppercase tracking-[0.3em] text-white/50">
+                Order summary
+              </h3>
+              <Link href="/cart" className="text-xs text-white/40 hover:text-white/60">
+                Edit cart
+              </Link>
             </div>
+
+            <ul className="space-y-3">
+              {items.map((item) => (
+                <CartLineItem key={`${item.productId}::${item.weight}`} item={item} />
+              ))}
+            </ul>
+
+            <div className="border-t border-white/10 pt-3 space-y-2">
+              <div className="flex justify-between text-sm text-white/70">
+                <span>Subtotal ({totalItems} {totalItems === 1 ? "item" : "items"})</span>
+                <span className="text-white">{currency.format(subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-sm text-white/70">
+                <span>Shipping</span>
+                <span className="text-emerald-300">Free</span>
+              </div>
+              <div className="flex justify-between text-base font-semibold text-white pt-1">
+                <span>Total</span>
+                <span>{currency.format(subtotal)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/60">
+            <p className="font-semibold text-white/80">Need help?</p>
+            <p className="mt-1">
+              Visit <Link href="/support" className="underline">support</Link> for
+              payment issues or order questions.
+            </p>
           </div>
         </aside>
       </div>
@@ -249,16 +197,31 @@ export default function CheckoutPage() {
   );
 }
 
-function FormField({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+/* ── Cart line item ── */
+
+function CartLineItem({ item }: { item: CartItem }) {
   return (
-    <label className="block text-xs uppercase tracking-[0.3em] text-white/40">
-      {label}
-      <div className="mt-1 space-y-1">
-        {children}
-        {error && <p className="text-xs text-red-300">{error}</p>}
+    <li className="flex gap-3">
+      <div className="shrink-0">
+        {item.image ? (
+          <Image
+            src={item.image}
+            alt={item.title}
+            width={48}
+            height={48}
+            className="rounded-xl object-cover"
+          />
+        ) : (
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 text-lg">📦</div>
+        )}
       </div>
-    </label>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-white truncate">{item.title}</p>
+        <p className="text-xs text-white/40">{item.weight} × {item.quantity}</p>
+      </div>
+      <p className="shrink-0 text-sm font-semibold text-white">
+        {currency.format(item.unitPrice * item.quantity)}
+      </p>
+    </li>
   );
 }
-
-const inputClass = "w-full rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-white/40";
