@@ -9,6 +9,7 @@ import { LogoMark } from "./LogoMark";
 import { BellIcon } from "./BellIcon";
 import { Button } from "@/components/ui";
 import { useNotifications } from "@/components/providers/NotificationProvider";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export type MobileDrawerProps = {
   open: boolean;
@@ -21,6 +22,8 @@ export type MobileDrawerProps = {
 export function MobileDrawer({ open, onClose, sections, ctas, navItems }: MobileDrawerProps) {
   const router = useRouter();
   const { unreadCount } = useNotifications();
+  const { logout, token } = useAuth();
+  const isAuthenticated = Boolean(token);
   const notificationBadge = unreadCount > 0 ? (unreadCount > 99 ? "99+" : `${unreadCount}`) : null;
   const defaultAccordion = useMemo(() => navItems.find((item) => item.children)?.label ?? null, [navItems]);
   const [expanded, setExpanded] = useState<string | null>(defaultAccordion);
@@ -38,6 +41,12 @@ export function MobileDrawer({ open, onClose, sections, ctas, navItems }: Mobile
   const goToNotifications = () => {
     router.push("/account/notifications");
     onClose();
+  };
+
+  const handleSignOut = () => {
+    logout();
+    onClose();
+    router.push("/login");
   };
 
   return (
@@ -140,6 +149,15 @@ export function MobileDrawer({ open, onClose, sections, ctas, navItems }: Mobile
                     onClick={onClose}
                   />
                 ))}
+                {section.title === "Account" && isAuthenticated ? (
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="rounded-full border border-white/15 px-4 py-2 text-left text-sm font-semibold uppercase tracking-[0.15em] text-white/70 transition hover:border-white/40 hover:text-white"
+                  >
+                    Sign out
+                  </button>
+                ) : null}
               </div>
             </div>
           ))}

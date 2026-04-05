@@ -15,6 +15,7 @@ import { BellIcon } from "./BellIcon";
 import { MobileDrawer } from "./MobileDrawer";
 import { LogoMark } from "./LogoMark";
 import { useNotifications } from "@/components/providers/NotificationProvider";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 function IconLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
   return (
@@ -148,7 +149,13 @@ export function DesktopHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const router = useRouter();
   const { unreadCount } = useNotifications();
+  const { logout, token } = useAuth();
   const notificationBadge = unreadCount > 0 ? formatBadge(unreadCount) : undefined;
+
+  const handleSignOut = () => {
+    logout();
+    router.push("/login");
+  };
 
   return (
     <>
@@ -176,6 +183,15 @@ export function DesktopHeader() {
             <IconLink href="/checkout" label="Shopping bag">
               <BagIcon />
             </IconLink>
+            {token ? (
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="hidden rounded-full border border-white/15 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/80 transition hover:border-white/40 hover:text-white sm:inline-flex"
+              >
+                Sign out
+              </button>
+            ) : null}
             <IconButton onClick={() => setDrawerOpen(true)} label="Open menu">
               <MenuIcon />
             </IconButton>
