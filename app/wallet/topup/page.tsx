@@ -217,6 +217,12 @@ function NowPaymentsPanel({ intent, status, countdown, payment, paymentStatus }:
   const normalizedStatus = paymentStatus ? paymentStatus.replace(/_/g, " ") : status?.status?.replace(/_/g, " ") || "pending";
   const success = paymentStatus ? ["finished", "confirmed", "completed"].includes(paymentStatus) : status?.status === "confirmed";
   const qrSrc = payment.qrCode || (payment.payAddress ? `https://chart.googleapis.com/chart?chs=240x240&cht=qr&chl=${encodeURIComponent(payment.payAddress)}` : null);
+  const topupStatusText = paymentStatus
+    ? paymentStatus.replace(/_/g, " ")
+    : status?.status
+      ? status.status.replace(/_/g, " ")
+      : "pending";
+  const invoiceAmount = typeof status?.amountFiat === "number" ? status.amountFiat : payment.priceAmount;
 
   const copyValue = async (value: string) => {
     try {
@@ -284,19 +290,19 @@ function NowPaymentsPanel({ intent, status, countdown, payment, paymentStatus }:
       {status && (
         <dl className="grid gap-2 text-xs text-white/80 sm:grid-cols-3">
           <div>
-            <dt className="uppercase tracking-[0.3em] text-white/40">Top-up status</dt>
-            <dd className="text-sm font-semibold capitalize text-white">{status.status.replace(/_/g, " ")}</dd>
-          </div>
-          <div>
-            <dt className="uppercase tracking-[0.3em] text-white/40">Network</dt>
-            <dd className="text-sm font-semibold text-white">{status.network || payment.payCurrency}</dd>
-          </div>
-          <div>
-            <dt className="uppercase tracking-[0.3em] text-white/40">Invoice amount</dt>
-            <dd className="text-sm font-semibold text-white">£{status.amountFiat.toFixed(2)}</dd>
-          </div>
-        </dl>
-      )}
+          <dt className="uppercase tracking-[0.3em] text-white/40">Top-up status</dt>
+          <dd className="text-sm font-semibold capitalize text-white">{topupStatusText}</dd>
+        </div>
+        <div>
+          <dt className="uppercase tracking-[0.3em] text-white/40">Network</dt>
+          <dd className="text-sm font-semibold text-white">{status.network || payment.payCurrency}</dd>
+        </div>
+        <div>
+          <dt className="uppercase tracking-[0.3em] text-white/40">Invoice amount</dt>
+          <dd className="text-sm font-semibold text-white">£{invoiceAmount.toFixed(2)}</dd>
+        </div>
+      </dl>
+    )}
       {countdown && <p className="text-xs text-white/60">Invoice expires in {countdown}</p>}
       {success && (
         <p className="text-xs text-emerald-200">Payment confirmed. Balance will update shortly.</p>
