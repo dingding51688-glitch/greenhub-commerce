@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
@@ -12,7 +12,6 @@ import {
   getCommissionHubSnapshot,
   ReferralApiError,
   type CommissionHubSnapshot,
-  type CommissionHubConversion,
   type CommissionHubTask,
   type CommissionTransaction
 } from "@/lib/referral-api";
@@ -108,8 +107,7 @@ export default function CommissionHubPage() {
   const telegramShare = summaryLink ? `https://t.me/share/url?url=${shareUrl}&text=${shareText}` : null;
   const whatsappShare = summaryLink ? `https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}` : null;
 
-  const statCards = useMemo(
-    () => [
+  const statCards = [
       {
         label: "Clicks",
         value: clicks.toString(),
@@ -125,9 +123,7 @@ export default function CommissionHubPage() {
         value: currency.format(lifetimeCommission),
         sub: `£${clickCommission.toFixed(2)} clicks · £${orderCommission.toFixed(2)} orders`
       }
-    ],
-    [clicks, ctr, registrations, topups, conversionRate, lifetimeCommission, clickCommission, orderCommission]
-  );
+  ];
 
   const handleCopy = async () => {
     if (!summaryLink) return;
