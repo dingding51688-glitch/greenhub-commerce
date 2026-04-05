@@ -25,7 +25,7 @@ export default function ReferralLeaderboardPage() {
 
   const heroCopy = {
     title: "Top ambassadors",
-    body: "Every quarter we spotlight the members who activate the most lockers. Top 3 receive a concierge bonus and limited merch drop.",
+    body: "Every quarter we spotlight the members who bring in the most referrals. Top 3 receive a bonus reward and limited merch drop.",
     nextReset: "Reset April 30, 2026"
   };
 
@@ -60,7 +60,7 @@ export default function ReferralLeaderboardPage() {
         <StateMessage
           variant="info"
           title="Want to climb the board?"
-          body="Log in or create an account to start sharing your locker invite link."
+          body="Log in or create an account to start sharing your invite link."
           actionLabel="Start earning"
           onAction={() => (window.location.href = "/login")}
         />
@@ -86,7 +86,7 @@ export default function ReferralLeaderboardPage() {
           <p className="text-xs uppercase tracking-[0.3em] text-white/50">Programme rules</p>
           <ul className="mt-3 list-disc space-y-2 pl-5">
             <li>Only genuine invites count (no coupon dumps, no paid ads).</li>
-            <li>Commission posts within 12h of locker delivery.</li>
+            <li>Commission posts within 12h of order fulfilment.</li>
             <li>Top 3 each month receive £150 bonus; top 10 qualify for merch drop.</li>
             <li>Accounts abusing the system will be removed from the leaderboard.</li>
           </ul>
@@ -104,7 +104,7 @@ export default function ReferralLeaderboardPage() {
             </div>
             <div>
               <dt className="font-semibold text-white">How do I cash out?</dt>
-              <dd className="text-white/70">Same flow as other rewards — Wallet → Withdraw (min £20 via bank or USDT).</dd>
+              <dd className="text-white/70">Same flow as other rewards — Account → Withdraw (min £20 via bank or USDT).</dd>
             </div>
           </dl>
         </div>

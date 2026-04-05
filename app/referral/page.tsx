@@ -21,8 +21,8 @@ import { consumeClickError, getLastTrackedClickTime } from "@/lib/referral-track
 const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
 const fallbackSummary: ReferralSummary = {
-  code: "LOCKER25",
-  link: "https://greenhub420.co.uk/join/LOCKER25",
+  code: "GREEN25",
+  link: "https://greenhub420.co.uk/join/GREEN25",
   totalInvites: 12,
   activeLockers: 5,
   bonusEarned: 180,
@@ -37,8 +37,8 @@ const fallbackSummary: ReferralSummary = {
 };
 
 const fallbackInvites: ReferralEvent[] = [
-  { id: 1, inviteeEmail: "alice@example.com", status: "locker_active", locker: "BT1-901", createdAt: new Date().toISOString() },
-  { id: 2, inviteeEmail: "bob@example.com", status: "pending", locker: "—", createdAt: new Date().toISOString() },
+  { id: 1, inviteeEmail: "alice@example.com", status: "active", createdAt: new Date().toISOString() },
+  { id: 2, inviteeEmail: "bob@example.com", status: "pending", createdAt: new Date().toISOString() },
 ];
 
 const fallbackCommissions: CommissionTransaction[] = [
@@ -82,7 +82,7 @@ export default function ReferralPage() {
   const clickCommission = summary.clickPayoutTotal;
   const purchaseCommission = Math.max(0, summary.bonusEarned - summary.clickPayoutTotal);
 
-  const shareText = encodeURIComponent("Join my Bloom locker. Use my invite link for priority drops!");
+  const shareText = encodeURIComponent("Join GreenHub and get great deals. Use my invite link!");
   const shareUrl = encodeURIComponent(summary.link);
   const telegramShare = `https://t.me/share/url?url=${shareUrl}&text=${shareText}`;
   const whatsappShare = `https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}`;
@@ -130,9 +130,9 @@ export default function ReferralPage() {
       <header className="rounded-[40px] border border-white/10 bg-night-950/80 p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-white/50">Referral locker</p>
-            <h1 className="text-3xl font-semibold text-white">Share your invite, earn commission</h1>
-            <p className="text-sm text-white/60">Each locker you activate earns 10% credit after their first drop.</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-white/50">Commission Hub</p>
+            <h1 className="text-3xl font-semibold text-white">Share products and earn cash rewards</h1>
+            <p className="text-sm text-white/60"></p>
           </div>
           <div className="rounded-3xl border border-white/15 bg-white/5 p-4 text-sm text-white/80">
             <p className="text-xs uppercase tracking-[0.3em] text-white/40">Invite link</p>
@@ -177,7 +177,7 @@ export default function ReferralPage() {
           </div>
         ))}
       </div>
-      <p className="text-sm text-white/60">Every unique click pays £0.30. Every friend checkout generates 10% wallet credit — rewards never expire.</p>
+      <p className="text-sm text-white/60">Every unique click pays £0.30. Every friend checkout generates 10% account credit — rewards never expire.</p>
       {lastClickTime && (
         <p className="text-xs text-white/50">Last click recorded {new Date(lastClickTime).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}</p>
       )}
@@ -194,7 +194,7 @@ export default function ReferralPage() {
               rows={inviteRows.map((invite) => ({
                 id: invite.id,
                 primary: invite.inviteeEmail,
-                secondary: invite.locker || "Locker pending",
+                secondary: invite.locker || "—",
                 status: formatStatus(invite.status),
                 timestamp: invite.createdAt,
                 amount: null,
@@ -224,12 +224,12 @@ export default function ReferralPage() {
         <h2 className="text-2xl font-semibold text-white">How referrals work</h2>
         <ol className="mt-3 list-decimal space-y-2 pl-6 text-sm text-white/70">
           <li>Share your invite link with trusted friends.</li>
-          <li>They verify with concierge, unlocking their first locker.</li>
-          <li>After their first successful drop, 10% of their spend appears in your wallet.</li>
+          <li>They sign up and browse the product catalogue.</li>
+          <li>When they place an order, 10% of their spend is credited to your account.</li>
         </ol>
         <div className="mt-4 flex flex-wrap gap-3">
           <Button asChild>
-            <a href="/contact">Ping concierge</a>
+            <a href="/contact">Contact support</a>
           </Button>
           <Button variant="ghost" asChild>
             <Link href="/referral/poster">Poster generator</Link>
@@ -329,7 +329,7 @@ function HistoryTable({
 function StatusPill({ status }: { status: string }) {
   const palette: Record<string, string> = {
     paid: "bg-emerald-400/10 text-emerald-200 border-emerald-400/40",
-    locker_active: "bg-brand-500/10 text-brand-200 border-brand-500/40",
+    active: "bg-brand-500/10 text-brand-200 border-brand-500/40",
     pending: "bg-yellow-400/10 text-yellow-200 border-yellow-400/40",
     processing: "bg-blue-400/10 text-blue-200 border-blue-400/40",
   };

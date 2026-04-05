@@ -83,7 +83,7 @@ export default function WithdrawalHistoryPage() {
       <header className="space-y-2">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Wallet</p>
         <h1 className="text-3xl font-semibold text-white">Withdrawal history</h1>
-        <p className="text-sm text-white/70">Track every payout request. Pending items will be updated by concierge once verified.</p>
+        <p className="text-sm text-white/70">Track every payout request. Pending items will be updated by the team once verified.</p>
       </header>
 
       <div className="flex flex-wrap items-center gap-3">

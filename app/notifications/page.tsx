@@ -65,7 +65,7 @@ export default function NotificationsPage() {
     return (
       <StateMessage
         title="Please login"
-        body="Notifications sync with your Bloom locker profile."
+        body="Notifications sync with your account profile."
         actionLabel="Login"
         onAction={() => router.push("/login")}
       />

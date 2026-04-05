@@ -76,8 +76,8 @@ export default function RegisterPage() {
     <section className="mx-auto mt-10 max-w-lg space-y-6 rounded-[40px] border border-white/10 bg-night-950/80 p-6 shadow-card">
       <div className="space-y-2">
         <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-ink-500">Register</p>
-        <h1 className="text-3xl font-semibold text-white">Create your locker account</h1>
-        <p className="text-sm text-ink-400">Sign up to reserve lockers, track refills, and chat with concierge.</p>
+        <h1 className="text-3xl font-semibold text-white">Create your account</h1>
+        <p className="text-sm text-ink-400">Sign up to browse products, track orders, and manage your account.</p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -110,9 +110,9 @@ export default function RegisterPage() {
       {success && (
         <div className="space-y-3 rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
           <p className="font-semibold text-emerald-200">✅ Account ready</p>
-          <p>Continue to the locker feed to browse products and reserve your first slot.</p>
+          <p>Continue to the product catalogue to browse and place your first order.</p>
           <Button asChild size="lg" className="w-full">
-            <Link href="/products">Continue to locker feed</Link>
+            <Link href="/products">Browse products</Link>
           </Button>
         </div>
       )}

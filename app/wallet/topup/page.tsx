@@ -39,7 +39,7 @@ const METHOD_OPTIONS = [
   {
     id: "bank",
     label: "Bank transfer",
-    description: "Send GBP via Faster Payments. Ops will match the reference and credit your wallet.",
+    description: "Send GBP via Faster Payments. The team will match the reference and credit your account.",
     requiresIntent: false
   },
   {
@@ -108,7 +108,7 @@ export default function WalletTopupPage() {
       setError(null);
       setIntent(null);
       setStatus(null);
-      setStatusMessage("Manual payment instructions ready below. Confirm with concierge once sent.");
+      setStatusMessage("Manual payment instructions ready below. Confirm with support once sent.");
       return;
     }
 
@@ -190,7 +190,7 @@ export default function WalletTopupPage() {
       <header className="space-y-2">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Wallet</p>
         <h1 className="text-3xl font-semibold text-white">Top up your balance</h1>
-        <p className="text-sm text-white/70">Pick a tier, choose payment method, and follow the instructions. Your wallet updates automatically when the status becomes confirmed.</p>
+        <p className="text-sm text-white/70">Pick a tier, choose payment method, and follow the instructions. Your balance updates automatically when the status becomes confirmed.</p>
       </header>
 
       <TransferIdNotice transferId={transferId} />
@@ -333,7 +333,7 @@ export default function WalletTopupPage() {
 
         <aside className="space-y-5 rounded-3xl border border-white/10 bg-white/5 p-5 text-sm text-white/80">
           <h2 className="text-lg font-semibold text-white">Need help?</h2>
-          <p className="text-sm text-white/70">Share your order code or screenshot with concierge if you need manual review.</p>
+          <p className="text-sm text-white/70">Share your order code or screenshot with support if you need manual review.</p>
           <Textarea readOnly value={`Tier: ${selectedTier?.title || "Custom"}\nAmount: £${amount.toFixed(2)}\nMethod: ${method.toUpperCase()}\nChain: ${chain}`} />
           <Link href="/notifications" className="block rounded-2xl border border-white/15 px-4 py-2 text-center text-sm text-white/70 hover:border-white/40">
             Check notifications
@@ -453,9 +453,9 @@ function BankInstructions({ amount, transferId }: { amount: number; transferId?:
         <li>Account number: {BANK_DETAILS.number}</li>
         <li>Sort code: {BANK_DETAILS.sortCode}</li>
         <li>Amount: £{amount.toFixed(2)} (or equivalent)</li>
-        <li>Reference: {transferId || "your locker email"}</li>
+        <li>Reference: {transferId || "your registered email"}</li>
       </ul>
-      <p className="text-xs text-white/50">Always include your Transfer ID so we can match the payment. Share the payment screenshot with concierge if it hasn’t auto-posted within 30 minutes.</p>
+      <p className="text-xs text-white/50">Always include your Transfer ID so we can match the payment. Share the payment screenshot with support if it hasn’t auto-posted within 30 minutes.</p>
     </div>
   );
 }
@@ -475,7 +475,7 @@ function CryptoInstructions({ amount, chain, transferId }: { amount: number; cha
           View QR code
         </a>
       )}
-      <p className="text-xs text-white/70">Send £{amount.toFixed(2)} worth of USDT. Include Transfer ID {transferId || "(see above)"} when you DM concierge with the TX hash.</p>
+      <p className="text-xs text-white/70">Send £{amount.toFixed(2)} worth of USDT. Include Transfer ID {transferId || "(see above)"} when you DM support with the TX hash.</p>
     </div>
   );
 }

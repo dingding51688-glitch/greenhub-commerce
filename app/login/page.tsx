@@ -59,7 +59,7 @@ export default function LoginPage() {
     <section className="mx-auto mt-10 max-w-md space-y-4 rounded-[40px] border border-white/10 bg-night-950/80 p-6 shadow-card">
       <div className="space-y-2">
         <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-ink-500">Login</p>
-        <h1 className="text-3xl font-semibold text-white">Sign in to your locker</h1>
+        <h1 className="text-3xl font-semibold text-white">Sign in to your account</h1>
         <p className="text-sm text-ink-400">Use your verified email or username plus password.</p>
       </div>
 

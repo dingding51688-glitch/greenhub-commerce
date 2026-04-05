@@ -19,8 +19,8 @@ const QRCode = dynamic(
 );
 
 const fallbackSummary: ReferralSummary = {
-  code: "LOCKER25",
-  link: "https://greenhub420.co.uk/invite?ref=LOCKER25",
+  code: "GREEN25",
+  link: "https://greenhub420.co.uk/invite?ref=GREEN25",
   totalInvites: 0,
   activeLockers: 0,
   bonusEarned: 0,
@@ -41,10 +41,10 @@ const fallbackSummary: ReferralSummary = {
 };
 
 const templates = {
-  locker: {
-    id: "locker",
-    name: "Locker green (portrait)",
-    badge: "Locker referral",
+  green: {
+    id: "green",
+    name: "Green (portrait)",
+    badge: "Referral",
     background: "linear-gradient(180deg,#07130c 0%,#041009 100%)",
     accent: "#13a86b",
     text: "#ffffff"
@@ -68,15 +68,15 @@ export default function ReferralPosterPage() {
   const { data, error } = useSWR(token ? "referral-summary" : null, getReferralSummary);
   const summary = error ? fallbackSummary : data || fallbackSummary;
 
-  const code = summary.code || "LOCKER25";
+  const code = summary.code || "GREEN25";
   const inviteUrl = summary.link || `https://greenhub420.co.uk/invite?ref=${code}`;
 
-  const [templateId, setTemplateId] = useState<keyof typeof templates>("locker");
+  const [templateId, setTemplateId] = useState<keyof typeof templates>("green");
   const [layout, setLayout] = useState<"portrait" | "landscape">("portrait");
-  const [headline, setHeadline] = useState("Order lockers. Earn cash.");
+  const [headline, setHeadline] = useState("Share products. Earn rewards.");
   const [subline, setSubline] = useState("£0.30 per click + 10% lifetime share");
-  const [footerNote, setFooterNote] = useState("Scan to claim locker priority. Use code for extra perks.");
-  const [accent, setAccent] = useState<string>(templates["locker"].accent);
+  const [footerNote, setFooterNote] = useState("Scan to join. Use code for extra perks.");
+  const [accent, setAccent] = useState<string>(templates["green"].accent);
   const [showAvatar, setShowAvatar] = useState(false);
   const [downloadToast, setDownloadToast] = useState<string | null>(null);
 
@@ -120,7 +120,7 @@ export default function ReferralPosterPage() {
     }
   };
 
-  const shareText = encodeURIComponent(`Join lockers with code ${code}`);
+  const shareText = encodeURIComponent(`Join GreenHub with code ${code}`);
   const shareHref = `https://t.me/share/url?url=${encodeURIComponent(inviteUrl)}&text=${shareText}`;
 
   return (
@@ -140,7 +140,7 @@ export default function ReferralPosterPage() {
             setTemplateId={(id) => {
               setTemplateId(id);
               setAccent(templates[id].accent);
-              setLayout(id === "locker" ? "portrait" : "landscape");
+              setLayout(id === "green" ? "portrait" : "landscape");
             }}
             setLayout={setLayout}
             setAccent={setAccent}
@@ -151,7 +151,7 @@ export default function ReferralPosterPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="space-y-1 text-sm text-white">
               <span className="font-medium">Headline</span>
-              <Input value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="Order lockers. Earn cash." />
+              <Input value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="Share products. Earn rewards." />
             </label>
             <label className="space-y-1 text-sm text-white">
               <span className="font-medium">Subheading</span>
@@ -159,7 +159,7 @@ export default function ReferralPosterPage() {
             </label>
             <label className="space-y-1 text-sm text-white sm:col-span-2">
               <span className="font-medium">Footer note</span>
-              <Textarea value={footerNote} onChange={(e) => setFooterNote(e.target.value)} placeholder="Scan to claim locker priority..." />
+              <Textarea value={footerNote} onChange={(e) => setFooterNote(e.target.value)} placeholder="Scan to join and get perks..." />
             </label>
           </div>
 
@@ -291,7 +291,7 @@ const PosterPreview = forwardRef<HTMLDivElement, PosterPreviewProps>(
           {template.badge}
         </span>
         <h2 className="text-4xl font-semibold leading-tight" style={{ lineHeight: 1.2 }}>
-          {headline || "Share lockers. Earn cash."}
+          {headline || "Share products. Earn cash."}
         </h2>
         <p className="text-lg font-normal text-white/80">{subline || "£0.30 per click + 10% lifetime."}</p>
         <div className="flex flex-wrap gap-3 text-sm text-white/80">
@@ -302,7 +302,7 @@ const PosterPreview = forwardRef<HTMLDivElement, PosterPreviewProps>(
           <div className="mt-4 flex items-center gap-3">
             <div className="h-14 w-14 rounded-full border border-white/20 bg-white/10" />
             <div>
-              <p className="text-sm text-white/70">Locker concierge</p>
+              <p className="text-sm text-white/70">Customer support</p>
               <p className="text-xs text-white/50">Scan QR to start</p>
             </div>
           </div>
@@ -319,7 +319,7 @@ const PosterPreview = forwardRef<HTMLDivElement, PosterPreviewProps>(
         </div>
       </div>
       <div className="pointer-events-none absolute inset-x-6 bottom-6 flex justify-between text-xs uppercase tracking-[0.4em] text-white/40">
-        <span>GreenHub lockers</span>
+        <span>GreenHub</span>
         <span>#Invite-{code}</span>
       </div>
     </div>

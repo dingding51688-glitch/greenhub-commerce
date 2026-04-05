@@ -16,7 +16,7 @@ export default function FavoritesPage() {
     return (
       <StateMessage
         title="Sign in to view favorites"
-        body="Create an account to save locker-ready strains."
+        body="Create an account to save your favourite products."
         actionLabel="Go to register"
         onAction={() => router.push("/register")}
       />
@@ -29,7 +29,7 @@ export default function FavoritesPage() {
     <section className="space-y-8">
       <header className="rounded-3xl border border-white/10 bg-night-950/80 p-6">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Favorites</p>
-        <h1 className="text-3xl font-semibold text-white">Pinned locker drops</h1>
+        <h1 className="text-3xl font-semibold text-white">Saved products</h1>
         <p className="mt-2 text-sm text-white/60">Save strains you want to pick up later — we’ll sync them across devices.</p>
       </header>
 

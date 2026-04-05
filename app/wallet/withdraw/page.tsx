@@ -36,11 +36,11 @@ const payoutConfigs = {
     ]
   },
   wallet: {
-    label: "Locker wallet credit",
-    description: "Move balance to another concierge handle or internal account.",
+    label: "Internal transfer",
+    description: "Move balance to another member handle or internal account.",
     fields: [
       { key: "handle", label: "Recipient handle", placeholder: "@greenhub", required: true },
-      { key: "memo", label: "Memo", placeholder: "Transfer to concierge", required: false }
+      { key: "memo", label: "Memo", placeholder: "Transfer memo", required: false }
     ]
   }
 } as const;
@@ -170,7 +170,7 @@ export default function WalletWithdrawPage() {
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Wallet</p>
         <h1 className="text-3xl font-semibold text-white">Withdraw funds</h1>
         <p className="text-sm text-white/70">
-          Request a payout to your bank, crypto wallet, or another concierge handle. Ops will verify within 12 hours.
+          Request a payout to your bank, crypto wallet, or another member handle. The team will verify within 12 hours.
         </p>
       </header>
 
@@ -397,7 +397,7 @@ function ReviewStep({
       )}
       <label className="text-sm text-white">
         <span className="font-medium">Note to ops (optional)</span>
-        <Textarea className="mt-1" value={note} onChange={(event) => onNoteChange(event.target.value)} placeholder="Any context for concierge" />
+        <Textarea className="mt-1" value={note} onChange={(event) => onNoteChange(event.target.value)} placeholder="Any notes for the team" />
       </label>
     </section>
   );
@@ -426,7 +426,7 @@ function SuccessCard({ request }: { request: WithdrawalRequest }) {
           View history
         </Link>
         <Link href="/wallet" className="text-sm text-white/80 underline">
-          Back to wallet
+          Back to balance
         </Link>
       </div>
     </div>

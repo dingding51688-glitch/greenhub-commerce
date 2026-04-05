@@ -125,7 +125,7 @@ export default function AccountPage() {
     const nodes = customerProfile?.data?.attributes?.lockerPreferences?.data || [];
     return nodes.map((node) => ({
       value: node.attributes?.code || String(node.id),
-      label: node.attributes?.label || node.attributes?.code || `Locker ${node.id}`
+      label: node.attributes?.label || node.attributes?.code || `Area ${node.id}`
     }));
   }, [customerProfile]);
 
@@ -170,7 +170,7 @@ export default function AccountPage() {
       return (
         <StateMessage
           variant="empty"
-          title="No wallet activity yet"
+          title="No activity yet"
           body="Place an order or top up to see history."
         />
       );
@@ -233,7 +233,7 @@ export default function AccountPage() {
     return (
       <StateMessage
         title="Please sign in"
-        body="Log in to see your wallet balance and recent activity."
+        body="Log in to see your account balance and recent activity."
         actionLabel="Go to login"
         onAction={() => router.push("/login")}
       />
@@ -246,7 +246,7 @@ export default function AccountPage() {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">Profile settings</p>
-            <h2 className="text-2xl font-semibold text-white">Manage your locker identity</h2>
+            <h2 className="text-2xl font-semibold text-white">Account Center</h2>
           </div>
           <button
             onClick={() => refreshCustomerProfile()}
@@ -255,7 +255,7 @@ export default function AccountPage() {
             Reload
           </button>
         </div>
-        <p className="mt-2 text-sm text-white/60">Need concierge help? Visit the <Link className="text-white underline" href="/support">support hub</Link>.</p>
+        <p className="mt-2 text-sm text-white/60">Need help? Visit the <Link className="text-white underline" href="/support">support hub</Link>.</p>
         <p className="text-sm text-white/60">Manage alerts in the <Link className="text-white underline" href="/account/notifications">notification center</Link>.</p>
         {customerLoading && !customerProfile ? (
           <div className="mt-4 space-y-3">
@@ -304,11 +304,11 @@ export default function AccountPage() {
                 <p className="text-xs text-white/40">Leave blank if you don’t want a phone on file.</p>
               </ProfileField>
               <ProfileField label="Telegram" error={profileForm.formState.errors.telegramHandle?.message}>
-                <input type="text" placeholder="@locker_member" {...profileForm.register("telegramHandle")} className={profileInputClass} />
+                <input type="text" placeholder="@your_handle" {...profileForm.register("telegramHandle")} className={profileInputClass} />
               </ProfileField>
               <ProfileField label="Preferred locker" error={profileForm.formState.errors.preferredLocker?.message}>
                 <select {...profileForm.register("preferredLocker")} className={profileInputClass}>
-                  <option value="">Select a locker</option>
+                  <option value="">Select preferred area</option>
                   {lockerOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -320,8 +320,8 @@ export default function AccountPage() {
             <label className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80">
               <input type="checkbox" className="mt-1 h-4 w-4 accent-brand-500" {...profileForm.register("marketingOptIn")} />
               <span>
-                Opt-in to Bloom locker marketing updates
-                <small className="block text-white/50">Discount drops + locker opening alerts.</small>
+                Opt-in to marketing updates
+                <small className="block text-white/50">Discount drops + new product alerts.</small>
               </span>
             </label>
             {profileAlert && (
@@ -377,7 +377,7 @@ export default function AccountPage() {
           </div>
         )}
         <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-white/80">
-          <p className="text-lg font-semibold">Top up your wallet</p>
+          <p className="text-lg font-semibold">Top up your balance</p>
           <p className="mt-1 text-sm text-white/60">
             Real recharge flow will live here. For now, use the dashboard or NowPayments to add funds.
           </p>

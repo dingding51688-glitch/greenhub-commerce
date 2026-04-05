@@ -104,7 +104,7 @@ export default function WalletPage() {
 
     const rows = txData?.data || [];
     if (rows.length === 0) {
-      return <StateMessage variant="empty" title="No wallet activity yet" body="Top up or place an order to see history." />;
+      return <StateMessage variant="empty" title="No activity yet" body="Top up or place an order to see history." />;
     }
 
     return <TransactionList rows={rows} />;
@@ -115,7 +115,7 @@ export default function WalletPage() {
       <section className="space-y-6 px-4 py-10">
         <StateMessage
           title="Please sign in"
-          body="Log in to see your wallet balance and start a top-up."
+          body="Log in to see your account balance and start a top-up."
           actionLabel="Go to login"
           onAction={() => router.push("/login")}
         />
@@ -161,7 +161,7 @@ export default function WalletPage() {
             </Button>
           </Link>
           <Link href="/wallet/topup">
-            <Button size="md">Top up wallet</Button>
+            <Button size="md">Top up balance</Button>
           </Link>
         </div>
       </header>
@@ -170,7 +170,7 @@ export default function WalletPage() {
 
       <div className="rounded-3xl border border-white/10 bg-night-950/60 p-4 text-sm text-white/70">
         <p className="font-semibold text-white">New to payments?</p>
-        <p className="mt-1">Read the payment guide for wallet top-ups, NowPayments, and manual bank/USDT instructions.</p>
+        <p className="mt-1">Read the payment guide for top-ups, NowPayments, and manual bank/USDT instructions.</p>
         <Button asChild variant="ghost" size="sm" className="mt-3">
           <Link href="/guide/payment">Open payment guide</Link>
         </Button>
@@ -183,10 +183,10 @@ export default function WalletPage() {
           <ul className="mt-3 list-disc space-y-1 pl-5">
             <li>Select a tier or enter your own amount.</li>
             <li>Choose NowPayments for instant card/Apple Pay or follow bank / USDT instructions.</li>
-            <li>We credit your wallet as soon as the payment status turns <strong>confirmed</strong>.</li>
+            <li>We credit your account as soon as the payment status turns <strong>confirmed</strong>.</li>
           </ul>
           <p className="mt-3 text-xs text-white/60">
-            Need concierge help? Ping us on Telegram @greenhub when referencing your order code.
+            Need help? Ping us on Telegram @greenhub when referencing your order code.
           </p>
         </div>
       </div>
