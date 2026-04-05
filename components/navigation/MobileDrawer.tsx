@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
-import type { DrawerSection, NavigationCTA, NavItem } from "@/data/fixtures/navigation";
+import type { DrawerSection, MENUCTA, NavItem } from "@/data/fixtures/navigation";
 import { NavLink } from "./NavLink";
 import { LogoMark } from "./LogoMark";
 import { Button } from "@/components/ui";
@@ -11,7 +11,7 @@ export type MobileDrawerProps = {
   open: boolean;
   onClose: () => void;
   sections: DrawerSection[];
-  ctas: { primary: NavigationCTA; secondary: NavigationCTA };
+  ctas: { primary: MENUCTA; secondary: MENUCTA };
   navItems: NavItem[];
 };
 
@@ -62,7 +62,7 @@ export function MobileDrawer({ open, onClose, sections, ctas, navItems }: Mobile
         <div className="flex flex-col gap-6 overflow-y-auto">
           <div className="space-y-2">
             <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[rgba(255,255,255,0.6)]">
-              Navigation
+              MENU
             </p>
             <div className="flex flex-col gap-2">
               {navItems.map((item) =>

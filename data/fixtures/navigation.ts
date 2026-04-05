@@ -14,19 +14,12 @@ export type NavigationCTA = {
 
 export const primaryNav: NavItem[] = [
   { label: "Home", href: "/", match: "exact" },
-  {
-    label: "Shop all",
-    href: "/products",
-    match: "prefix",
-    children: [
-      { label: "Flowers", href: "/products?category=flowers" },
-      { label: "Pre-rolls", href: "/products?category=pre-rolls" },
-      { label: "Vapes", href: "/products?category=vapes" }
-    ]
-  },
+  { label: "Shop all", href: "/products", match: "prefix" },
+  { label: "Flowers", href: "/products?category=flowers" },
+  { label: "Pre-rolls", href: "/products?category=pre-rolls" },
+  { label: "Vapes", href: "/products?category=vapes" },
   { label: "Ordering guide", href: "/how-it-works", match: "exact" },
-  { label: "Support", href: "/support", match: "exact" },
-  { label: "Deals / Updates", href: "/blog" }
+  { label: "Support", href: "/support", match: "exact" }
 ];
 
 export const ctaButtons: { primary: NavigationCTA; secondary: NavigationCTA } = {
