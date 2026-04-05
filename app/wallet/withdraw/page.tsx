@@ -7,11 +7,11 @@ import useSWR from "swr";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Button, Input, Textarea } from "@/components/ui";
 import { StateMessage } from "@/components/StateMessage";
-import { TransferIdNotice } from "@/components/wallet/TransferIdNotice";
+
 import type { WalletBalanceResponse, WithdrawalRequest } from "@/lib/types";
 import { swrFetcher } from "@/lib/api";
 import { createWithdrawalRequest } from "@/lib/withdrawal-api";
-import { deriveTransferId } from "@/lib/wallet-utils";
+
 
 const MIN_WITHDRAWAL = 20;
 const FEE_PERCENT = 0.02; // 2% handling fee (update if ops changes)
@@ -49,8 +49,7 @@ type MethodId = keyof typeof payoutConfigs;
 
 export default function WalletWithdrawPage() {
   const router = useRouter();
-  const { token, profile } = useAuth();
-  const transferId = deriveTransferId(profile);
+  const { token } = useAuth();
   const [step, setStep] = useState(1);
   const [amountInput, setAmountInput] = useState("100");
   const [method, setMethod] = useState<MethodId>("bank");
@@ -165,16 +164,14 @@ export default function WalletWithdrawPage() {
   }
 
   return (
-    <section className="space-y-8 px-4 py-10">
+    <section className="space-y-6 px-4 py-8">
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/50">Wallet</p>
-        <h1 className="text-3xl font-semibold text-white">Withdraw funds</h1>
-        <p className="text-sm text-white/70">
+        <Link href="/wallet" className="text-xs text-white/40 hover:text-white/60">← Back to wallet</Link>
+        <h1 className="text-2xl font-semibold text-white sm:text-3xl">Withdraw funds</h1>
+        <p className="text-sm leading-relaxed text-white/70">
           Request a payout to your bank, crypto wallet, or another member handle. The team will verify within 12 hours.
         </p>
       </header>
-
-      <TransferIdNotice transferId={transferId} />
 
       {balanceError && (
         <StateMessage variant="error" title="Unable to load balance" body={balanceError.message} />
@@ -185,7 +182,7 @@ export default function WalletWithdrawPage() {
       {result ? (
         <SuccessCard request={result} />
       ) : (
-        <div className="space-y-6 rounded-[32px] border border-white/10 bg-card p-6">
+        <div className="space-y-6 rounded-3xl border border-white/10 bg-card p-4 sm:rounded-[32px] sm:p-6">
           {step === 1 && (
             <AmountStep
               amount={amountInput}
@@ -220,21 +217,21 @@ export default function WalletWithdrawPage() {
 
           {error && <p className="text-sm text-amber-300">{error}</p>}
 
-          <div className="flex flex-wrap items-center gap-3">
-            {step > 1 && (
-              <Button variant="secondary" onClick={handleBack} disabled={submitting}>
-                Back
-              </Button>
-            )}
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             {step < 3 && (
-              <Button onClick={handleNext}>Continue</Button>
+              <Button onClick={handleNext} className="w-full min-h-[48px] text-base sm:w-auto">Continue</Button>
             )}
             {step === 3 && (
-              <Button onClick={handleSubmit} disabled={submitting}>
+              <Button onClick={handleSubmit} disabled={submitting} className="w-full min-h-[48px] text-base sm:w-auto">
                 {submitting ? "Submitting…" : "Submit request"}
               </Button>
             )}
-            <Link href="/wallet/withdraw/history" className="ml-auto text-sm text-white/70 underline">
+            {step > 1 && (
+              <Button variant="secondary" onClick={handleBack} disabled={submitting} className="w-full min-h-[48px] text-base sm:w-auto">
+                Back
+              </Button>
+            )}
+            <Link href="/wallet/withdraw/history" className="text-center text-sm text-white/70 underline sm:ml-auto">
               View history
             </Link>
           </div>
@@ -247,22 +244,22 @@ export default function WalletWithdrawPage() {
 function Stepper({ current }: { current: number }) {
   const steps = ["Amount", "Payout", "Review"];
   return (
-    <div className="flex items-center gap-3 text-xs uppercase tracking-[0.35em] text-white/50">
+    <div className="flex items-center justify-between gap-1 text-xs uppercase tracking-[0.25em] text-white/50 sm:justify-start sm:gap-3 sm:tracking-[0.35em]">
       {steps.map((label, index) => {
         const idx = index + 1;
         const active = idx === current;
         const done = idx < current;
         return (
-          <div key={label} className="flex items-center gap-2">
+          <div key={label} className="flex items-center gap-1.5 sm:gap-2">
             <span
-              className={`flex h-8 w-8 items-center justify-center rounded-full border ${
+              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs sm:h-8 sm:w-8 ${
                 done ? "border-emerald-400 text-emerald-200" : active ? "border-white text-white" : "border-white/30"
               }`}
             >
               {idx}
             </span>
-            <span className={active ? "text-white" : "text-white/60"}>{label}</span>
-            {idx < steps.length && <div className="h-px w-10 bg-white/15" />}
+            <span className={`text-[11px] sm:text-xs ${active ? "text-white" : "text-white/60"}`}>{label}</span>
+            {idx < steps.length && <div className="hidden h-px w-6 bg-white/15 sm:block sm:w-10" />}
           </div>
         );
       })}
@@ -319,7 +316,7 @@ function MethodStep({
   return (
     <section className="space-y-4">
       <p className="text-lg font-semibold text-white">2. Select payout method</p>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-3">
         {(Object.keys(payoutConfigs) as MethodId[]).map((id) => (
           <button
             key={id}
@@ -421,12 +418,12 @@ function SuccessCard({ request }: { request: WithdrawalRequest }) {
           <dd>{request.payoutMethod}</dd>
         </div>
       </dl>
-      <div className="flex flex-wrap gap-3">
-        <Link href="/wallet/withdraw/history" className="rounded-full border border-white/20 px-5 py-2 text-sm font-semibold text-white hover:border-white/50">
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Link href="/wallet/withdraw/history" className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/20 px-5 text-sm font-semibold text-white hover:border-white/50">
           View history
         </Link>
-        <Link href="/wallet" className="text-sm text-white/80 underline">
-          Back to balance
+        <Link href="/wallet" className="inline-flex min-h-[48px] items-center justify-center text-sm text-white/80 underline">
+          Back to wallet
         </Link>
       </div>
     </div>

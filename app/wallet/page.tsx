@@ -66,22 +66,26 @@ export default function WalletPage() {
           onAction={() => refreshBalance()}
         />
       ) : balanceData ? (
-        <div className="rounded-3xl border border-white/10 bg-card p-6 shadow-2xl shadow-brand-600/10">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/50">Available balance</p>
-          <p className="mt-3 text-4xl font-bold text-white">{GBP.format(balanceData.balance)}</p>
-          <p className="mt-2 text-sm text-white/50">
-            Lifetime top-up {GBP.format(balanceData.lifetimeTopUp)} · Bonus {GBP.format(balanceData.bonusAwarded)}
+        <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-night-900 via-night-950 to-night-900 p-6 shadow-2xl shadow-brand-600/10">
+          {/* subtle glow */}
+          <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand-500/10 blur-3xl" />
+
+          <p className="relative text-xs font-medium uppercase tracking-[0.3em] text-white/70">Available balance</p>
+          <p className="relative mt-3 text-[2.5rem] font-extrabold leading-none text-white drop-shadow-sm">{GBP.format(balanceData.balance)}</p>
+          <p className="relative mt-3 text-sm text-white/60">
+            Lifetime top-up <span className="font-semibold text-white/80">{GBP.format(balanceData.lifetimeTopUp)}</span>{" "}
+            · Bonus <span className="font-semibold text-white/80">{GBP.format(balanceData.bonusAwarded)}</span>
           </p>
 
-          {/* 三个操作按钮 — 手机端堆叠 */}
-          <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:gap-3">
-            <Button asChild className="flex-1 py-3 text-base">
+          {/* 三个操作按钮 — 手机端堆叠，min-h 便于点击 */}
+          <div className="relative mt-6 flex flex-col gap-2.5 sm:flex-row sm:gap-3">
+            <Button asChild className="flex-1 min-h-[48px] text-base font-semibold">
               <Link href="/wallet/topup">Top up</Link>
             </Button>
-            <Button asChild variant="secondary" className="flex-1 py-3 text-base">
+            <Button asChild variant="secondary" className="flex-1 min-h-[48px] text-base">
               <Link href="/wallet/transfer">Transfer</Link>
             </Button>
-            <Button asChild variant="secondary" className="flex-1 py-3 text-base">
+            <Button asChild variant="secondary" className="flex-1 min-h-[48px] text-base">
               <Link href="/wallet/withdraw">Withdraw</Link>
             </Button>
           </div>
