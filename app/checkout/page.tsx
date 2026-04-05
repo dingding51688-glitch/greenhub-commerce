@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import useSWR from "swr";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,8 +12,10 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { useCart, type CartItem } from "@/components/providers/CartProvider";
 import { StateMessage } from "@/components/StateMessage";
 import Button from "@/components/ui/button";
+import { swrFetcher } from "@/lib/api";
 import { createOrder } from "@/lib/orders-api";
 import { getStoredReferralCode } from "@/lib/referral-tracking";
+import type { WalletBalanceResponse } from "@/lib/types";
 
 const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
@@ -32,10 +35,22 @@ export default function CheckoutPage() {
   const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  /* ── 钱包余额 ── */
+  const { data: walletData } = useSWR<WalletBalanceResponse>(
+    token ? "/api/wallet/balance" : null,
+    swrFetcher,
+    { refreshInterval: 60_000 }
+  );
+  const walletBalance = walletData?.balance ?? 0;
+
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { paymentOption: "wallet" },
   });
+
+  const selectedPayment = form.watch("paymentOption");
+  const isWallet = selectedPayment === "wallet";
+  const insufficientBalance = isWallet && subtotal > walletBalance;
 
   /* ── Guards ── */
 
@@ -119,7 +134,13 @@ export default function CheckoutPage() {
           <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
             <div className="space-y-3">
               {[
-                { value: "wallet" as const, label: "Wallet balance", desc: "Instant — deducted from your topped-up balance" },
+                {
+                  value: "wallet" as const,
+                  label: `Wallet balance (${currency.format(walletBalance)})`,
+                  desc: walletBalance > 0
+                    ? "Instant — deducted from your topped-up balance"
+                    : "No balance yet — top up your wallet first",
+                },
                 { value: "nowpayments" as const, label: "Crypto (USDT)", desc: "Via NowPayments — confirmation in ~2 min" },
               ].map((option) => (
                 <label
@@ -144,7 +165,26 @@ export default function CheckoutPage() {
               ))}
             </div>
 
-            <Button type="submit" disabled={submitting} className="w-full">
+            {insufficientBalance && (
+              <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+                <p className="font-semibold">余额不足</p>
+                <p className="mt-1 text-xs text-amber-200/70">
+                  需要 {currency.format(subtotal)}，当前余额 {currency.format(walletBalance)}，
+                  差额 {currency.format(subtotal - walletBalance)}。
+                </p>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => router.push("/wallet/topup")}
+                  type="button"
+                >
+                  去充值
+                </Button>
+              </div>
+            )}
+
+            <Button type="submit" disabled={submitting || insufficientBalance} className="w-full">
               {submitting ? "Placing order…" : `Pay ${currency.format(subtotal)}`}
             </Button>
           </form>
