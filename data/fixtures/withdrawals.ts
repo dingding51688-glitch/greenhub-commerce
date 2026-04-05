@@ -37,7 +37,7 @@ export const withdrawalFixture: WithdrawalRequest[] = [
     currency: "GBP",
     payoutMethod: "wallet",
     payoutDetails: {
-      handle: "@lockerbot"
+      handle: "@greenbot"
     },
     status: "paid",
     fee: 3,

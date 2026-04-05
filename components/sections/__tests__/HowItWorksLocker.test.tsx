@@ -6,7 +6,7 @@ describe("HowItWorksLocker", () => {
   it("renders steps and tip copy", () => {
     render(
       <HowItWorksLocker
-        title="Locker flow"
+        title="Order flow"
         steps={[
           { icon: "①", title: "Reserve", description: "Lock your slot" },
           { icon: "②", title: "Pack", description: "Team prepares" }
@@ -15,7 +15,7 @@ describe("HowItWorksLocker", () => {
       />
     );
 
-    expect(screen.getByText(/locker flow/i)).toBeInTheDocument();
+    expect(screen.getByText(/order flow/i)).toBeInTheDocument();
     expect(screen.getByText(/reserve/i)).toBeInTheDocument();
     expect(screen.getAllByText(/open 24\/7/i)).toHaveLength(2);
   });

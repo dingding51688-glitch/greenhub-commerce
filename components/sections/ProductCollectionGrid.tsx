@@ -28,9 +28,9 @@ const tonePalette = {
 
 export function ProductCollectionGrid(props: Partial<ProductCollectionGridProps>) {
   const content = {
-    eyebrow: "Locker menu",
+    eyebrow: "Product menu",
     title: "Member favourites",
-    description: "Curated drops refreshed every Friday at 10am.",
+    description: "Curated selection refreshed every Friday at 10am.",
     products: featuredProducts,
     primaryCta: { label: "View full menu", href: "/products" },
     ...props
@@ -107,7 +107,7 @@ export function ProductCollectionGrid(props: Partial<ProductCollectionGridProps>
         </div>
       ) : (
         <div className="rounded-[32px] border border-dashed border-white/20 px-6 py-10 text-center text-sm text-[rgba(255,255,255,0.6)]">
-          No products available — check back after the next drop.
+          No products available — check back soon for new arrivals.
         </div>
       )}
     </section>

@@ -8,11 +8,11 @@ describe("PaymentRecommendation", () => {
       <PaymentRecommendation
         recommendation={{
           title: "Reserve+",
-          description: "Locker allocation",
+          description: "Product allocation",
           price: "£49",
           frequency: "/ month",
           badge: "Popular",
-          features: ["Hold locker"],
+          features: ["Priority dispatch"],
           cta: { label: "Start", href: "/reserve" }
         }}
         secondary={[

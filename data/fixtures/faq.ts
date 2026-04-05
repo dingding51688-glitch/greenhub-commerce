@@ -12,23 +12,23 @@ export type FaqCategory = {
   entries: FaqEntry[];
 };
 
-const lockerEntries: FaqEntry[] = [
+const deliveryEntries: FaqEntry[] = [
   {
-    id: "locker-access",
-    question: "How do I get locker access?",
-    answer: "Create an account, verify your ID inside /account, and place your first order. We text the locker PIN + QR right before pickup.",
-    keywords: ["verify", "locker"]
+    id: "delivery-access",
+    question: "How do I start ordering?",
+    answer: "Create an account, verify your ID inside /account, and place your first order. We'll send a collection code by SMS shortly before pickup.",
+    keywords: ["verify", "delivery"]
   },
   {
-    id: "locker-window",
-    question: "How long do lockers stay open?",
-    answer: "Standard window is 120 minutes after the SMS. Reply BEFORE the timer expires if you need an extension so concierge can reassign inventory.",
+    id: "collection-window",
+    question: "How long is the collection window?",
+    answer: "Standard window is 120 minutes after the SMS. Reply BEFORE the timer expires if you need an extension so the team can hold your parcel.",
     keywords: ["window", "pickup"]
   },
   {
     id: "missed-pickup",
     question: "What if I miss the pickup?",
-    answer: "Reply to the locker SMS or Telegram @greenhub_concierge. We can restock or schedule another locker once the courier returns.",
+    answer: "Reply to the SMS or message us on Telegram @greenhub_support. We can reschedule or arrange redelivery once the courier returns.",
     keywords: ["miss", "pickup"]
   }
 ];
@@ -37,19 +37,19 @@ const paymentEntries: FaqEntry[] = [
   {
     id: "payment-methods",
     question: "What payment methods are supported?",
-    answer: "Wallet top-ups (minimum £20), NowPayments card/USDT bridge, and manual bank or direct USDT transfers. Cash on delivery isn’t offered.",
+    answer: "Account top-ups (minimum £20), NowPayments card/USDT bridge, and manual bank or direct USDT transfers. Cash on delivery isn't offered.",
     keywords: ["card", "USDT"]
   },
   {
     id: "transfer-id",
     question: "Why is the Transfer ID important?",
-    answer: "It links your payments to the correct account. Add it to every bank/USDT reference and include it when chatting with concierge.",
+    answer: "It links your payments to the correct account. Add it to every bank/USDT reference and include it when chatting with support.",
     keywords: ["transfer id", "reference"]
   },
   {
     id: "nowpayments-issues",
     question: "NowPayments flagged my card—what now?",
-    answer: "They run their own risk checks. If the invoice fails twice, switch to wallet/bank or DM concierge so finance can review manually.",
+    answer: "They run their own risk checks. If the invoice fails twice, switch to account balance or bank, or DM support so finance can review manually.",
     keywords: ["nowpayments", "card"]
   }
 ];
@@ -58,35 +58,35 @@ const orderEntries: FaqEntry[] = [
   {
     id: "order-status",
     question: "Where can I see order status?",
-    answer: "Visit /orders for live tracking. Each card shows locker postcode, payment method, and a link to the detail page.",
+    answer: "Visit /orders for live tracking. Each card shows your delivery postcode, payment method, and a link to the detail page.",
     keywords: ["status", "orders"]
   },
   {
-    id: "change-locker",
-    question: "Can I change lockers after ordering?",
-    answer: "Yes—reply to the SMS or ping Telegram @greenhub_concierge with the new postcode. We need ~2h notice to reassign.",
-    keywords: ["change", "locker"]
+    id: "change-delivery",
+    question: "Can I change my delivery address after ordering?",
+    answer: "Yes—reply to the SMS or message Telegram @greenhub_support with the new postcode. We need roughly 2 hours' notice to reassign.",
+    keywords: ["change", "delivery"]
   },
   {
     id: "damaged",
     question: "What if the parcel looks tampered?",
-    answer: "Take photos, close the locker, and text HELP + locker ID immediately. Ops will inspect and refund or redeliver.",
+    answer: "Take photos and contact support immediately with your order reference. The team will inspect and issue a refund or redelivery.",
     keywords: ["damaged", "parcel"]
   }
 ];
 
-const walletEntries: FaqEntry[] = [
+const balanceEntries: FaqEntry[] = [
   {
-    id: "wallet-withdraw",
+    id: "balance-withdraw",
     question: "How do I withdraw funds?",
-    answer: "Use /wallet/withdraw to send balance to UK bank, USDT, or another concierge handle. Minimum transfer is £20.",
-    keywords: ["withdraw", "wallet"]
+    answer: "Use /wallet/withdraw to send balance to a UK bank, USDT address, or another member handle. Minimum transfer is £20.",
+    keywords: ["withdraw", "balance"]
   },
   {
-    id: "wallet-refund",
-    question: "How long do wallet refunds take?",
-    answer: "Wallet credits post within 6 hours of approval. Bank cards can take 3–5 working days depending on your issuer.",
-    keywords: ["refund", "wallet"]
+    id: "balance-refund",
+    question: "How long do refunds take?",
+    answer: "Account credits post within 6 hours of approval. Bank transfers can take 3–5 working days depending on your bank.",
+    keywords: ["refund", "balance"]
   }
 ];
 
@@ -94,7 +94,7 @@ const referralEntries: FaqEntry[] = [
   {
     id: "referral-rewards",
     question: "What do I earn from referrals?",
-    answer: "£0.30 per verified click plus 10% of every locker order your friend makes for life.",
+    answer: "£0.30 per verified click plus 10% of every order your friend places — for life.",
     keywords: ["referral", "rewards"]
   },
   {
@@ -106,11 +106,11 @@ const referralEntries: FaqEntry[] = [
 ];
 
 export const faqCategories: FaqCategory[] = [
-  { id: "all", title: "All topics", description: "Every locker + wallet question in one place.", entries: [] },
-  { id: "locker", title: "Lockers", description: "Access, pickup windows, and incidents.", entries: lockerEntries },
-  { id: "payment", title: "Payments", description: "Wallet, NowPayments, and manual transfers.", entries: paymentEntries },
-  { id: "orders", title: "Orders", description: "Tracking, locker changes, damaged parcels.", entries: orderEntries },
-  { id: "wallet", title: "Wallet & withdrawals", description: "Credits, refunds, payouts.", entries: walletEntries },
+  { id: "all", title: "All topics", description: "Browse every question in one place.", entries: [] },
+  { id: "delivery", title: "Delivery", description: "Collection, pickup windows, and incidents.", entries: deliveryEntries },
+  { id: "payment", title: "Payments", description: "Top-ups, NowPayments, and manual transfers.", entries: paymentEntries },
+  { id: "orders", title: "Orders", description: "Tracking, address changes, damaged parcels.", entries: orderEntries },
+  { id: "balance", title: "Balance & withdrawals", description: "Credits, refunds, payouts.", entries: balanceEntries },
   { id: "referral", title: "Referrals", description: "Earning from invites.", entries: referralEntries }
 ];
 

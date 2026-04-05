@@ -6,16 +6,16 @@ describe("HeroClassic", () => {
   it("renders title, subtitle and CTAs", () => {
     render(
       <HeroClassic
-        title="Locker hero"
-        subtitle="Trusted lockers across Belfast"
-        primaryCta={{ label: "Shop lockers", href: "/" }}
+        title="Store hero"
+        subtitle="Trusted products across Belfast"
+        primaryCta={{ label: "Shop now", href: "/" }}
         secondaryCta={{ label: "Learn more", href: "/how-it-works" }}
       />
     );
 
-    expect(screen.getByText(/locker hero/i)).toBeInTheDocument();
-    expect(screen.getByText(/trusted lockers/i)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /shop lockers/i })).toBeInTheDocument();
+    expect(screen.getByText(/store hero/i)).toBeInTheDocument();
+    expect(screen.getByText(/trusted products/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /shop now/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /learn more/i })).toBeInTheDocument();
   });
 });

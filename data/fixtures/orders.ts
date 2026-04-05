@@ -41,7 +41,7 @@ export const ordersFixture: OrderRecord[] = [
     items: [
       {
         productId: 3,
-        title: "Locker Vape Kit — Midnight",
+        title: "Vape Kit — Midnight",
         quantity: 1,
         weight: "1g",
         unitPrice: 95,
@@ -61,7 +61,7 @@ export const ordersFixture: OrderRecord[] = [
     items: [
       {
         productId: 4,
-        title: "Locker Cart — Honeycomb",
+        title: "Cart — Honeycomb",
         quantity: 1,
         weight: "1g",
         unitPrice: 60,

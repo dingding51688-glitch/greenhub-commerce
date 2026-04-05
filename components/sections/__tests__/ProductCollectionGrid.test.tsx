@@ -31,7 +31,7 @@ describe("ProductCollectionGrid", () => {
     render(<ProductCollectionGrid title="Menu" products={[]} />);
 
     expect(
-      screen.getByText(/no products available — check back after the next drop/i)
+      screen.getByText(/no products available — check back soon for new arrivals/i)
     ).toBeInTheDocument();
   });
 });

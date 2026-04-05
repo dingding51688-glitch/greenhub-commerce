@@ -9,17 +9,18 @@ export type HowItWorksLockerProps = {
   title?: string;
   steps?: LockerStep[];
   tip?: LockerTip;
+  eyebrow?: string;
 };
 
 export function HowItWorksLocker(props: Partial<HowItWorksLockerProps>) {
-  const content = { ...lockerFlow, ...props } as Required<HowItWorksLockerProps>;
+  const content = { eyebrow: "How it works", ...lockerFlow, ...props } as Required<HowItWorksLockerProps>;
 
   return (
     <section className="rounded-[40px] border border-white/10 bg-[linear-gradient(135deg,#070707,#050505)] px-6 py-10 shadow-card sm:px-10">
       <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[rgba(255,255,255,0.6)]">
-            Lockers
+            {content.eyebrow}
           </p>
           <h2 className="mt-2 text-[28px] font-semibold leading-[1.3] text-white sm:text-[32px]">
             {content.title}
