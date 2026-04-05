@@ -209,8 +209,6 @@ export default function AccountPage() {
         loading={commissionLoading}
         error={commissionError}
       />
-
-      <SignOutSection onSignOut={handleSignOut} />
     </section>
   );
 }
@@ -675,18 +673,3 @@ function Field({ label, error, children }: { label: string; error?: string; chil
   );
 }
 
-function SignOutSection({ onSignOut }: { onSignOut: () => void }) {
-  return (
-    <section className="rounded-[32px] border border-white/10 bg-night-950/70 p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-ink-500">Secure your account</p>
-          <p className="text-sm text-ink-400">Sign out when you’re finished so we clear credentials on this device.</p>
-        </div>
-        <Button variant="ghost" onClick={onSignOut} className="w-full sm:w-auto">
-          Sign out
-        </Button>
-      </div>
-    </section>
-  );
-}

@@ -149,15 +149,6 @@ export function MobileDrawer({ open, onClose, sections, ctas, navItems }: Mobile
                     onClick={onClose}
                   />
                 ))}
-                {section.title === "Account" && isAuthenticated ? (
-                  <button
-                    type="button"
-                    onClick={handleSignOut}
-                    className="rounded-full border border-white/15 px-4 py-2 text-left text-sm font-semibold uppercase tracking-[0.15em] text-white/70 transition hover:border-white/40 hover:text-white"
-                  >
-                    Sign out
-                  </button>
-                ) : null}
               </div>
             </div>
           ))}
@@ -168,11 +159,15 @@ export function MobileDrawer({ open, onClose, sections, ctas, navItems }: Mobile
               {ctas.primary.label}
             </a>
           </Button>
-          <Button variant="secondary" asChild fullWidth>
-            <a href={ctas.secondary.href} onClick={onClose}>
-              {ctas.secondary.label}
-            </a>
-          </Button>
+          {isAuthenticated ? (
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="inline-flex w-full items-center justify-center rounded-pill border border-white/15 bg-black px-8 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white transition hover:border-white/40 hover:bg-black/80"
+            >
+              Sign out
+            </button>
+          ) : null}
         </div>
       </aside>
     </div>
