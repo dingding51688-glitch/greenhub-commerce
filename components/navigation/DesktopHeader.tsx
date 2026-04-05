@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import clsx from "clsx";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState, type FocusEvent } from "react";
 import {
+  primaryNav,
   drawerSections,
-  ctaButtons
+  ctaButtons,
+  type NavItem
 } from "@/data/fixtures/navigation";
+import { NavLink } from "./NavLink";
 import { MobileDrawer } from "./MobileDrawer";
 import { LogoMark } from "./LogoMark";
 
@@ -68,18 +73,89 @@ function MenuIcon() {
   );
 }
 
+function ChevronDown({ open }: { open: boolean }) {
+  return (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      className={clsx("ml-1 transition-transform", open && "rotate-180")}
+    >
+      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ShopMenu({ item }: { item: NavItem }) {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const active = pathname.startsWith(item.href);
+
+  const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+      setOpen(false);
+    }
+  };
+
+  return (
+    <div
+      className="relative hidden lg:block"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onFocusCapture={() => setOpen(true)}
+      onBlurCapture={handleBlur}
+    >
+      <Link
+        href={item.href}
+        className={clsx(
+          "flex items-center gap-1 border-b-2 border-transparent pb-1.5 text-[11px] uppercase tracking-[0.2em] text-[rgba(255,255,255,0.55)] transition hover:text-white",
+          active && "border-white text-white"
+        )}
+      >
+        {item.label}
+        <ChevronDown open={open} />
+      </Link>
+      {open && (
+        <div className="absolute left-0 top-full mt-3 min-w-[220px] rounded-2xl border border-white/10 bg-[#050505] p-4 shadow-xl">
+          <div className="flex flex-col gap-1">
+            {item.children?.map((child) => (
+              <Link
+                key={child.href}
+                href={child.href}
+                className="rounded-lg px-3 py-2 text-sm text-[rgba(255,255,255,0.75)] transition hover:bg-white/10 hover:text-white"
+              >
+                {child.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function DesktopHeader() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
     <>
       <header className="sticky top-0 z-30 border-b border-white/5 bg-[#050505]">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4">
           <Link href="/" className="flex items-center">
             <LogoMark />
           </Link>
+          <nav className="hidden flex-1 items-center justify-center gap-6 lg:flex">
+            {primaryNav.map((item) =>
+              item.children ? (
+                <ShopMenu key={item.label} item={item} />
+              ) : (
+                <NavLink key={item.label} {...item} />
+              )
+            )}
+          </nav>
           <div className="flex items-center gap-2">
-            <IconLink href="/login" label="Account">
+            <IconLink href="/account" label="Account">
               <AccountIcon />
             </IconLink>
             <IconLink href="/checkout" label="Shopping bag">
@@ -96,6 +172,7 @@ export function DesktopHeader() {
         onClose={() => setDrawerOpen(false)}
         sections={drawerSections}
         ctas={ctaButtons}
+        navItems={primaryNav}
       />
     </>
   );

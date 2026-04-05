@@ -1,7 +1,8 @@
 "use client";
 
 import clsx from "clsx";
-import type { DrawerSection, NavigationCTA } from "@/data/fixtures/navigation";
+import { useState } from "react";
+import type { DrawerSection, NavigationCTA, NavItem } from "@/data/fixtures/navigation";
 import { NavLink } from "./NavLink";
 import { LogoMark } from "./LogoMark";
 import { Button } from "@/components/ui";
@@ -11,9 +12,16 @@ export type MobileDrawerProps = {
   onClose: () => void;
   sections: DrawerSection[];
   ctas: { primary: NavigationCTA; secondary: NavigationCTA };
+  navItems: NavItem[];
 };
 
-export function MobileDrawer({ open, onClose, sections, ctas }: MobileDrawerProps) {
+export function MobileDrawer({ open, onClose, sections, ctas, navItems }: MobileDrawerProps) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  const toggle = (label: string) => {
+    setExpanded((prev) => (prev === label ? null : label));
+  };
+
   return (
     <div
       className={clsx(
@@ -45,6 +53,46 @@ export function MobileDrawer({ open, onClose, sections, ctas }: MobileDrawerProp
           </button>
         </div>
         <div className="flex flex-col gap-6 overflow-y-auto">
+          <div className="space-y-2">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[rgba(255,255,255,0.6)]">
+              Navigation
+            </p>
+            <div className="flex flex-col gap-2">
+              {navItems.map((item) =>
+                item.children ? (
+                  <div key={item.label} className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => toggle(item.label)}
+                      className="flex w-full items-center justify-between rounded-xl border border-white/10 px-3 py-2 text-left text-sm font-semibold uppercase tracking-[0.15em] text-white/80"
+                    >
+                      <span>{item.label}</span>
+                      <span className="text-white/60">{expanded === item.label ? "−" : "+"}</span>
+                    </button>
+                    {expanded === item.label && (
+                      <div className="space-y-1 pl-3">
+                        {item.children.map((child) => (
+                          <NavLink
+                            key={child.href}
+                            {...child}
+                            variant="drawer"
+                            onClick={onClose}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <NavLink
+                    key={item.href}
+                    {...item}
+                    variant="drawer"
+                    onClick={onClose}
+                  />
+                )
+              )}
+            </div>
+          </div>
           {sections.map((section) => (
             <div key={section.title} className="space-y-2">
               <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[rgba(255,255,255,0.6)]">

@@ -4,6 +4,7 @@ export type NavItem = {
   label: string;
   href: string;
   match?: NavMatch;
+  children?: NavItem[];
 };
 
 export type NavigationCTA = {
@@ -13,17 +14,24 @@ export type NavigationCTA = {
 
 export const primaryNav: NavItem[] = [
   { label: "Home", href: "/", match: "exact" },
-  { label: "Shop all", href: "/products", match: "prefix" },
-  { label: "Flowers", href: "/products?category=flowers" },
-  { label: "Pre-rolls", href: "/products?category=pre-rolls" },
-  { label: "Vapes", href: "/products?category=vapes" },
-  { label: "How it works?", href: "/how-it-works", match: "exact" },
-  { label: "Contact", href: "/contact", match: "exact" }
+  {
+    label: "Shop all",
+    href: "/products",
+    match: "prefix",
+    children: [
+      { label: "Flowers", href: "/products?category=flowers" },
+      { label: "Pre-rolls", href: "/products?category=pre-rolls" },
+      { label: "Vapes", href: "/products?category=vapes" }
+    ]
+  },
+  { label: "Ordering guide", href: "/how-it-works", match: "exact" },
+  { label: "Support", href: "/support", match: "exact" },
+  { label: "Deals / Updates", href: "/blog" }
 ];
 
 export const ctaButtons: { primary: NavigationCTA; secondary: NavigationCTA } = {
   primary: { label: "Browse products", href: "/products" },
-  secondary: { label: "Book a locker", href: "/checkout" }
+  secondary: { label: "Recharge balance", href: "/wallet/topup" }
 };
 
 export type DrawerSection = {
@@ -40,10 +48,6 @@ export const marketingLinks: NavItem[] = [
 
 export const drawerSections: DrawerSection[] = [
   {
-    title: "Menu",
-    links: primaryNav
-  },
-  {
     title: "Account",
     links: [
       { label: "Overview", href: "/account", match: "prefix" },
@@ -51,7 +55,7 @@ export const drawerSections: DrawerSection[] = [
       { label: "Rewards", href: "/rewards", match: "prefix" }
     ]
   }
-  // Legacy locker network + quick links were removed to match the 420.co.uk drawer (menu + account only).
+  // Legacy logistics quick links were removed to match the 420.co.uk drawer (menu + account only).
 ];
 
 export type FooterColumn = {
@@ -64,7 +68,7 @@ export const footerColumns: FooterColumn[] = [
     title: "Company",
     links: [
       { label: "About", href: "/about" },
-      { label: "Locker partners", href: "/lockers" },
+      { label: "Retail partners", href: "/partners" },
       { label: "Press", href: "/press" }
     ]
   },
