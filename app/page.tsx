@@ -43,22 +43,22 @@ function FeaturedCollections() {
 
 function SupportCta() {
   return (
-    <section className="rounded-[40px] border border-white/10 bg-[linear-gradient(135deg,#080808,#050505)] px-6 py-10 text-center shadow-card sm:px-12">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/60">Need help?</p>
-      <h2 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">Questions about ordering?</h2>
-      <p className="mx-auto mt-3 max-w-md text-sm text-white/70">
+    <section className="rounded-3xl border border-white/10 bg-[linear-gradient(135deg,#080808,#050505)] px-5 py-8 text-left shadow-card sm:rounded-[40px] sm:px-12 sm:py-10 sm:text-center">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/60">Need help?</p>
+      <h2 className="mt-2 text-xl font-semibold text-white sm:text-3xl">Questions about ordering?</h2>
+      <p className="mt-3 text-sm leading-relaxed text-white/70 sm:mx-auto sm:max-w-md">
         Our support team is available 09:00–21:00 GMT daily. Check the ordering guide or reach out directly.
       </p>
-      <div className="mt-6 flex flex-wrap justify-center gap-3">
+      <div className="mt-5 flex flex-col gap-2.5 sm:mt-6 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3">
         <a
           href="/how-it-works"
-          className="inline-flex items-center justify-center rounded-pill border border-white/30 px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white/85 transition hover:border-white/60 hover:text-white"
+          className="inline-flex min-h-[48px] items-center justify-center rounded-pill border border-white/30 px-6 text-sm font-semibold uppercase tracking-[0.1em] text-white/85 transition hover:border-white/60 hover:text-white"
         >
           Ordering guide
         </a>
         <a
           href="/support"
-          className="inline-flex items-center justify-center rounded-pill cta-gradient border border-transparent px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-cta transition hover:opacity-95"
+          className="inline-flex min-h-[48px] items-center justify-center rounded-pill cta-gradient border border-transparent px-6 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-cta transition hover:opacity-95"
         >
           Contact support
         </a>

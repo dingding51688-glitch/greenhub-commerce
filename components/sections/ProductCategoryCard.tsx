@@ -52,33 +52,35 @@ export function ProductCategoryCard({
   return (
     <Link
       href={href}
-      className="group relative flex min-h-[260px] flex-col overflow-hidden rounded-[40px] border border-white/10 bg-[#050505] text-white shadow-[0_25px_70px_rgba(0,0,0,0.35)] sm:flex-row"
+      className="group relative flex min-h-[220px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#050505] text-white shadow-[0_25px_70px_rgba(0,0,0,0.35)] sm:min-h-[260px] sm:flex-row sm:rounded-[40px]"
       style={{ background }}
     >
-      <div className="relative z-10 flex w-full flex-col justify-between gap-5 px-6 py-6 sm:w-3/5">
+      <div className="relative z-10 flex w-full flex-col justify-between gap-4 px-4 py-5 sm:w-3/5 sm:gap-5 sm:px-6 sm:py-6">
         <div>
           {label && (
-            <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/75">{label}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/75">{label}</p>
           )}
-          <h3 className="mt-3 text-2xl font-semibold uppercase tracking-[0.22em]">{title}</h3>
-          {subtitle && <p className="mt-3 text-sm text-white/80">{subtitle}</p>}
+          <h3 className="mt-2 text-xl font-semibold uppercase tracking-[0.18em] sm:mt-3 sm:text-2xl sm:tracking-[0.22em]">{title}</h3>
+          {subtitle && <p className="mt-2 text-sm leading-relaxed text-white/80 sm:mt-3">{subtitle}</p>}
         </div>
-        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white transition group-hover:translate-x-1 group-hover:-translate-y-1">
-          <ArrowIcon />
-        </span>
+        <div className="flex items-center justify-between sm:justify-start">
+          <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white transition group-hover:translate-x-1 group-hover:-translate-y-1 sm:h-12 sm:w-12">
+            <ArrowIcon />
+          </span>
+        </div>
       </div>
-      <div className="relative z-10 flex flex-1 items-end justify-center px-4 pb-4 sm:justify-end sm:px-0 sm:pr-8">
+      <div className="relative z-10 flex flex-1 items-center justify-center px-4 pb-4 sm:items-end sm:justify-end sm:px-0 sm:pr-8">
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={imageAlt || title}
             width={280}
             height={280}
-            className="h-44 w-auto object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.55)]"
+            className="h-36 w-auto object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.55)] sm:h-44"
             priority={false}
           />
         ) : (
-          <div className="flex h-32 w-32 items-center justify-center rounded-full border border-white/20 bg-white/5 text-4xl">
+          <div className="flex h-28 w-28 items-center justify-center rounded-full border border-white/20 bg-white/5 text-4xl sm:h-32 sm:w-32">
             <span role="img" aria-hidden="true">
               {imageEmojiFallback}
             </span>
