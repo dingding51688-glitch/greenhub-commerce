@@ -79,30 +79,33 @@ export default function WithdrawalHistoryPage() {
   const fallbackRows = withdrawalFixture;
 
   return (
-    <section className="space-y-8 px-4 py-10">
+    <section className="space-y-6 px-4 py-8">
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/50">Wallet</p>
-        <h1 className="text-3xl font-semibold text-white">Withdrawal history</h1>
-        <p className="text-sm text-white/70">Track every payout request. Pending items will be updated by the team once verified.</p>
+        <a href="/wallet" className="text-xs text-white/40 hover:text-white/60">← Back to wallet</a>
+        <h1 className="text-2xl font-semibold text-white sm:text-3xl">Withdrawal history</h1>
+        <p className="text-sm leading-relaxed text-white/70">Track every payout request. Pending items will be updated by the team once verified.</p>
       </header>
 
-      <div className="flex flex-wrap items-center gap-3">
-        {FILTERS.map((filter) => (
-          <button
-            key={filter.id}
-            onClick={() => setFilterId(filter.id)}
-            className={`rounded-full border px-4 py-2 text-sm transition ${
-              filterId === filter.id ? "border-white bg-white/10 text-white" : "border-white/10 text-white/70 hover:border-white/30"
-            }`}
-          >
-            {filter.label}
-          </button>
-        ))}
+      {/* Filter pills — horizontally scrollable on mobile */}
+      <div className="flex items-center gap-2">
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-none sm:mx-0 sm:flex-wrap sm:px-0">
+          {FILTERS.map((filter) => (
+            <button
+              key={filter.id}
+              onClick={() => setFilterId(filter.id)}
+              className={`shrink-0 rounded-full border px-4 py-2.5 text-sm font-medium transition ${
+                filterId === filter.id ? "border-white bg-white/10 text-white" : "border-white/10 text-white/70 hover:border-white/30"
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
         <button
           onClick={() => mutate()}
-          className="ml-auto rounded-full border border-white/15 px-4 py-2 text-sm text-white/70 hover:border-white/40"
+          className="shrink-0 rounded-full border border-white/15 px-3 py-2.5 text-sm text-white/70 hover:border-white/40"
         >
-          Refresh
+          ↻
         </button>
       </div>
 
@@ -124,13 +127,19 @@ export default function WithdrawalHistoryPage() {
           />
         </div>
       ) : filteredRows.length === 0 ? (
-        <StateMessage
-          variant="empty"
-          title={filterId === "all" ? "No withdrawal requests yet" : "No records for this filter"}
-          body="Submit a withdrawal to see it logged here."
-          actionLabel="New withdrawal"
-          onAction={() => router.push("/wallet/withdraw")}
-        />
+        <div className="rounded-3xl border border-white/10 bg-card p-6 text-center sm:p-8">
+          <p className="text-3xl">📭</p>
+          <h3 className="mt-3 text-lg font-semibold text-white">
+            {filterId === "all" ? "No withdrawal requests yet" : "No records for this filter"}
+          </h3>
+          <p className="mt-2 text-sm text-white/60">Submit a withdrawal to see it logged here.</p>
+          <button
+            onClick={() => router.push("/wallet/withdraw")}
+            className="mt-5 inline-flex w-full min-h-[48px] items-center justify-center rounded-full bg-brand-500 px-6 text-base font-semibold text-white shadow-lg shadow-brand-500/20 hover:bg-brand-400 sm:w-auto"
+          >
+            New withdrawal
+          </button>
+        </div>
       ) : (
         <WithdrawalList
           rows={filteredRows}
@@ -163,7 +172,7 @@ function WithdrawalList({
         <button
           onClick={onLoadMore}
           disabled={loadingMore}
-          className="w-full rounded-full border border-white/20 px-4 py-3 text-sm font-semibold text-white hover:border-white/50 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full min-h-[48px] rounded-full border border-white/20 px-4 text-sm font-semibold text-white hover:border-white/50 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loadingMore ? "Loading…" : "Load more"}
         </button>
@@ -179,7 +188,7 @@ function WithdrawalCard({ request }: { request: WithdrawalRequest }) {
     .slice(0, 3);
 
   return (
-    <article className="space-y-3 rounded-3xl border border-white/10 bg-card p-5 shadow-card">
+    <article className="space-y-3 rounded-3xl border border-white/10 bg-card p-4 shadow-card sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-white/60">{request.reference || `#${request.id}`}</p>
@@ -192,11 +201,11 @@ function WithdrawalCard({ request }: { request: WithdrawalRequest }) {
         </div>
       </div>
       {detailEntries.length > 0 && (
-        <div className="grid gap-2 text-xs text-white/70 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-2 text-xs text-white/70 sm:grid-cols-3">
           {detailEntries.map(([key, value]) => (
-            <div key={key}>
-              <p className="uppercase tracking-[0.35em] text-white/40">{key}</p>
-              <p className="text-white">{String(value)}</p>
+            <div key={key} className="min-w-0">
+              <p className="uppercase tracking-[0.25em] text-white/40">{key}</p>
+              <p className="truncate text-white">{String(value)}</p>
             </div>
           ))}
         </div>

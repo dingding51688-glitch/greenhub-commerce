@@ -82,10 +82,10 @@ export default function WalletPage() {
             <Button asChild className="flex-1 min-h-[48px] text-base font-semibold">
               <Link href="/wallet/topup">Top up</Link>
             </Button>
-            <Button asChild variant="secondary" className="flex-1 min-h-[48px] text-base">
+            <Button asChild className="flex-1 min-h-[48px] border-2 border-emerald-400/60 bg-emerald-500/15 text-base font-semibold text-emerald-100 hover:bg-emerald-500/25">
               <Link href="/wallet/transfer">Transfer</Link>
             </Button>
-            <Button asChild variant="secondary" className="flex-1 min-h-[48px] text-base">
+            <Button asChild className="flex-1 min-h-[48px] border-2 border-amber-400/60 bg-amber-500/15 text-base font-semibold text-amber-100 hover:bg-amber-500/25">
               <Link href="/wallet/withdraw">Withdraw</Link>
             </Button>
           </div>
