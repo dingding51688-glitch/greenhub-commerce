@@ -23,8 +23,16 @@ const FORWARDED_HEADER_ALLOWLIST = new Set([
   "cookie"
 ]);
 
+function resolveStrapiBase(): string | null {
+  const direct = process.env.STRAPI_DIRECT_URL?.trim();
+  if (direct) return direct.replace(/\/$/, "");
+  const authBase = (process.env.NEXT_PUBLIC_AUTH_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "").trim();
+  if (/^https?:\/\//i.test(authBase)) return authBase.replace(/\/$/, "");
+  return null;
+}
+
 async function handler(request: NextRequest, context: { params: { slug?: string[] } }) {
-  const baseUrl = process.env.STRAPI_DIRECT_URL;
+  const baseUrl = resolveStrapiBase();
   if (!baseUrl) {
     return NextResponse.json({ error: "STRAPI_DIRECT_URL is not configured" }, { status: 500 });
   }
