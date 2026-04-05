@@ -132,8 +132,11 @@ export default function AccountSecurityPage() {
         throw new Error(payload?.error?.message || "Unable to change email");
       }
       emailForm.reset();
-      setEmailStatus({ type: "success", message: "Email updated" });
-      await refreshProfile();
+      setEmailStatus({
+        type: "success",
+        message: payload.message || "Verification email sent! Please check your inbox (and Spam/Junk folder).",
+      });
+      // Do NOT refresh profile here - email hasn't changed yet, pending verification
     } catch (error: any) {
       setEmailStatus({ type: "error", message: error?.message || "Update failed" });
     } finally {
@@ -169,8 +172,8 @@ export default function AccountSecurityPage() {
       <div className="rounded-3xl border border-white/10 bg-night-950/80 p-6">
         <div className="flex flex-col gap-1">
           <h2 className="text-xl font-semibold text-white">Change email</h2>
-          <p className="text-sm text-white/60">
-            Current: <span className="font-mono text-white">{userEmail || "—"}</span>. We’ll send a security alert to your locker inbox.
+          <p className="text-sm leading-relaxed text-white/60">
+            Current: <span className="font-mono text-white">{userEmail || "-"}</span>. We&apos;ll send a verification email to your new address. Your email won&apos;t change until you click the link.
           </p>
         </div>
         <form className="mt-4 space-y-4" onSubmit={emailForm.handleSubmit(submitEmailChange)}>
@@ -196,7 +199,7 @@ export default function AccountSecurityPage() {
           )}
           <div className="flex justify-end">
             <Button type="submit" disabled={emailLoading}>
-              {emailLoading ? "Saving…" : "Update email"}
+              {emailLoading ? "Sending…" : "Send verification email"}
             </Button>
           </div>
         </form>
@@ -204,7 +207,7 @@ export default function AccountSecurityPage() {
 
       <div className="rounded-3xl border border-white/10 bg-night-950/80 p-6">
         <h2 className="text-xl font-semibold text-white">Change password</h2>
-        <p className="text-sm text-white/60">Set a strong, unique password. We’ll sign out other sessions when you change it.</p>
+        <p className="text-sm text-white/60">Set a strong, unique password. We&apos;ll sign out other sessions when you change it.</p>
         <form className="mt-4 space-y-4" onSubmit={passwordForm.handleSubmit(onSubmit)}>
           <InputField label="Current password" error={passwordForm.formState.errors.currentPassword?.message}>
             <input type="password" {...passwordForm.register("currentPassword")} className="w-full rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-white" />
@@ -231,7 +234,7 @@ export default function AccountSecurityPage() {
           )}
           <div className="flex justify-end">
             <Button type="submit" disabled={passwordLoading}>
-              {passwordLoading ? "Saving…" : "Update password"}
+              {passwordLoading ? "Saving..." : "Update password"}
             </Button>
           </div>
         </form>
@@ -240,7 +243,7 @@ export default function AccountSecurityPage() {
       <div className="rounded-3xl border border-white/10 bg-night-950/70 p-6">
         <h2 className="text-xl font-semibold text-white">Two-factor reminders</h2>
         <p className="text-sm text-white/60">
-          Telegram concierge approvals double-check sensitive actions today. Full OTP-based 2FA is coming soon — watch the
+          Telegram concierge approvals double-check sensitive actions today. Full OTP-based 2FA is coming soon - watch the
           <Link href="/referral" className="underline"> updates feed</Link> for beta access.
         </p>
         <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-white/70">
@@ -272,7 +275,7 @@ export default function AccountSecurityPage() {
             onAction={() => refreshDevices()}
           />
         ) : devices.length === 0 ? (
-          <StateMessage variant="empty" title="No sessions" body="We’ll list new logins here." />
+          <StateMessage variant="empty" title="No sessions" body="We'll list new logins here." />
         ) : (
           <div className="mt-4 divide-y divide-white/10 rounded-3xl border border-white/10">
             {devices.map((device) => (

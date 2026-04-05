@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { AUTH_TOKEN_KEY } from "@/lib/auth-store";
 
 export const dynamic = "force-dynamic";
 
@@ -12,14 +10,6 @@ function getStrapiBase(): string {
   throw new Error("Cannot resolve Strapi URL");
 }
 
-function getToken(request: NextRequest): string | null {
-  const cookieToken = cookies().get(AUTH_TOKEN_KEY)?.value;
-  if (cookieToken) return cookieToken;
-  const authHeader = request.headers.get("authorization");
-  if (authHeader?.startsWith("Bearer ")) return authHeader.slice(7);
-  return null;
-}
-
 export async function POST(request: NextRequest) {
   let base: string;
   try {
@@ -28,26 +18,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 
-  const token = getToken(request);
-  if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json().catch(() => ({}));
 
   try {
-    const response = await fetch(`${base}/api/account/change-email`, {
+    const response = await fetch(`${base}/api/account/verify-email`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: body?.token }),
     });
     const payload = await response.json().catch(() => ({}));
     return NextResponse.json(payload, { status: response.status });
   } catch (err: any) {
-    console.error("[change-email] Strapi fetch failed:", err.message);
+    console.error("[verify-email] Strapi fetch failed:", err.message);
     return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
   }
 }
