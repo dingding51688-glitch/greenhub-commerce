@@ -7,7 +7,7 @@ export function Footer() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-10 md:flex-row">
         <div className="flex-1 space-y-3">
           <p className="text-[10px] uppercase tracking-[0.35em] text-[rgba(255,255,255,0.6)]">GreenHub NI</p>
-          <p className="text-xl font-semibold text-white">Locker collective</p>
+          <p className="text-xl font-semibold text-white">Storefront collective</p>
           <p className="text-sm text-[rgba(255,255,255,0.75)]">{footerContact.address}</p>
           <div className="text-sm text-[rgba(255,255,255,0.75)]">
             <a href={`mailto:${footerContact.email}`} className="block hover:text-white">

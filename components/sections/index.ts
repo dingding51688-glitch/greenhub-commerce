@@ -3,6 +3,7 @@ export type { HeroClassicProps } from "./HeroClassic";
 
 export { HowItWorksLocker } from "./HowItWorksLocker";
 export type { HowItWorksLockerProps } from "./HowItWorksLocker";
+export { HowItWorksLocker as HowItWorksStore } from "./HowItWorksLocker";
 
 export { ProductCollectionGrid } from "./ProductCollectionGrid";
 export type { ProductCollectionGridProps } from "./ProductCollectionGrid";

@@ -51,7 +51,7 @@ export function PaymentRecommendation(props: Partial<PaymentRecommendationProps>
           Recommended way to pay
         </h2>
         <p className="text-sm text-[rgba(255,255,255,0.75)]">
-          Choose the plan that matches how often you visit the lockers. Switch or cancel anytime.
+          Choose the plan that matches how often you restock through the store. Switch or cancel anytime.
         </p>
       </header>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">

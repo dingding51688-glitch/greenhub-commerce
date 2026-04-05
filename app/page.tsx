@@ -1,4 +1,4 @@
-import { HeroClassic, HowItWorksLocker, PaymentRecommendation, ProductCategoryCard, ProductCollectionGrid } from "@/components/sections";
+import { HeroClassic, HowItWorksStore, PaymentRecommendation, ProductCategoryCard, ProductCollectionGrid } from "@/components/sections";
 import type { ProductCardData, ProductsResponse } from "@/lib/types";
 import { serverFetch } from "@/lib/server-api";
 import { featuredCollectionsContent, homeHeroContent } from "@/data/fixtures/marketing";
@@ -26,6 +26,20 @@ async function getHighlightedProducts(): Promise<ProductCardData[]> {
   }
 }
 
+const storeJourneyContent = {
+  eyebrow: "Online store",
+  title: "How the online store works",
+  steps: [
+    { icon: "①", title: "Reserve online", description: "Browse the catalog, add what you need to cart, and confirm checkout with wallet or card." },
+    { icon: "②", title: "We prep & dispatch", description: "Support verifies payment, seals packaging, and texts you tracking + pickup instructions." },
+    { icon: "③", title: "Collect or receive", description: "Head to the pickup point or accept the courier hand-off, then reply DONE so we can reset the slot." }
+  ],
+  tip: {
+    label: "Service coverage",
+    content: "Belfast & Derry orders dispatch same-evening; other NI postcodes leave our hub by 10:00 the next morning."
+  }
+};
+
 export default async function HomePage() {
   const highlightedProducts = await getHighlightedProducts();
 
@@ -37,13 +51,13 @@ export default async function HomePage() {
 
       <ProductCollectionGrid
         title="Featured products"
-        description="Live menu pulled directly from Strapi so members can see what's ready right now."
+        description="Real-time catalog pulled from Strapi so you always see what's ready to dispatch."
         products={highlightedProducts}
-        primaryCta={{ label: "View full menu", href: "/products" }}
+        primaryCta={{ label: "Browse product catalog", href: "/products" }}
       />
 
-      <div id="lockers">
-        <HowItWorksLocker />
+      <div id="store-journey">
+        <HowItWorksStore {...storeJourneyContent} />
       </div>
 
       <PaymentRecommendation />

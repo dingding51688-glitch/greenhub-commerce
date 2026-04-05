@@ -109,7 +109,7 @@ function ProductHero({ product }: { product: ProductRecord }) {
   const imageAlt = product.coverImage?.alternativeText ?? meta?.imageAlt ?? product.title;
   const rating = product.rating ?? meta?.rating ?? 4.9;
   const reviews = product.reviews ?? meta?.reviews ?? 0;
-  const origin = meta?.origin ?? "🇬🇧 Locker verified";
+  const origin = meta?.origin ?? "🇬🇧 Store verified";
   const priceRange = formatPriceRange(product);
 
   return (
@@ -148,8 +148,8 @@ function StrainInfo() {
   return (
     <section id="strain-info" className="rounded-[32px] border border-white/10 bg-night-950/70 p-6">
       <Card
-        title="Locker-ready experience"
-        description="Locker-ready flower, hand bottled the morning of delivery. Expect dense buds, terpene-heavy aroma, and discreet packaging that slides into any Bloom locker."
+        title="Store-ready experience"
+        description="Flower prepared the morning of dispatch with dense buds, terpene-heavy aroma, and discreet packaging built for private collection."
       >
         <ul className="list-disc space-y-2 pl-5 text-sm">
           <li>Sourced from small-batch EU cultivators.</li>
@@ -168,7 +168,7 @@ function CuratedPicks({ products }: { products: ProductRecord[] }) {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-ink-500">Curated picks</p>
-          <h2 className="text-3xl font-semibold text-white">Related locker drops</h2>
+          <h2 className="text-3xl font-semibold text-white">Related store releases</h2>
         </div>
         <Button asChild variant="ghost" className="w-full sm:w-auto">
           <Link href="/products">View menu</Link>

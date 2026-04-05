@@ -13,9 +13,9 @@ export type ProductCategoryContent = {
 export const productCategoryContent: Record<ProductCategoryKey, ProductCategoryContent> = {
   "shop-all": {
     breadcrumb: "HOME / SHOP ALL",
-    title: "Locker-ready menu for every palette",
+    title: "Store menu for every palette",
     description: "Scroll through every strain, pre-roll, and cart in a single feed. Use the tabs to jump into a category or keep filters on \"All\" to see everything.",
-    helper: "Filters update the locker feed instantly."
+    helper: "Filters update the catalog instantly."
   },
   flowers: {
     breadcrumb: "HOME / SHOP ALL / FLOWERS",
@@ -25,8 +25,8 @@ export const productCategoryContent: Record<ProductCategoryKey, ProductCategoryC
   },
   "pre-rolls": {
     breadcrumb: "HOME / SHOP ALL / PRE-ROLLS",
-    title: "Hand-twisted joints, ready for the locker",
-    description: "Infused one-gram pre-rolls with glass tips and terpene boosts. Perfect for quick locker pickups.",
+    title: "Hand-twisted joints, ready for pickup",
+    description: "Infused one-gram pre-rolls with glass tips and terpene boosts. Perfect for quick grab-and-go pickups.",
     filter: { field: "category", value: "pre-rolls" }
   },
   vapes: {
@@ -66,7 +66,7 @@ export const productListingMeta: Record<string, ProductCardMeta> = {
   "rose-spliff": {
     imageUrl: "https://cms.greenhub420.co.uk/uploads/rose_spliff_0670cb8d92.jpg",
     imageAlt: "Rose petal joints",
-    origin: "🇬🇧 NI concierge",
+    origin: "🇬🇧 NI support team",
     rating: 4.7,
     reviews: 76,
     potencyBadge: "Medium"
@@ -88,7 +88,7 @@ export const productListingFallbacks: ProductRecord[] = [
     title: "Cereal Milk",
     slug: "cereal-milk",
     description: "Cream-heavy hybrid with frosted buds, cured 14 days and flushed with nitrogen before dispatch.",
-    heroBadge: "Locker-ready",
+    heroBadge: "Store favorite",
     priceFrom: 45,
     strain: "Hybrid",
     thc: "23% THC",
