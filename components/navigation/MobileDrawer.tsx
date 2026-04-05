@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { DrawerSection, NavigationCTA, NavItem } from "@/data/fixtures/navigation";
 import { NavLink } from "./NavLink";
 import { LogoMark } from "./LogoMark";
@@ -16,7 +16,14 @@ export type MobileDrawerProps = {
 };
 
 export function MobileDrawer({ open, onClose, sections, ctas, navItems }: MobileDrawerProps) {
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const defaultAccordion = useMemo(() => navItems.find((item) => item.children)?.label ?? null, [navItems]);
+  const [expanded, setExpanded] = useState<string | null>(defaultAccordion);
+
+  useEffect(() => {
+    if (open) {
+      setExpanded(defaultAccordion);
+    }
+  }, [open, defaultAccordion]);
 
   const toggle = (label: string) => {
     setExpanded((prev) => (prev === label ? null : label));
