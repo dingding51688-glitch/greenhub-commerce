@@ -15,6 +15,7 @@ import { BellIcon } from "./BellIcon";
 import { MobileDrawer } from "./MobileDrawer";
 import { LogoMark } from "./LogoMark";
 import { useNotifications } from "@/components/providers/NotificationProvider";
+import { useCart } from "@/components/providers/CartProvider";
 
 function IconLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
   return (
@@ -149,6 +150,8 @@ export function DesktopHeader() {
   const router = useRouter();
   const { unreadCount } = useNotifications();
   const notificationBadge = unreadCount > 0 ? formatBadge(unreadCount) : undefined;
+  const { totalItems } = useCart();
+  const cartBadge = totalItems > 0 ? formatBadge(totalItems) : undefined;
 
   return (
     <>
@@ -173,9 +176,9 @@ export function DesktopHeader() {
             <IconLink href="/account" label="Account">
               <AccountIcon />
             </IconLink>
-            <IconLink href="/checkout" label="Shopping bag">
+            <IconButton onClick={() => router.push("/cart")} label="Shopping cart" badge={cartBadge}>
               <BagIcon />
-            </IconLink>
+            </IconButton>
             <IconButton onClick={() => setDrawerOpen(true)} label="Open menu">
               <MenuIcon />
             </IconButton>

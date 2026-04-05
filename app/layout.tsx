@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { CartProvider } from "@/components/providers/CartProvider";
 import { NotificationProvider } from "@/components/providers/NotificationProvider";
 import { DesktopHeader, Footer } from "@/components/navigation";
 
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="text-white">
         <AuthProvider>
+          <CartProvider>
           <NotificationProvider>
             <div className="min-h-screen flex flex-col">
               <DesktopHeader />
@@ -23,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Footer />
             </div>
           </NotificationProvider>
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

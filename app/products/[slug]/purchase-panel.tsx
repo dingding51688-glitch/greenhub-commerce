@@ -5,6 +5,7 @@ import { useState } from "react";
 import Button from "@/components/ui/button";
 import type { ProductRecord, WeightOption } from "@/lib/types";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/components/providers/CartProvider";
 
 const MIN_QTY = 1;
 const MAX_QTY = 5;
@@ -30,11 +31,13 @@ function formatUnitPrice(option: WeightOption) {
 
 export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
   const router = useRouter();
+  const { addItem } = useCart();
   const rawOptions = product.weightOptions ?? [];
   const normalizedOptions = rawOptions.length > 0 ? rawOptions : FALLBACK_WEIGHT_OPTIONS;
-  const limitedOptions = normalizedOptions.slice(0, 4); // legacy UI only surfaces the first four tiers
+  const limitedOptions = normalizedOptions.slice(0, 4);
   const [selectedId, setSelectedId] = useState<number | null>(limitedOptions[0]?.id ?? null);
   const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
 
   const displayOptions = limitedOptions.map((option) => {
     const highlight = option.featured || option.label.toLowerCase().includes("28");
@@ -47,13 +50,19 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
 
   const selected = displayOptions.find((option) => option.id === selectedId) ?? displayOptions[0] ?? null;
 
-  const handleCheckout = () => {
+  const handleAddToCart = () => {
     if (!selected) return;
-    const params = new URLSearchParams();
-    params.set("product", product.slug);
-    params.set("weight", selected.label);
-    params.set("qty", quantity.toString());
-    router.push(`/checkout?${params.toString()}`);
+    addItem({
+      productId: product.id,
+      slug: product.slug,
+      title: product.title,
+      image: product.coverImage?.url ?? null,
+      weight: selected.label,
+      unitPrice: selected.price,
+      quantity,
+    });
+    setAdded(true);
+    setTimeout(() => router.push("/cart"), 600);
   };
 
   const adjustQuantity = (delta: number) => {
@@ -133,11 +142,11 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
       </div>
 
       <Button
-        onClick={handleCheckout}
-        disabled={!selected}
+        onClick={handleAddToCart}
+        disabled={!selected || added}
         className="w-full rounded-[30px] border-2 border-[#0B0F0D] bg-[#23A26D] text-[#0B0F0D] font-semibold tracking-wide hover:bg-[#1F8B5D]"
       >
-        ADD TO CART
+        {added ? "✓ ADDED — GOING TO CART" : "ADD TO CART"}
       </Button>
 
       <div className="rounded-[32px] border border-white/15 bg-[#0A0C0E] p-5 text-sm text-[#EDEDED]">
