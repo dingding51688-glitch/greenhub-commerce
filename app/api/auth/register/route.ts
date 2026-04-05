@@ -21,10 +21,7 @@ export async function POST(request: Request) {
   const payload = {
     username,
     email,
-    password,
-    fullName,
-    phone,
-    telegramHandle
+    password
   };
 
   try {

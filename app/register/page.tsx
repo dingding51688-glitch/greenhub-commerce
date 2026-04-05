@@ -88,10 +88,10 @@ export default function RegisterPage() {
           <input type="email" {...register("email")} className={inputClass} placeholder="you@email.com" />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Telegram handle" error={errors.telegramHandle?.message}>
+          <Field label="Telegram handle (optional)" error={errors.telegramHandle?.message}>
             <input type="text" {...register("telegramHandle")} className={inputClass} placeholder="@greenhub_member" />
           </Field>
-          <Field label="Phone" error={errors.phone?.message}>
+          <Field label="Phone (optional)" error={errors.phone?.message}>
             <input type="tel" {...register("phone")} className={inputClass} placeholder="+44 7700 900000" />
           </Field>
         </div>
