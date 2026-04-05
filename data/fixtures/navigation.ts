@@ -38,10 +38,9 @@ export type DrawerSection = {
 };
 
 export const marketingLinks: NavItem[] = [
-  { label: "About", href: "/about" },
-  { label: "Shipping", href: "/shipping" },
-  { label: "Returns", href: "/returns" },
-  { label: "Terms", href: "/terms" }
+  { label: "Products", href: "/products" },
+  { label: "Ordering guide", href: "/how-it-works" },
+  { label: "Support", href: "/support" }
 ];
 
 export const drawerSections: DrawerSection[] = [
@@ -63,27 +62,27 @@ export type FooterColumn = {
 
 export const footerColumns: FooterColumn[] = [
   {
-    title: "Company",
+    title: "Shop",
     links: [
-      { label: "About", href: "/about" },
-      { label: "Retail partners", href: "/partners" },
-      { label: "Press", href: "/press" }
+      { label: "All products", href: "/products" },
+      { label: "Flowers", href: "/products?category=flowers" },
+      { label: "Vapes", href: "/products?category=vapes" }
     ]
   },
   {
     title: "Help",
     links: [
+      { label: "Ordering guide", href: "/how-it-works" },
       { label: "Support", href: "/support" },
-      { label: "FAQ", href: "/faq" },
-      { label: "Shipping", href: "/shipping" }
+      { label: "FAQ", href: "/faq" }
     ]
   },
   {
-    title: "Policies",
+    title: "Account",
     links: [
-      { label: "Returns", href: "/returns" },
-      { label: "Terms", href: "/terms" },
-      { label: "Privacy", href: "/privacy" }
+      { label: "Overview", href: "/account" },
+      { label: "Balance", href: "/wallet" },
+      { label: "Commission hub", href: "/referral" }
     ]
   }
 ];

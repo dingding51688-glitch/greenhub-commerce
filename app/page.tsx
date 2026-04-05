@@ -1,4 +1,4 @@
-import { HeroClassic, HowItWorksStore, PaymentRecommendation, ProductCategoryCard, ProductCollectionGrid } from "@/components/sections";
+import { HeroClassic, HowItWorksStore, ProductCategoryCard, ProductCollectionGrid } from "@/components/sections";
 import type { ProductCardData, ProductsResponse } from "@/lib/types";
 import { serverFetch } from "@/lib/server-api";
 import { featuredCollectionsContent, homeHeroContent } from "@/data/fixtures/marketing";
@@ -60,7 +60,7 @@ export default async function HomePage() {
         <HowItWorksStore {...storeJourneyContent} />
       </div>
 
-      <PaymentRecommendation />
+      <SupportCta />
     </div>
   );
 }
@@ -71,6 +71,26 @@ function FeaturedCollections() {
       {featuredCollectionsContent.map((collection) => (
         <ProductCategoryCard key={collection.title} {...collection} />
       ))}
+    </section>
+  );
+}
+
+function SupportCta() {
+  return (
+    <section className="rounded-[40px] border border-white/10 bg-[linear-gradient(135deg,#080808,#050505)] px-6 py-10 text-center shadow-card sm:px-12">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/60">Need help?</p>
+      <h2 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">Questions about ordering?</h2>
+      <p className="mx-auto mt-3 max-w-md text-sm text-white/70">
+        Our support team is available 09:00–21:00 GMT daily. Check the ordering guide or reach out directly.
+      </p>
+      <div className="mt-6 flex flex-wrap justify-center gap-3">
+        <a href="/how-it-works" className="inline-flex items-center justify-center rounded-pill border border-white/30 px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white/85 transition hover:border-white/60 hover:text-white">
+          Ordering guide
+        </a>
+        <a href="/support" className="inline-flex items-center justify-center rounded-pill cta-gradient border border-transparent px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-cta transition hover:opacity-95">
+          Contact support
+        </a>
+      </div>
     </section>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,9 +34,19 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 const inputClass = "mt-1 w-full rounded-2xl border border-white/15 bg-transparent px-3 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const { register: registerUser } = useAuth();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [countdown, setCountdown] = useState(3);
+
+  /* Auto-redirect after successful registration */
+  useEffect(() => {
+    if (!success) return;
+    const interval = setInterval(() => setCountdown((c) => c - 1), 1000);
+    const timeout = setTimeout(() => router.push("/products"), 2000);
+    return () => { clearInterval(interval); clearTimeout(timeout); };
+  }, [success, router]);
 
   const {
     register,
@@ -109,10 +120,10 @@ export default function RegisterPage() {
 
       {success && (
         <div className="space-y-3 rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
-          <p className="font-semibold text-emerald-200">✅ Account ready</p>
-          <p>Continue to the product catalogue to browse and place your first order.</p>
+          <p className="font-semibold text-emerald-200">✅ Account created — you&apos;re logged in!</p>
+          <p>Redirecting to products in {countdown > 0 ? countdown : 1}s…</p>
           <Button asChild size="lg" className="w-full">
-            <Link href="/products">Browse products</Link>
+            <Link href="/products">Browse products now</Link>
           </Button>
         </div>
       )}
