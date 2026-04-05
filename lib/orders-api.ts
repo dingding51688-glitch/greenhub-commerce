@@ -39,6 +39,8 @@ export type OrderItemInput = {
 
 export type CreateOrderPayload = {
   items: OrderItemInput[];
+  contactEmail?: string;
+  deliveryPostcode?: string;
   dropoffPostcode?: string;
   paymentOption?: string;
   referralCode?: string;
