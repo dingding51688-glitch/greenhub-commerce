@@ -2,8 +2,8 @@ import { HeroClassic, HowItWorksStore, ProductCategoryCard } from "@/components/
 import { featuredCollectionsContent, homeHeroContent } from "@/data/fixtures/marketing";
 
 const storeJourneyContent = {
-  eyebrow: "Online store",
-  title: "How the online store works",
+  eyebrow: "Store journey",
+  title: "How ordering works",
   steps: [
     { icon: "①", title: "Reserve online", description: "Browse the catalog, add what you need to cart, and confirm checkout with wallet or card." },
     { icon: "②", title: "We prep & dispatch", description: "Support verifies payment, seals packaging, and texts you tracking + pickup instructions." },

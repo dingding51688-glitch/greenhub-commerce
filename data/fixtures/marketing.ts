@@ -22,7 +22,7 @@ export const heroClassicContent = {
 
 export const homeHeroContent = {
   highlight: "HOME",
-  eyebrow: "ONLINE STORE · SAME-DAY DISPATCH",
+  eyebrow: "SAME-DAY DISPATCH",
   title: "Order online & collect discreetly",
   subtitle: "Enter your postcode and we'll route the parcel to the closest pickup point or courier.",
   bullets: [
