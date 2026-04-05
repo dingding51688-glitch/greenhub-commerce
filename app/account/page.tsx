@@ -84,6 +84,8 @@ export default function AccountPage() {
   const router = useRouter();
   const [redirecting, setRedirecting] = useState(false);
 
+  const handleSignOut = () => { logout(); router.push("/login"); };
+
   /* Auto-redirect to login — only after auth hydration is complete */
   useEffect(() => {
     if (!isReady || token || redirecting) return;
