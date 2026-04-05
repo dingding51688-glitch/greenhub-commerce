@@ -162,7 +162,7 @@ export default function AccountSecurityPage() {
     <section className="space-y-8">
       <header className="rounded-3xl border border-white/10 bg-card p-6 shadow-card">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Account security</p>
-        <h1 className="text-3xl font-semibold text-white">Keep your locker safe</h1>
+        <h1 className="hidden text-3xl font-semibold text-white sm:block">Keep your locker safe</h1>
         <p className="mt-2 hidden text-sm text-white/60 sm:block">Security reminder: avoid saving passwords on shared devices and enable concierge approvals for sensitive changes.</p>
       </header>
 
