@@ -1,30 +1,5 @@
-import { HeroClassic, HowItWorksStore, ProductCategoryCard, ProductCollectionGrid } from "@/components/sections";
-import type { ProductCardData, ProductsResponse } from "@/lib/types";
-import { serverFetch } from "@/lib/server-api";
+import { HeroClassic, HowItWorksStore, ProductCategoryCard } from "@/components/sections";
 import { featuredCollectionsContent, homeHeroContent } from "@/data/fixtures/marketing";
-
-async function getHighlightedProducts(): Promise<ProductCardData[]> {
-  try {
-    const params = new URLSearchParams({
-      "pagination[page]": "1",
-      "pagination[pageSize]": "4",
-      "sort[0]": "createdAt:desc",
-      "populate[weightOptions]": "*"
-    });
-    const response = await serverFetch<ProductsResponse>(`/api/products?${params.toString()}`);
-    return (response.data || []).map((product) => ({
-      id: product.documentId,
-      title: product.title,
-      category: product.strain,
-      description: product.description,
-      price: `£${product.priceFrom.toFixed(2)}`,
-      badge: product.heroBadge ?? undefined
-    }));
-  } catch (error) {
-    console.error("Failed to load highlighted products", error);
-    return [];
-  }
-}
 
 const storeJourneyContent = {
   eyebrow: "Online store",
@@ -40,21 +15,12 @@ const storeJourneyContent = {
   }
 };
 
-export default async function HomePage() {
-  const highlightedProducts = await getHighlightedProducts();
-
+export default function HomePage() {
   return (
     <div className="space-y-10 pb-20">
       <HeroClassic {...homeHeroContent} />
 
       <FeaturedCollections />
-
-      <ProductCollectionGrid
-        title="Featured products"
-        description="Real-time catalog pulled from Strapi so you always see what's ready to dispatch."
-        products={highlightedProducts}
-        primaryCta={{ label: "Browse product catalog", href: "/products" }}
-      />
 
       <div id="store-journey">
         <HowItWorksStore {...storeJourneyContent} />
@@ -84,10 +50,16 @@ function SupportCta() {
         Our support team is available 09:00–21:00 GMT daily. Check the ordering guide or reach out directly.
       </p>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
-        <a href="/how-it-works" className="inline-flex items-center justify-center rounded-pill border border-white/30 px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white/85 transition hover:border-white/60 hover:text-white">
+        <a
+          href="/how-it-works"
+          className="inline-flex items-center justify-center rounded-pill border border-white/30 px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white/85 transition hover:border-white/60 hover:text-white"
+        >
           Ordering guide
         </a>
-        <a href="/support" className="inline-flex items-center justify-center rounded-pill cta-gradient border border-transparent px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-cta transition hover:opacity-95">
+        <a
+          href="/support"
+          className="inline-flex items-center justify-center rounded-pill cta-gradient border border-transparent px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-cta transition hover:opacity-95"
+        >
           Contact support
         </a>
       </div>
