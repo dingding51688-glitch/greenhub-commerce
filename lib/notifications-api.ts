@@ -1,29 +1,27 @@
 import { getStoredToken } from "@/lib/auth-store";
 
-const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "";
+/**
+ * Notifications use the dedicated Next.js API route at /api/account/notifications
+ * rather than the generic Strapi proxy (/api/strapi/...) because:
+ *  - The server route resolves STRAPI_DIRECT_URL correctly at runtime
+ *  - Avoids double-path issues (/api/strapi/api/notifications)
+ *  - Works even when STRAPI_DIRECT_URL isn't set as a NEXT_PUBLIC_ env var
+ */
 
-function ensureBase() {
-  if (!AUTH_BASE) throw new Error("NEXT_PUBLIC_AUTH_BASE_URL missing");
-}
+const NOTIFICATIONS_ROUTE = "/api/account/notifications";
 
-async function notificationsFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  ensureBase();
+async function authFetch<T>(url: string, init?: RequestInit): Promise<T> {
   const token = getStoredToken();
   if (!token) throw new Error("Login required");
   const headers = new Headers(init?.headers);
   headers.set("Authorization", `Bearer ${token}`);
   if (init?.body && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
   headers.set("Accept", "application/json");
-  const response = await fetch(`${AUTH_BASE}${path}`, {
-    ...init,
-    headers
-  });
+  const response = await fetch(url, { ...init, headers });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    if (response.status === 401) {
-      throw new Error("Unauthorized. Please sign in again.");
-    }
-    throw new Error(payload?.error?.message || "Notification request failed");
+    if (response.status === 401) throw new Error("Unauthorized. Please sign in again.");
+    throw new Error(payload?.error?.message || payload?.error || "Notification request failed");
   }
   return payload as T;
 }
@@ -61,23 +59,30 @@ export async function listNotifications(params?: { page?: number; pageSize?: num
   if (params?.pageSize) query.set("pageSize", params.pageSize.toString());
   if (params?.unreadOnly) query.set("unreadOnly", "true");
   const qs = query.toString();
-  const url = `/api/notifications${qs ? `?${qs}` : ""}`;
-  return notificationsFetch<ListNotificationsResponse>(url);
+  return authFetch<ListNotificationsResponse>(`${NOTIFICATIONS_ROUTE}${qs ? `?${qs}` : ""}`);
 }
 
 export async function getUnreadCount() {
-  return notificationsFetch<{ count: number }>("/api/notifications/unread-count");
+  // Use the list route with unreadOnly flag and count from response
+  // This avoids needing a separate endpoint
+  try {
+    const response = await authFetch<ListNotificationsResponse>(`${NOTIFICATIONS_ROUTE}?unreadOnly=true&pageSize=100`);
+    return { count: response.data?.filter((n) => !n.read).length ?? 0 };
+  } catch {
+    return { count: 0 };
+  }
 }
 
 export async function markRead(ids: number[]) {
-  return notificationsFetch<{ success: boolean }>("/api/notifications/mark-read", {
+  return authFetch<{ success: boolean }>(NOTIFICATIONS_ROUTE, {
     method: "PUT",
-    body: JSON.stringify({ ids })
+    body: JSON.stringify({ notificationIds: ids }),
   });
 }
 
 export async function markAllRead() {
-  return notificationsFetch<{ success: boolean }>("/api/notifications/mark-all-read", {
-    method: "PUT"
+  return authFetch<{ success: boolean }>(NOTIFICATIONS_ROUTE, {
+    method: "PUT",
+    body: JSON.stringify({ action: "markAll" }),
   });
 }
