@@ -155,6 +155,19 @@ export type ProductRecord = {
   weightOptions?: WeightOption[];
 };
 
+export type FavoriteProduct = {
+  productId: number;
+  slug: string;
+  title: string;
+  description?: string | null;
+  strain?: string | null;
+  thc?: string | null;
+  potency?: string | null;
+  priceFrom?: number | null;
+  coverImage?: ProductImage | null;
+  addedAt: string;
+};
+
 export type ProductsResponse = {
   data: ProductRecord[];
   meta?: {
@@ -266,6 +279,7 @@ export type TopupRecord = {
   cryptoCurrency?: string | null;
   network?: string | null;
   payAddress?: string | null;
+  qrCode?: string | null;
   invoiceUrl?: string | null;
   expiresAt?: string | null;
   bonusUsdt?: number | null;

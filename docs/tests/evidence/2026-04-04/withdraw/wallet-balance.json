@@ -1,0 +1,8 @@
+{
+  "capturedAt": "2026-04-04T17:34:00Z",
+  "success": true,
+  "balance": 189,
+  "lifetimeTopUp": 460,
+  "bonusAwarded": 18.5,
+  "source": "curl https://paul-decent-column-acknowledge.trycloudflare.com/api/strapi/api/wallet/balance"
+}

@@ -9,3 +9,9 @@ memory/
 newsite/
 oldsite-*/
 uploads/*.zip
+# Node/Next artifacts
+node_modules/
+.next/
+coverage/
+dist/
+*.log

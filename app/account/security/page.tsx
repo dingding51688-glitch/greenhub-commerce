@@ -12,6 +12,17 @@ import { StateMessage } from "@/components/StateMessage";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { swrFetcher } from "@/lib/api";
 
+const emailSchema = z
+  .object({
+    newEmail: z.string().email("Enter a valid email"),
+    confirmEmail: z.string().email("Confirm with the same email"),
+    currentPassword: z.string().min(8, "Enter your current password"),
+  })
+  .refine((data) => data.newEmail === data.confirmEmail, {
+    path: ["confirmEmail"],
+    message: "Emails do not match",
+  });
+
 const passwordSchema = z
   .object({
     currentPassword: z.string().min(8, "Enter your current password"),
@@ -27,6 +38,8 @@ const passwordSchema = z
   });
 
 type PasswordFormValues = z.infer<typeof passwordSchema>;
+
+type EmailFormValues = z.infer<typeof emailSchema>;
 
 type DeviceRecord = {
   id: number;
@@ -52,9 +65,12 @@ function passwordStrength(password: string) {
 }
 
 export default function AccountSecurityPage() {
-  const { token } = useAuth();
+  const { token, userEmail, refreshProfile } = useAuth();
   const router = useRouter();
+  const emailForm = useForm<EmailFormValues>({ resolver: zodResolver(emailSchema) });
   const passwordForm = useForm<PasswordFormValues>({ resolver: zodResolver(passwordSchema) });
+  const [emailStatus, setEmailStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [emailLoading, setEmailLoading] = useState(false);
   const [passwordStatus, setPasswordStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const { data: devicesData, error: devicesError, isLoading: devicesLoading, mutate: refreshDevices } = useSWR<{ devices: DeviceRecord[] }>(
@@ -99,6 +115,32 @@ export default function AccountSecurityPage() {
     }
   };
 
+  const submitEmailChange = async (values: EmailFormValues) => {
+    setEmailStatus(null);
+    setEmailLoading(true);
+    try {
+      const response = await fetch("/api/account/security/change-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          newEmail: values.newEmail,
+          currentPassword: values.currentPassword
+        })
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload?.error?.message || "Unable to change email");
+      }
+      emailForm.reset();
+      setEmailStatus({ type: "success", message: "Email updated" });
+      await refreshProfile();
+    } catch (error: any) {
+      setEmailStatus({ type: "error", message: error?.message || "Update failed" });
+    } finally {
+      setEmailLoading(false);
+    }
+  };
+
   const strength = passwordStrength(passwordForm.watch("newPassword"));
 
   const devices = devicesData?.devices || [];
@@ -123,6 +165,42 @@ export default function AccountSecurityPage() {
         <h1 className="text-3xl font-semibold text-white">Keep your locker safe</h1>
         <p className="mt-2 text-sm text-white/60">Security reminder: avoid saving passwords on shared devices and enable concierge approvals for sensitive changes.</p>
       </header>
+
+      <div className="rounded-3xl border border-white/10 bg-night-950/80 p-6">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-xl font-semibold text-white">Change email</h2>
+          <p className="text-sm text-white/60">
+            Current: <span className="font-mono text-white">{userEmail || "—"}</span>. We’ll send a security alert to your locker inbox.
+          </p>
+        </div>
+        <form className="mt-4 space-y-4" onSubmit={emailForm.handleSubmit(submitEmailChange)}>
+          <InputField label="New email" error={emailForm.formState.errors.newEmail?.message}>
+            <input type="email" {...emailForm.register("newEmail")} className="w-full rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-white" />
+          </InputField>
+          <InputField label="Confirm email" error={emailForm.formState.errors.confirmEmail?.message}>
+            <input type="email" {...emailForm.register("confirmEmail")} className="w-full rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-white" />
+          </InputField>
+          <InputField label="Current password" error={emailForm.formState.errors.currentPassword?.message}>
+            <input type="password" {...emailForm.register("currentPassword")} className="w-full rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-white" />
+          </InputField>
+          {emailStatus && (
+            <div
+              className={`rounded-2xl border px-3 py-2 text-sm ${
+                emailStatus.type === "success"
+                  ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-100"
+                  : "border-red-400/40 bg-red-400/10 text-red-100"
+              }`}
+            >
+              {emailStatus.message}
+            </div>
+          )}
+          <div className="flex justify-end">
+            <Button type="submit" disabled={emailLoading}>
+              {emailLoading ? "Saving…" : "Update email"}
+            </Button>
+          </div>
+        </form>
+      </div>
 
       <div className="rounded-3xl border border-white/10 bg-night-950/80 p-6">
         <h2 className="text-xl font-semibold text-white">Change password</h2>

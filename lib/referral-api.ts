@@ -28,6 +28,7 @@ export type ReferralSummary = {
   activeLockers: number;
   bonusEarned: number;
   clicks: number;
+  validClicks?: number;
   clickPayoutTotal: number;
   registrations: number;
   topups: number;
@@ -35,6 +36,17 @@ export type ReferralSummary = {
   ctr: number;
   impressions?: number;
   monthCommission?: number;
+  totalOrderValue?: number;
+  totalConverted?: number;
+  totalCommission?: number;
+  thirtyDayCommission?: number;
+  customers?: Array<{
+    email: string;
+    orders: number;
+    totalSpend: number;
+    commission: number;
+    lastOrder?: string;
+  }>;
 };
 
 export async function getReferralSummary() {

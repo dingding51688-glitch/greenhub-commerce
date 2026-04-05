@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -90,12 +90,21 @@ export default function AccountPage() {
     { refreshInterval: 90_000 }
   );
 
+  const nextApiFetcher = useCallback(async (path: string) => {
+    const response = await fetch(path, { cache: "no-store" });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload?.error?.message || payload?.message || "Request failed");
+    }
+    return payload as CustomerProfileResponse;
+  }, []);
+
   const {
     data: customerProfile,
     error: customerError,
     isLoading: customerLoading,
     mutate: refreshCustomerProfile,
-  } = useSWR<CustomerProfileResponse>(token ? "/api/account/profile" : null, swrFetcher);
+  } = useSWR<CustomerProfileResponse>(token ? "/api/account/profile" : null, nextApiFetcher);
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -200,7 +209,7 @@ export default function AccountPage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          phone: values.phone || null,
+          phone: values.phone?.trim() ? values.phone.trim() : null,
           telegramHandle: values.telegramHandle ? values.telegramHandle.replace(/^@/, "") : null,
           preferredLocker: values.preferredLocker || null,
           marketingOptIn: values.marketingOptIn
@@ -277,7 +286,22 @@ export default function AccountPage() {
                 <input type="email" readOnly {...profileForm.register("email")} className={profileInputClass} />
               </ProfileField>
               <ProfileField label="Phone" error={profileForm.formState.errors.phone?.message}>
-                <input type="tel" placeholder="+44 7700 900000" {...profileForm.register("phone")} className={profileInputClass} />
+                <div className="flex gap-2">
+                  <input
+                    type="tel"
+                    placeholder="+44 7700 900000"
+                    {...profileForm.register("phone")}
+                    className={`${profileInputClass} flex-1`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => profileForm.setValue("phone", "", { shouldDirty: true })}
+                    className="rounded-2xl border border-white/10 px-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/60 transition hover:border-white/30"
+                  >
+                    Clear
+                  </button>
+                </div>
+                <p className="text-xs text-white/40">Leave blank if you don’t want a phone on file.</p>
               </ProfileField>
               <ProfileField label="Telegram" error={profileForm.formState.errors.telegramHandle?.message}>
                 <input type="text" placeholder="@locker_member" {...profileForm.register("telegramHandle")} className={profileInputClass} />

@@ -1,0 +1,2 @@
+Blocked request. This host ("clip-inquiries-academic-taste.trycloudflare.com") is not allowed.
+To allow this host, add "clip-inquiries-academic-taste.trycloudflare.com" to `server.allowedHosts` in vite.config.js.

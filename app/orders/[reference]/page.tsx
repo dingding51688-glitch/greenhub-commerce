@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { StateMessage } from "@/components/StateMessage";
 import Button from "@/components/ui/button";
-import { getOrderTracking, type OrderRecord } from "@/lib/orders-api";
+import { getOrderTracking } from "@/lib/orders-api";
+import type { OrderRecord } from "@/lib/types";
 
 export default function OrderDetailPage({ params }: { params: { reference: string } }) {
   const { token } = useAuth();

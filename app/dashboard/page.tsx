@@ -24,6 +24,7 @@ const fallbackReferral: ReferralSummary = {
   activeLockers: 0,
   bonusEarned: 0,
   clicks: 0,
+  validClicks: 0,
   clickPayoutTotal: 0,
   registrations: 0,
   topups: 0,
@@ -31,6 +32,11 @@ const fallbackReferral: ReferralSummary = {
   ctr: 0,
   impressions: 0,
   monthCommission: 0,
+  totalOrderValue: 0,
+  totalConverted: 0,
+  totalCommission: 0,
+  thirtyDayCommission: 0,
+  customers: [],
 };
 
 export default function DashboardPage() {
