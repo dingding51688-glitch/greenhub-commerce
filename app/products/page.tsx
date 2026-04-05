@@ -15,7 +15,6 @@ import {
   type ProductCategoryKey
 } from "@/data/fixtures/products";
 
-const STRAIN_FILTERS = ["all", "Hybrid", "Indica", "Sativa"] as const;
 const CATEGORY_TABS: ProductCategoryKey[] = ["shop-all", "flowers", "pre-rolls", "vapes"];
 
 function resolveCategory(value: string | null): ProductCategoryKey {
@@ -29,17 +28,12 @@ export default function ProductsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const category = resolveCategory(searchParams.get("category"));
-  const strainParam = searchParams.get("strain") || "all";
-  const strain = STRAIN_FILTERS.includes(strainParam as (typeof STRAIN_FILTERS)[number]) ? strainParam : "all";
 
   const requestParams = new URLSearchParams({
     "pagination[pageSize]": "12",
     "sort[0]": "createdAt:desc",
     "populate[weightOptions]": "*"
   });
-  if (strain !== "all") {
-    requestParams.set("filters[strain][$eq]", strain);
-  }
   const categoryFilter = productCategoryContent[category].filter;
   if (categoryFilter) {
     requestParams.set(`filters[${categoryFilter.field}][$eq]`, categoryFilter.value);
@@ -73,16 +67,6 @@ export default function ProductsPage() {
     router.replace(query ? `/products?${query}` : "/products", { scroll: false });
   };
 
-  const handleFilterChange = (value: string) => {
-    const next = new URLSearchParams(searchParams.toString());
-    if (value === "all") {
-      next.delete("strain");
-    } else {
-      next.set("strain", value);
-    }
-    const query = next.toString();
-    router.replace(query ? `/products?${query}` : "/products", { scroll: false });
-  };
 
   const hero = productCategoryContent[category];
 
@@ -94,7 +78,7 @@ export default function ProductsPage() {
         </p>
       </div>
 
-      <div className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-night-950/60 p-4">
+      <div className="rounded-3xl border border-white/10 bg-night-950/60 p-4">
         <div className="flex flex-wrap gap-2">
           {CATEGORY_TABS.map((tab) => (
             <button
@@ -107,23 +91,6 @@ export default function ProductsPage() {
               onClick={() => handleCategoryChange(tab)}
             >
               {tab === "shop-all" ? "Shop All" : tab.replace("-", " ")}
-            </button>
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {STRAIN_FILTERS.map((option) => (
-            <button
-              key={option}
-              type="button"
-              className={clsx(
-                "rounded-full border px-4 py-2 text-xs uppercase tracking-[0.2em]",
-                strain === option
-                  ? "border-night-900 bg-night-900 text-white"
-                  : "border-night-200 bg-night-50 text-night-500 hover:text-night-800"
-              )}
-              onClick={() => handleFilterChange(option)}
-            >
-              {option === "all" ? "All" : option}
             </button>
           ))}
         </div>
@@ -142,7 +109,7 @@ export default function ProductsPage() {
 
       {!isLoading && displayProducts.length === 0 && (
         <div className="rounded-3xl border border-white/10 bg-night-950/60 p-6 text-center text-sm text-ink-400">
-          No products available for this filter. Try All strains or another category later tonight.
+          No products available for this filter. Try another category later tonight.
         </div>
       )}
 
