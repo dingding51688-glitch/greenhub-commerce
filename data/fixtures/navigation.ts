@@ -48,7 +48,7 @@ export const drawerSections: DrawerSection[] = [
     title: "Account",
     links: [
       { label: "Overview", href: "/account", match: "prefix" },
-      { label: "Account balance", href: "/wallet", match: "prefix" }
+      { label: "Wallet", href: "/wallet", match: "prefix" }
     ]
   }
   // Legacy logistics quick links were removed to match the 420.co.uk drawer (menu + account only).
@@ -80,7 +80,7 @@ export const footerColumns: FooterColumn[] = [
     title: "Account",
     links: [
       { label: "Overview", href: "/account" },
-      { label: "Balance", href: "/wallet" },
+      { label: "Wallet", href: "/wallet" },
       { label: "Commission hub", href: "/referral" }
     ]
   }

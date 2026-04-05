@@ -20,14 +20,14 @@ export async function GET() {
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const response = await fetch(`${AUTH_BASE}/api/customers/me/notification-preferences`, {
+  const response = await fetch(`${AUTH_BASE}/api/notifications`, {
     headers: {
       Authorization: `Bearer ${token}`
     },
-    next: { revalidate: 0 }
+    cache: "no-store"
   });
   const payload = await response.json().catch(() => ({}));
-  return NextResponse.json(payload?.data ?? payload, { status: response.status });
+  return NextResponse.json(payload, { status: response.status });
 }
 
 export async function PUT(request: Request) {
@@ -37,14 +37,21 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = await request.json().catch(() => ({}));
-  const response = await fetch(`${AUTH_BASE}/api/customers/me/notification-preferences`, {
+  const action = body?.action === "markAll" ? "mark-all-read" : "mark-read";
+  const payloadToSend =
+    action === "mark-all-read"
+      ? {}
+      : {
+          notificationIds: Array.isArray(body?.notificationIds) ? body.notificationIds : []
+        };
+  const response = await fetch(`${AUTH_BASE}/api/notifications/${action}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(payloadToSend)
   });
   const payload = await response.json().catch(() => ({}));
-  return NextResponse.json(payload?.data ?? payload, { status: response.status });
+  return NextResponse.json(payload, { status: response.status });
 }
