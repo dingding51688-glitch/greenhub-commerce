@@ -61,7 +61,8 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
   }
 
   const items = order.items ?? [];
-  const hasLockerInfo = Boolean(order.lockerAddress || order.lockerAccessCode || order.lockerEta);
+  const lockerAddressDisplay = order.lockerNotes || order.lockerAddress;
+  const hasLockerInfo = Boolean(lockerAddressDisplay || order.lockerAccessCode || order.lockerEta);
 
   return (
     <section className="space-y-6">
@@ -102,7 +103,7 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
             <div>
               <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Address</p>
               <p className="text-base text-white">
-                {order.lockerAddress || "Waiting for assignment"}
+                {lockerAddressDisplay || "Waiting for assignment"}
               </p>
             </div>
             <div>
