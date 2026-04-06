@@ -34,8 +34,10 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
     headers.set("Authorization", `Bearer ${authToken}`);
   }
 
-  const normalizedBase = BASE_URL.replace(/\/$/, "");
-  const response = await fetch(`${normalizedBase}${finalPath}`, {
+  const normalizedBase = normalizeBase(BASE_URL);
+  const needsDedup = /\/api(\/|$)/.test(normalizedBase) && finalPath.startsWith("/api/");
+  const dedupedPath = needsDedup ? finalPath.replace(/^\/api/, "") : finalPath;
+  const response = await fetch(`${normalizedBase}${dedupedPath}`, {
     ...init,
     headers,
     cache: "no-store",
@@ -49,6 +51,18 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
     throw error;
   }
   return payload as T;
+}
+
+function normalizeBase(value?: string) {
+  if (!value) return "";
+  let base = value.trim();
+  if (!base) return base;
+  base = base.replace(/\/$/, "");
+  // Collapse accidental double "/api/api" segments (e.g. when env already includes /api)
+  while (base.includes("/api/api")) {
+    base = base.replace("/api/api", "/api");
+  }
+  return base;
 }
 
 export const swrFetcher = <T>(path: string) => apiFetch<T>(path);
