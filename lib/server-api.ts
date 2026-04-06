@@ -44,7 +44,9 @@ export async function serverFetch<T>(path: string, init?: RequestInit): Promise<
 
       return res.json() as Promise<T>;
     } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
+      const normalizedError = error instanceof Error ? error : new Error(String(error));
+      console.warn(`[serverFetch] retry via fallback (base=${base})`, normalizedError.message);
+      lastError = normalizedError;
     }
   }
 
