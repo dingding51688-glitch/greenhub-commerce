@@ -35,7 +35,11 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   }
 
   const normalizedBase = normalizeBase(BASE_URL);
-  const needsDedup = /\/api(\/|$)/.test(normalizedBase) && finalPath.startsWith("/api/");
+<<<<<<< HEAD
+  const needsDedup = /\/api\/?$/.test(normalizedBase) && finalPath.startsWith("/api/");
+=======
+  const needsDedup = /\/api\/?$/.test(normalizedBase) && finalPath.startsWith("/api/");
+>>>>>>> db8d450 (fix(api): normalize duplicate api segments)
   const dedupedPath = needsDedup ? finalPath.replace(/^\/api/, "") : finalPath;
   const response = await fetch(`${normalizedBase}${dedupedPath}`, {
     ...init,
