@@ -36,6 +36,12 @@ export async function serverFetch<T>(path: string, init?: RequestInit): Promise<
         throw new Error(`Request failed: ${res.status} ${url} ${errorText}`);
       }
 
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        const errorText = await res.text();
+        throw new Error(`Unexpected content type: ${contentType} ${url} ${errorText}`);
+      }
+
       return res.json() as Promise<T>;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
