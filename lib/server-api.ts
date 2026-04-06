@@ -6,7 +6,10 @@ const API_BASE = RAW_API_BASE ? resolveServerBase(RAW_API_BASE, { fallback: FALL
 
 export async function serverFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  const url = `${API_BASE}${normalizedPath}`;
+  const dedupedPath = API_BASE.endsWith("/api") && normalizedPath.startsWith("/api/")
+    ? normalizedPath.replace(/^\/api/, "")
+    : normalizedPath;
+  const url = `${API_BASE}${dedupedPath}`;
   const res = await fetch(url, {
     ...init,
     headers: {
