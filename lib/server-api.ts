@@ -1,7 +1,7 @@
 import { resolveServerBase } from "@/lib/server-base";
 
 const RAW_API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-const FALLBACK_DIRECT = process.env.STRAPI_DIRECT_URL || "http://127.0.0.1:1337";
+const FALLBACK_DIRECT = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
 const API_BASE = RAW_API_BASE ? resolveServerBase(RAW_API_BASE, { fallback: FALLBACK_DIRECT }) : FALLBACK_DIRECT;
 const BASES = Array.from(new Set([API_BASE, FALLBACK_DIRECT].filter((value): value is string => Boolean(value))));
 
