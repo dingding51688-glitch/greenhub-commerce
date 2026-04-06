@@ -19,7 +19,8 @@ export async function serverFetch<T>(path: string, init?: RequestInit): Promise<
   });
 
   if (!res.ok) {
-    throw new Error(`Request failed: ${res.status}`);
+    const errorText = await res.text();
+    throw new Error(`Request failed: ${res.status} ${url} ${errorText}`);
   }
 
   return res.json() as Promise<T>;
