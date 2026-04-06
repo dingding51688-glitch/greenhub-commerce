@@ -54,7 +54,7 @@ export default function WalletTransferPage() {
   const onSubmit = async (values: TransferFormValues) => {
     setResult(null);
     try {
-      await apiMutate("/api/strapi/account/transfers", "POST", {
+      await apiMutate("/api/account/transfers", "POST", {
         toHandle: values.handle,
         amount: values.amount,
         memo: values.memo || undefined,
