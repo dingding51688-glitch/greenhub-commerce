@@ -61,6 +61,7 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
   }
 
   const items = order.items ?? [];
+  const hasLockerInfo = Boolean(order.lockerAddress || order.lockerAccessCode || order.lockerEta);
 
   return (
     <section className="space-y-6">
@@ -96,6 +97,29 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
           </ul>
         )}
       </div>
+
+      {hasLockerInfo && (
+        <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
+          <p className="text-xs uppercase tracking-[0.3em] text-white/40">Locker details</p>
+          <div className="mt-3 space-y-2">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Address</p>
+              <p className="text-base text-white">
+                {order.lockerAddress || "Waiting for assignment"}
+              </p>
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Access code</p>
+              <p className="font-mono text-lg text-white">
+                {order.lockerAccessCode || "TBA"}
+              </p>
+            </div>
+            {order.lockerEta && (
+              <p className="text-white/60">ETA: {order.lockerEta}</p>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
         <p className="font-semibold text-white">Need to change locker or payment?</p>
