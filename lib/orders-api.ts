@@ -92,25 +92,13 @@ export type OrderTrackingResponse = {
 };
 
 export async function getOrderTracking(referenceOrId: string) {
-  const token = getStoredToken();
-  if (!token) throw new Error("Login required");
-
-  const headers = new Headers({
-    Authorization: `Bearer ${token}`,
-    Accept: "application/json"
-  });
-
-  const response = await fetch(`/api/orders/${referenceOrId}/tracking`, {
-    headers,
-    cache: "no-store"
-  });
-
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(payload?.error?.message || "Unable to load order");
-  }
-
+  const payload = await ordersFetch<{ success?: boolean; order?: OrderRecord; tracking?: OrderRecord }>(
+    `/api/orders/${referenceOrId}/tracking`
+  );
   const orderPayload = payload?.order || payload?.tracking;
+  if (!orderPayload) {
+    throw new Error("Order tracking unavailable");
+  }
   return {
     success: payload?.success ?? true,
     order: orderPayload
