@@ -10,11 +10,14 @@ function resolveStrapiDirect(path: string) {
   const direct = process.env.STRAPI_DIRECT_URL?.trim();
   if (!direct) return null;
   const normalizedDirect = direct.replace(/\/$/, "");
+  const baseOrigin = normalizedDirect.endsWith("/api")
+    ? normalizedDirect.slice(0, -4)
+    : normalizedDirect;
   const suffix = path.startsWith(STRAPI_PROXY_PREFIX)
     ? path.slice(STRAPI_PROXY_PREFIX.length)
     : path;
   const normalizedSuffix = suffix.startsWith("/") ? suffix : `/${suffix}`;
-  return `${normalizedDirect}${normalizedSuffix}`.replace(/\/$/, "");
+  return `${baseOrigin}${normalizedSuffix}`.replace(/\/$/, "");
 }
 
 export function resolveServerBase(value?: string | null, options?: { fallback?: string }) {

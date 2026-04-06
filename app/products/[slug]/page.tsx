@@ -10,6 +10,16 @@ import { ProductDetailPurchase } from "./purchase-panel";
 import { getProductListingMeta } from "@/data/fixtures/products";
 import { FavoriteToggle } from "@/components/FavoriteToggle";
 
+export async function generateStaticParams() {
+  try {
+    const data = await serverFetch<ProductsResponse>("/api/products?pagination[pageSize]=50");
+    return data.data?.map((product) => ({ slug: product.slug })) ?? [];
+  } catch (error) {
+    console.warn("Failed to preload product slugs", error);
+    return [];
+  }
+}
+
 async function getProduct(slug: string) {
   const query = new URLSearchParams({
     "filters[slug][$eq]": slug,
