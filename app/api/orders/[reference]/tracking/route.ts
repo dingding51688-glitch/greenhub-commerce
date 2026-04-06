@@ -30,14 +30,26 @@ export async function GET(req: NextRequest, { params }: { params: { reference: s
     cache: "no-store",
   });
 
-  const responseBody = await upstreamResponse.text();
   const responseHeaders = new Headers();
   const contentType = upstreamResponse.headers.get("content-type");
   if (contentType) {
     responseHeaders.set("content-type", contentType);
   }
 
-  return new NextResponse(responseBody, {
+  const isJson = contentType?.includes("application/json");
+  if (isJson) {
+    const jsonBody = await upstreamResponse.json().catch(() => null);
+    if (jsonBody && jsonBody.tracking && !jsonBody.order) {
+      jsonBody.order = jsonBody.tracking;
+    }
+    return NextResponse.json(jsonBody ?? {}, {
+      status: upstreamResponse.status,
+      headers: responseHeaders,
+    });
+  }
+
+  const buffer = await upstreamResponse.arrayBuffer();
+  return new NextResponse(buffer, {
     status: upstreamResponse.status,
     headers: responseHeaders,
   });
