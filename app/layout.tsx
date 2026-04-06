@@ -10,6 +10,10 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Bloom Vapor Dashboard",
   description: "Account overview and orders for Bloom Vapor",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg"
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
