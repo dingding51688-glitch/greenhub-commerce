@@ -62,7 +62,6 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
 
   const items = order.items ?? [];
   const lockerAddressDisplay = order.lockerNotes || order.lockerAddress;
-  const hasLockerInfo = Boolean(lockerAddressDisplay || order.lockerAccessCode || order.lockerEta);
 
   return (
     <section className="space-y-6">
@@ -96,34 +95,32 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
         )}
       </div>
 
-      {hasLockerInfo && (
-        <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/40">Locker details</p>
-          <div className="mt-3 space-y-2">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Address</p>
-              <p className="text-base text-white">
-                {lockerAddressDisplay || "Waiting for assignment"}
-              </p>
-            </div>
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Yodel tracking number</p>
-              <p className="font-mono text-lg text-white">
-                {order.trackingNumber || "Waiting for assignment"}
-              </p>
-            </div>
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Access code</p>
-              <p className="font-mono text-lg text-white">
-                {order.lockerAccessCode || "Waiting for assignment"}
-              </p>
-            </div>
-            {order.lockerEta && (
-              <p className="text-white/60">ETA: {order.lockerEta}</p>
-            )}
+      <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
+        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Locker details</p>
+        <div className="mt-3 space-y-2">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Address</p>
+            <p className="text-base text-white">
+              {lockerAddressDisplay || "Pending"}
+            </p>
           </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Yodel tracking number</p>
+            <p className="font-mono text-lg text-white">
+              {order.trackingNumber || "Pending"}
+            </p>
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Access code</p>
+            <p className="font-mono text-lg text-white">
+              {order.lockerAccessCode || "Pending"}
+            </p>
+          </div>
+          {order.lockerEta && (
+            <p className="text-white/60">ETA: {order.lockerEta}</p>
+          )}
         </div>
-      )}
+      </div>
 
       <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
         <p className="font-semibold text-white">Need to change locker or payment?</p>
