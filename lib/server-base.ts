@@ -30,13 +30,6 @@ export function resolveServerBase(value?: string | null, options?: { fallback?: 
     return raw.replace(/\/$/, "");
   }
 
-  if (raw.startsWith(STRAPI_PROXY_PREFIX)) {
-    const direct = resolveStrapiDirect(raw);
-    if (direct) {
-      return direct;
-    }
-  }
-
   const origin = resolveInternalOrigin().replace(/\/$/, "");
   const normalizedPath = raw.startsWith("/") ? raw : `/${raw}`;
   return `${origin}${normalizedPath}`.replace(/\/$/, "");
