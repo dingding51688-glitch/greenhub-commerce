@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { StateMessage } from "@/components/StateMessage";
 import Button from "@/components/ui/button";
-import { getOrderTracking } from "@/lib/orders-api";
+import { findOrderSummary, getOrderTracking } from "@/lib/orders-api";
 import type { OrderRecord } from "@/lib/types";
 
 export default function OrderDetailPage({ params }: { params: { reference: string } }) {
@@ -18,8 +18,17 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
   useEffect(() => {
     if (!token) return;
     setLoading(true);
-    getOrderTracking(params.reference)
-      .then((response) => setOrder(response.order))
+    Promise.all([
+      getOrderTracking(params.reference),
+      findOrderSummary(params.reference).catch(() => null)
+    ])
+      .then(([trackingResponse, orderSummary]) => {
+        const trackingOrder = trackingResponse.order ?? null;
+        const merged = orderSummary
+          ? { ...orderSummary, status: trackingOrder?.status ?? orderSummary.status }
+          : trackingOrder;
+        setOrder(merged);
+      })
       .catch((err) => setError(err?.message || "Unable to load order"))
       .finally(() => setLoading(false));
   }, [params.reference, token]);
