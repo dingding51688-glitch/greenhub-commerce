@@ -23,8 +23,7 @@ export async function generateStaticParams() {
 async function getProduct(slug: string) {
   const query = new URLSearchParams({
     "filters[slug][$eq]": slug,
-    "populate[weightOptions]": "*",
-    "populate[coverImage]": "*"
+    "populate[weightOptions]": "*"
   });
   try {
     const data = await serverFetch<ProductsResponse>(`/api/products?${query.toString()}`);
@@ -40,8 +39,7 @@ async function getRelatedProducts(slug: string) {
     "filters[slug][$ne]": slug,
     "pagination[pageSize]": "4",
     "sort[0]": "createdAt:desc",
-    "populate[weightOptions]": "*",
-    "populate[coverImage]": "*"
+    "populate[weightOptions]": "*"
   });
   try {
     const data = await serverFetch<ProductsResponse>(`/api/products?${query.toString()}`);
