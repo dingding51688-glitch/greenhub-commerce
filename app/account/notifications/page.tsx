@@ -7,7 +7,6 @@ import useSWR from "swr";
 import Button from "@/components/ui/button";
 import { StateMessage } from "@/components/StateMessage";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { swrFetcher } from "@/lib/api";
 import type { NotificationRecord } from "@/lib/types";
 
 const dateFmt = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" });
@@ -38,10 +37,19 @@ type ActionNotice = {
   message: string;
 };
 
+const notificationsFetcher = async (): Promise<NotificationResponse> => {
+  const response = await fetch("/api/account/notifications", { cache: "no-store" });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload?.error?.message || payload?.error || "Unable to load notifications");
+  }
+  return payload as NotificationResponse;
+};
+
 export default function NotificationCenterPage() {
   const { token } = useAuth();
   const router = useRouter();
-  const { data, error, isLoading, mutate } = useSWR<NotificationResponse>(token ? "/api/account/notifications" : null, swrFetcher, {
+  const { data, error, isLoading, mutate } = useSWR<NotificationResponse>(token ? "/api/account/notifications" : null, notificationsFetcher, {
     keepPreviousData: true,
     revalidateOnFocus: false,
   });
