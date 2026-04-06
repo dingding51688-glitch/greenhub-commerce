@@ -37,6 +37,34 @@ type ActionNotice = {
   message: string;
 };
 
+type NotificationAction = {
+  label: string;
+  href: string;
+};
+
+const ACTION_WALLET_PREFIXES = ["wallet_", "topup_", "transfer_", "withdrawal_"];
+
+function resolveNotificationAction(record: NotificationRecord): NotificationAction | null {
+  const type = record.type || "";
+  const metadata = (record.metadata || {}) as Record<string, any>;
+
+  if (type.startsWith("order_")) {
+    const reference =
+      (metadata?.reference as string) ||
+      (metadata?.orderReference as string) ||
+      (metadata?.orderId as string) ||
+      (metadata?.order?.reference as string);
+    const href = reference ? `/orders/${reference}` : "/orders";
+    return { label: "View order", href };
+  }
+
+  if (ACTION_WALLET_PREFIXES.some((prefix) => type.startsWith(prefix))) {
+    return { label: "View wallet", href: "/wallet" };
+  }
+
+  return null;
+}
+
 const notificationsFetcher = async (): Promise<NotificationResponse> => {
   const response = await fetch("/api/account/notifications", { cache: "no-store" });
   const payload = await response.json().catch(() => ({}));
@@ -179,6 +207,7 @@ export default function NotificationCenterPage() {
 function NotificationCard({ record, onMarkRead }: { record: NotificationRecord; onMarkRead: (id: number) => void }) {
   const icon = typeIcon[record.type] ?? "🔔";
   const createdAt = record.createdAt ? dateFmt.format(new Date(record.createdAt)) : "Just now";
+  const action = resolveNotificationAction(record);
 
   return (
     <article
@@ -199,11 +228,18 @@ function NotificationCard({ record, onMarkRead }: { record: NotificationRecord; 
           <p className="text-xs text-white/40">{createdAt}</p>
         </div>
       </div>
-      {!record.isRead && (
-        <div className="flex gap-2">
-          <Button size="sm" variant="secondary" onClick={() => onMarkRead(record.id)}>
-            Mark read
-          </Button>
+      {(action || !record.isRead) && (
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end sm:gap-3">
+          {action && (
+            <Button asChild size="sm">
+              <Link href={action.href}>{action.label}</Link>
+            </Button>
+          )}
+          {!record.isRead && (
+            <Button size="sm" variant="secondary" onClick={() => onMarkRead(record.id)}>
+              Mark read
+            </Button>
+          )}
         </div>
       )}
     </article>
