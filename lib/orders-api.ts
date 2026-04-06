@@ -87,5 +87,15 @@ export type OrderTrackingResponse = {
 };
 
 export async function getOrderTracking(referenceOrId: string) {
-  return ordersFetch<OrderTrackingResponse>(`/api/orders/${referenceOrId}/tracking`);
+  const payload = await ordersFetch<{ success?: boolean; order?: OrderRecord; tracking?: OrderRecord }>(
+    `/api/orders/${referenceOrId}/tracking`
+  );
+  const orderPayload = payload?.order || payload?.tracking;
+  if (!orderPayload) {
+    throw new Error("Order tracking unavailable");
+  }
+  return {
+    success: payload?.success ?? true,
+    order: orderPayload
+  } as OrderTrackingResponse;
 }
