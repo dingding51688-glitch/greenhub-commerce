@@ -2,8 +2,18 @@ const ABSOLUTE_URL_REGEX = /^https?:\/\//i;
 const STRAPI_PROXY_PREFIX = "/api/strapi";
 
 function resolveInternalOrigin() {
-  const internal = process.env.NEXT_INTERNAL_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL;
-  return (internal && internal.trim()) || "http://localhost:3000";
+  const candidates = [
+    process.env.NEXT_INTERNAL_BASE_URL,
+    process.env.NEXT_PUBLIC_SITE_URL,
+    process.env.NEXT_PUBLIC_VERCEL_URL && `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`,
+    process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`
+  ];
+  for (const candidate of candidates) {
+    if (candidate && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+  return "http://localhost:3000";
 }
 
 function resolveStrapiDirect(path: string) {
