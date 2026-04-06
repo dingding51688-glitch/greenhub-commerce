@@ -11,6 +11,14 @@ import { Button } from "@/components/ui";
 import { swrFetcher } from "@/lib/api";
 import type { WalletBalanceResponse, WalletTransaction, WalletTransactionsResponse } from "@/lib/types";
 
+type CustomerProfileResponse = {
+  data?: {
+    attributes?: {
+      transferHandle?: string;
+    };
+  };
+};
+
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 const TIMESTAMP = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" });
 
@@ -35,6 +43,8 @@ export default function WalletPage() {
   } = useSWR<WalletBalanceResponse>(token ? "/api/wallet/balance" : null, swrFetcher, {
     refreshInterval: 60_000,
   });
+
+  const { data: customerProfile } = useSWR<CustomerProfileResponse>(token ? "/api/account/profile" : null, swrFetcher);
 
   const {
     data: txData,
@@ -94,7 +104,12 @@ export default function WalletPage() {
           </p>
 
           {/* User ID 可复制标签 */}
-          <UserIdBadge profile={profile} copyToast={copyToast} setCopyToast={setCopyToast} />
+          <UserIdBadge
+            profile={profile}
+            transferHandle={customerProfile?.data?.attributes?.transferHandle}
+            copyToast={copyToast}
+            setCopyToast={setCopyToast}
+          />
 
           {/* 三个操作按钮 — 手机端堆叠，min-h 便于点击 */}
           <div className="relative mt-5 flex flex-col gap-2.5 sm:flex-row sm:gap-3">
@@ -158,15 +173,17 @@ export default function WalletPage() {
 
 function UserIdBadge({
   profile,
+  transferHandle,
   copyToast,
   setCopyToast,
 }: {
   profile: { documentId?: string; customer?: { documentId?: string } } | null;
+  transferHandle?: string;
   copyToast: boolean;
   setCopyToast: (v: boolean) => void;
 }) {
   const rawId = profile?.customer?.documentId || profile?.documentId;
-  const userId = formatUserId(rawId);
+  const userId = transferHandle || formatUserId(rawId);
   if (!userId) return null;
 
   const handleCopy = async () => {
