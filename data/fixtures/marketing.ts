@@ -78,37 +78,37 @@ export const lockerFlow = orderFlow;
 
 export const featuredProducts: ProductCardData[] = [
   {
-    id: "cereal-milk",
-    title: "Cereal Milk",
-    category: "Hybrid flower",
-    description: "Creamy, uplifting hybrid sourced from Bay Area craft growers.",
-    price: "£45",
-    badge: "Top pick",
-    imageUrl: "/images/products/cereal-milk.png"
+    id: "midnight-gelato",
+    title: "Midnight Gelato",
+    category: "Flowers",
+    description: "Dessert-forward lift with creamy exhale and relaxed focus for late evenings.",
+    price: "From £32",
+    badge: "Limited",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_9a7ddbae00.png"
   },
   {
-    id: "ice-pop",
-    title: "Ice Pop 1g Cart",
-    category: "Live resin",
-    description: "Single source live resin cart with bright sherbet notes.",
-    price: "£38",
-    imageUrl: "/images/products/ice-pop.png"
+    id: "berry-kush",
+    title: "Berry Kush",
+    category: "Pre-rolls",
+    description: "Slow-cured flower packed into infused joints with glass tips.",
+    price: "From £35",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_1763924030.png"
   },
   {
-    id: "sativa-flight",
-    title: "Sativa Flight",
+    id: "midnight-gelato-7g",
+    title: "Midnight Gelato 7g",
+    category: "Small batch",
+    description: "Reserved jars cut from the same micro-batch now on the menu.",
+    price: "£60",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_9a7ddbae00.png"
+  },
+  {
+    id: "berry-kush-3-5g",
+    title: "Berry Kush Flight",
     category: "Starter pack",
-    description: "Three 3.5g jars of daytime favorites, ready for rotation.",
-    price: "£95",
-    imageUrl: "/images/products/sativa-flight.png"
-  },
-  {
-    id: "night-bites",
-    title: "Night Bites",
-    category: "Edibles",
-    description: "5 mg micro-dose chews infused with indica live rosin.",
-    price: "£22",
-    imageUrl: "/images/products/night-bites.png"
+    description: "Four half-gram minis designed for daytime rotation.",
+    price: "£35",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_1763924030.png"
   }
 ];
 
