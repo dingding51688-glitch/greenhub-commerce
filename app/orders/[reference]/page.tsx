@@ -71,9 +71,6 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
         <p className="mt-2 text-sm text-white/60">
           Status: <span className="text-white">{order.status}</span> · Total {currency.format(order.totalAmount)}
         </p>
-        <p className="mt-2 text-sm text-white/60">
-          Locker ETA: {order.lockerEta ? order.lockerEta : "Shared once courier scans the locker."}
-        </p>
       </div>
 
       <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5">
@@ -109,9 +106,15 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
               </p>
             </div>
             <div>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Yodel tracking number</p>
+              <p className="font-mono text-lg text-white">
+                {order.trackingNumber || "Waiting for assignment"}
+              </p>
+            </div>
+            <div>
               <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Access code</p>
               <p className="font-mono text-lg text-white">
-                {order.lockerAccessCode || "TBA"}
+                {order.lockerAccessCode || "Waiting for assignment"}
               </p>
             </div>
             {order.lockerEta && (
