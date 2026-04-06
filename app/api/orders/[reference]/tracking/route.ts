@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const STRAPI_DIRECT_URL = (process.env.STRAPI_DIRECT_URL || "").replace(/\/$/, "");
+const STRAPI_DIRECT_URL = process.env.STRAPI_DIRECT_URL || "";
 
 function ensureStrapiUrl(reference: string) {
-  const base = STRAPI_DIRECT_URL || "http://localhost:1338";
-  return `${base}/api/orders/${encodeURIComponent(reference)}/tracking`;
+  const upstream = new URL(STRAPI_DIRECT_URL || process.env.NEXT_PUBLIC_AUTH_BASE_URL || "http://localhost:1338");
+  const basePath = upstream.pathname.replace(/\/$/, "");
+  const apiBase = basePath.endsWith("/api") ? basePath : `${basePath}/api`;
+  upstream.pathname = `${apiBase}/orders/${encodeURIComponent(reference)}/tracking`.replace(/\/+/g, "/");
+  return upstream.toString();
 }
 
 export async function GET(req: NextRequest, { params }: { params: { reference: string } }) {
