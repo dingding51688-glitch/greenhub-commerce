@@ -35,7 +35,9 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   }
 
   const normalizedBase = BASE_URL.replace(/\/$/, "");
-  const response = await fetch(`${normalizedBase}${finalPath}`, {
+  const needsDedup = /\/api(\/|$)/.test(normalizedBase) && finalPath.startsWith("/api/");
+  const dedupedPath = needsDedup ? finalPath.replace(/^\/api/, "") : finalPath;
+  const response = await fetch(`${normalizedBase}${dedupedPath}`, {
     ...init,
     headers,
     cache: "no-store",
