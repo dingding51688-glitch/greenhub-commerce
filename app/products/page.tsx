@@ -32,19 +32,13 @@ export default function ProductsPage() {
   });
   const categoryFilter = productCategoryContent[category].filter;
   if (categoryFilter) {
-    requestParams.set(`filters[${categoryFilter.field}][$eq]`, categoryFilter.value);
+    requestParams.set(categoryFilter.param, categoryFilter.value);
   }
 
   const key = `/api/products?${requestParams.toString()}`;
   const { data, isLoading } = useSWR<ProductsResponse>(key, swrFetcher);
   const products = useMemo(() => data?.data ?? [], [data]);
-
-  const displayProducts = useMemo<ProductRecord[]>(() => {
-    if (!categoryFilter) {
-      return products;
-    }
-    return products.filter((product) => product.category === categoryFilter.value || !product.category);
-  }, [products, categoryFilter]);
+  const displayProducts = products;
 
   const handleCategoryChange = (value: ProductCategoryKey) => {
     const next = new URLSearchParams(searchParams.toString());

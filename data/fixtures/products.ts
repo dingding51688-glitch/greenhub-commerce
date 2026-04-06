@@ -5,7 +5,7 @@ export type ProductCategoryContent = {
   title: string;
   description: string;
   helper?: string;
-  filter?: { field: string; value: string };
+  filter?: { param: string; value: string };
 };
 
 export const productCategoryContent: Record<ProductCategoryKey, ProductCategoryContent> = {
@@ -19,19 +19,19 @@ export const productCategoryContent: Record<ProductCategoryKey, ProductCategoryC
     breadcrumb: "HOME / SHOP ALL / FLOWERS",
     title: "Fresh flower jars, trimmed this week",
     description: "Hybrid, indica, and sativa cultivars sealed in nitrogen jars. Always harvested within 14 days and held at 59% humidity.",
-    filter: { field: "category", value: "flowers" }
+    filter: { param: "filters[collection][slug][$eq]", value: "flower" }
   },
   "pre-rolls": {
     breadcrumb: "HOME / SHOP ALL / PRE-ROLLS",
     title: "Hand-twisted joints, ready for pickup",
     description: "Infused one-gram pre-rolls with glass tips and terpene boosts. Perfect for quick grab-and-go pickups.",
-    filter: { field: "category", value: "pre-rolls" }
+    filter: { param: "filters[collection][slug][$eq]", value: "pre-rolls" }
   },
   vapes: {
     breadcrumb: "HOME / SHOP ALL / VAPES",
     title: "Full-ceramic carts & pods",
     description: "Live resin and distillate carts with heavy metal testing on file. Works with Bloom pods or 510 batteries.",
-    filter: { field: "category", value: "vapes" }
+    filter: { param: "filters[collection][slug][$eq]", value: "vapes" }
   }
 };
 
