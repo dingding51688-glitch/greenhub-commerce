@@ -45,37 +45,37 @@ export type ProductCardMeta = {
 };
 
 export const productListingMeta: Record<string, ProductCardMeta> = {
-  "cereal-milk": {
-    imageUrl: "/images/products/cereal-milk.jpg",
-    imageAlt: "Cereal Milk flower",
-    origin: "🇬🇧 Belfast lab",
+  "berry-kush": {
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_1763924030.png",
+    imageAlt: "Berry Kush flower",
+    origin: "🇬🇧 Locker verified",
     rating: 4.9,
     reviews: 182,
-    potencyBadge: "Strong"
+    potencyBadge: "Medium"
   },
   "midnight-gelato": {
-    imageUrl: "https://cms.greenhub420.co.uk/uploads/midnight_gelato_c69a6bb9c4.jpg",
-    imageAlt: "Midnight Gelato pre-rolls",
-    origin: "🇪🇺 EU craft",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_9a7ddbae00.png",
+    imageAlt: "Midnight Gelato flower",
+    origin: "🇬🇧 Locker verified",
     rating: 4.8,
     reviews: 96,
     potencyBadge: "Medium"
   },
-  "rose-spliff": {
-    imageUrl: "https://cms.greenhub420.co.uk/uploads/rose_spliff_0670cb8d92.jpg",
-    imageAlt: "Rose petal joints",
-    origin: "🇬🇧 NI support team",
+  "berry-kush-3-5g": {
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_1763924030.png",
+    imageAlt: "Berry Kush 3.5g pre-roll",
+    origin: "🇬🇧 Locker verified",
     rating: 4.7,
-    reviews: 76,
+    reviews: 54,
     potencyBadge: "Medium"
   },
-  "cuban-z-vape": {
-    imageUrl: "https://cms.greenhub420.co.uk/uploads/cuban_z_vape_aaff226934.jpg",
-    imageAlt: "Cuban Z live resin cart",
-    origin: "🇺🇸 CA extract",
-    rating: 4.9,
-    reviews: 143,
-    potencyBadge: "High"
+  "midnight-gelato-7g": {
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_9a7ddbae00.png",
+    imageAlt: "Midnight Gelato 7g jar",
+    origin: "🇬🇧 Locker verified",
+    rating: 4.8,
+    reviews: 61,
+    potencyBadge: "Medium"
   }
 };
 
