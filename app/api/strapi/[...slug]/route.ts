@@ -37,8 +37,8 @@ async function handler(request: NextRequest, context: { params: { slug?: string[
     return NextResponse.json({ error: "STRAPI_DIRECT_URL is not configured" }, { status: 500 });
   }
 
-  const slug = context.params?.slug?.join("/") ?? "";
-  const targetUrl = new URL(slug ? `/${slug}` : "/", baseUrl);
+  const slug = context.params?.slug ?? [];
+  const targetUrl = buildTargetUrl(baseUrl, slug);
   targetUrl.search = request.nextUrl.search;
 
   const headers = buildForwardHeaders(request, baseUrl);
@@ -68,6 +68,32 @@ async function handler(request: NextRequest, context: { params: { slug?: string[
     status: response.status,
     headers: responseHeaders
   });
+}
+
+function buildTargetUrl(baseUrl: string, slug: string[]) {
+  const upstream = new URL(baseUrl);
+  const cleanedBasePath = upstream.pathname.replace(/\/+$/, "");
+  const slugPath = slug.join("/");
+  const normalizedSlug = ensureApiPrefix(cleanedBasePath, slugPath);
+  if (normalizedSlug) {
+    upstream.pathname = `${cleanedBasePath}/${normalizedSlug}`.replace(/\/+/g, "/").replace(/\/$/, "");
+  } else {
+    upstream.pathname = cleanedBasePath || "/";
+  }
+  return upstream;
+}
+
+function ensureApiPrefix(basePath: string, slugPath: string) {
+  if (!slugPath) return "";
+  const trimmedBase = basePath.replace(/\/$/, "");
+  if (trimmedBase.endsWith("/api")) {
+    return slugPath;
+  }
+  const firstSegment = slugPath.split("/")[0];
+  if (firstSegment === "api" || firstSegment === "uploads") {
+    return slugPath;
+  }
+  return `api/${slugPath}`;
 }
 
 function buildForwardHeaders(request: NextRequest, baseUrl: string) {
