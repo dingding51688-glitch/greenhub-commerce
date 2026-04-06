@@ -172,8 +172,8 @@ export const featuredCollectionsContent: FeaturedCollection[] = [
     label: "NOW SHIPPING",
     subtitle: "Fresh eighths ready to ship across NI",
     href: "/products?category=flowers",
-    imageUrl: "https://cdn.greenhub420.co.uk/ui-parity/flowers-card.png",
-    imageAlt: "Curated flower jars",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_9a7ddbae00.png",
+    imageAlt: "Midnight Gelato jar",
     tone: "green"
   },
   {
@@ -181,8 +181,8 @@ export const featuredCollectionsContent: FeaturedCollection[] = [
     label: "INFUSED MINIS",
     subtitle: "Resin-dipped five packs",
     href: "/products?category=pre-rolls",
-    imageUrl: "https://cdn.greenhub420.co.uk/ui-parity/pre-rolls-card.png",
-    imageAlt: "Infused pre-roll tins",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_1763924030.png",
+    imageAlt: "Berry Kush pre-rolls",
     tone: "orange"
   },
   {
@@ -190,8 +190,8 @@ export const featuredCollectionsContent: FeaturedCollection[] = [
     label: "READY TO SHIP",
     subtitle: "Live resin carts en route",
     href: "/products?category=vapes",
-    imageUrl: "https://cdn.greenhub420.co.uk/ui-parity/vapes-card.png",
-    imageAlt: "Gold vaporizer carts",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_9a7ddbae00.png",
+    imageAlt: "Placeholder vaporizer",
     tone: "cream"
   }
 ];
