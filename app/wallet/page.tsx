@@ -49,6 +49,12 @@ export default function WalletPage() {
 
   const transactions = txData?.data ?? [];
 
+  const resolveTxLink = (tx: WalletTransaction) => {
+    if (!tx.reference) return null;
+    if (tx.reference.startsWith("ORD-")) return `/orders/${tx.reference}`;
+    return null;
+  };
+
   if (!token) {
     return (
       <section className="px-4 py-10">
@@ -135,7 +141,7 @@ export default function WalletPage() {
         ) : (
           <div className="divide-y divide-white/5 overflow-hidden rounded-3xl border border-white/10 bg-card">
             {transactions.map((tx) => (
-              <TxRow key={tx.id} tx={tx} />
+              <TxRow key={tx.id} tx={tx} link={resolveTxLink(tx)} onNavigate={(href) => router.push(href)} />
             ))}
           </div>
         )}
@@ -194,12 +200,24 @@ function UserIdBadge({
   );
 }
 
-function TxRow({ tx }: { tx: WalletTransaction }) {
+function TxRow({ tx, link, onNavigate }: { tx: WalletTransaction; link?: string | null; onNavigate?: (href: string) => void }) {
+  const Wrapper = link ? "button" : "div";
+  const handleClick = () => {
+    if (link && onNavigate) onNavigate(link);
+  };
+
   return (
-    <div className="flex items-center justify-between gap-3 px-4 py-3">
+    <Wrapper
+      type={link ? "button" : undefined}
+      onClick={link ? handleClick : undefined}
+      className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left ${
+        link ? "transition hover:bg-white/5 focus-visible:bg-white/10 focus-visible:outline-none" : ""
+      }`}
+      aria-label={link ? `View details for ${tx.reference}` : undefined}
+    >
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold capitalize text-white truncate">{tx.type.replace(/_/g, " ")}</p>
-        <p className="text-[11px] text-white/40 truncate">{tx.reference}</p>
+        <p className={`text-[11px] truncate ${link ? "text-brand-200" : "text-white/40"}`}>{tx.reference}</p>
       </div>
       <div className="shrink-0 text-right">
         <p className={`text-sm font-semibold ${tx.amount >= 0 ? "text-emerald-300" : "text-red-300"}`}>
@@ -209,6 +227,6 @@ function TxRow({ tx }: { tx: WalletTransaction }) {
           {tx.createdAt ? TIMESTAMP.format(new Date(tx.createdAt)) : ""}
         </p>
       </div>
-    </div>
+    </Wrapper>
   );
 }
