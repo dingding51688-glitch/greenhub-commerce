@@ -1,5 +1,3 @@
-import type { ProductRecord } from "@/lib/types";
-
 export type ProductCategoryKey = "shop-all" | "flowers" | "pre-rolls" | "vapes";
 
 export type ProductCategoryContent = {
@@ -80,83 +78,6 @@ export const productListingMeta: Record<string, ProductCardMeta> = {
     potencyBadge: "High"
   }
 };
-
-export const productListingFallbacks: ProductRecord[] = [
-  {
-    id: 9001,
-    documentId: "mock-cereal-milk",
-    title: "Cereal Milk",
-    slug: "cereal-milk",
-    description: "Cream-heavy hybrid with frosted buds, cured 14 days and flushed with nitrogen before dispatch.",
-    heroBadge: "Store favorite",
-    priceFrom: 45,
-    strain: "Hybrid",
-    thc: "23% THC",
-    potency: "Strong",
-    rating: 4.9,
-    reviews: 182,
-    category: "flowers",
-    weightOptions: [
-      { id: 1, label: "3.5g jar", price: 45, unitPrice: "£45 / 3.5g", featured: true },
-      { id: 2, label: "7g jar", price: 80, unitPrice: "£80 / 7g" }
-    ]
-  },
-  {
-    id: 9002,
-    documentId: "mock-midnight-gelato",
-    title: "Midnight Gelato",
-    slug: "midnight-gelato",
-    description: "Velvety indica-leaning pre-roll pack with glass tips and ice-water hash infusion.",
-    heroBadge: "Infused",
-    priceFrom: 38,
-    strain: "Indica",
-    thc: "27% THC",
-    potency: "Medium",
-    rating: 4.8,
-    reviews: 96,
-    category: "pre-rolls",
-    weightOptions: [
-      { id: 3, label: "Pack of 3", price: 38, unitPrice: "£12.60 / roll", featured: true },
-      { id: 4, label: "Pack of 6", price: 70, unitPrice: "£11.60 / roll" }
-    ]
-  },
-  {
-    id: 9003,
-    documentId: "mock-rose-spliff",
-    title: "Rose Spliff",
-    slug: "rose-spliff",
-    description: "Hand-rolled rose petal joints, terpene boosted with strawberry live resin.",
-    heroBadge: "Limited",
-    priceFrom: 32,
-    strain: "Hybrid",
-    thc: "24% THC",
-    potency: "Medium",
-    rating: 4.7,
-    reviews: 76,
-    category: "pre-rolls",
-    weightOptions: [
-      { id: 5, label: "Twin pack", price: 32, unitPrice: "£16 / roll", featured: true }
-    ]
-  },
-  {
-    id: 9004,
-    documentId: "mock-cuban-z-vape",
-    title: "Cuban Z Live Resin",
-    slug: "cuban-z-vape",
-    description: "One-gram ceramic cart with Cuban Z terps, heavy limonene + fuel finish.",
-    heroBadge: "Live resin",
-    priceFrom: 48,
-    strain: "Sativa",
-    thc: "86% THC",
-    potency: "High",
-    rating: 4.9,
-    reviews: 143,
-    category: "vapes",
-    weightOptions: [
-      { id: 6, label: "1g cart", price: 48, unitPrice: "£48 / 1g", featured: true }
-    ]
-  }
-];
 
 export function getProductListingMeta(slug: string) {
   return productListingMeta[slug];

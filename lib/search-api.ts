@@ -1,4 +1,3 @@
-import { productListingFallbacks } from "@/data/fixtures/products";
 import type { ProductRecord, ProductImage, WeightOption } from "@/lib/types";
 
 const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -13,7 +12,7 @@ export type ProductSearchParams = {
 
 export async function searchProducts(params: ProductSearchParams = {}): Promise<ProductRecord[]> {
   if (!AUTH_BASE) {
-    return productListingFallbacks;
+    return [];
   }
 
   const url = new URL(`${AUTH_BASE}/api/products`);
@@ -39,7 +38,7 @@ export async function searchProducts(params: ProductSearchParams = {}): Promise<
 
   const response = await fetch(url.toString(), { next: { revalidate: 0 } });
   if (!response.ok) {
-    return productListingFallbacks;
+    return [];
   }
   const payload = await response.json().catch(() => ({}));
   const entries = Array.isArray(payload?.data) ? payload.data : [];
