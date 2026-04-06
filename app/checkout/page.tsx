@@ -111,6 +111,7 @@ export default function CheckoutPage() {
     setSubmitting(true);
     setAlert(null);
     try {
+      const normalizedPostcode = values.postcode.trim().toUpperCase();
       const referralCode = getStoredReferralCode();
       const response = await createOrder({
         items: items.map((item) => ({
@@ -120,7 +121,8 @@ export default function CheckoutPage() {
           weight: item.weight,
         })),
         contactEmail: values.email,
-        deliveryPostcode: values.postcode,
+        deliveryPostcode: normalizedPostcode,
+        dropoffPostcode: normalizedPostcode,
         paymentOption: "wallet",
         referralCode: referralCode || undefined,
       });
