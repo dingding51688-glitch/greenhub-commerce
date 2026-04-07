@@ -7,8 +7,20 @@ import useSWR from "swr";
 import Button from "@/components/ui/button";
 import { StateMessage } from "@/components/StateMessage";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { swrFetcher } from "@/lib/api";
+import { getStoredToken } from "@/lib/auth-store";
 import type { NotificationRecord } from "@/lib/types";
+
+type NotificationResponse = { data: NotificationRecord[] };
+
+async function fetchNotifications(): Promise<NotificationResponse> {
+  const token = getStoredToken();
+  if (!token) throw new Error("Login required");
+  const res = await fetch("/api/account/notifications?pageSize=100", {
+    headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+  });
+  if (!res.ok) throw new Error("Failed to fetch notifications");
+  return res.json();
+}
 
 const dateFmt = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" });
 
@@ -28,11 +40,6 @@ const typeIcon: Record<string, string> = {
   withdrawal_paid: "💵",
 };
 
-type NotificationResponse = {
-  success: boolean;
-  data: NotificationRecord[];
-};
-
 type ActionNotice = {
   type: "success" | "error";
   message: string;
@@ -41,10 +48,11 @@ type ActionNotice = {
 export default function NotificationCenterPage() {
   const { token } = useAuth();
   const router = useRouter();
-  const { data, error, isLoading, mutate } = useSWR<NotificationResponse>(token ? "/api/account/notifications" : null, swrFetcher, {
-    keepPreviousData: true,
-    revalidateOnFocus: false,
-  });
+  const { data, error, isLoading, mutate } = useSWR<NotificationResponse>(
+    token ? "notifications-page" : null,
+    fetchNotifications,
+    { keepPreviousData: true, revalidateOnFocus: false }
+  );
   const [actionNotice, setActionNotice] = useState<ActionNotice | null>(null);
   const notifications = useMemo(() => data?.data ?? [], [data]);
   const unreadCount = useMemo(() => notifications.filter((record) => !record.isRead).length, [notifications]);
