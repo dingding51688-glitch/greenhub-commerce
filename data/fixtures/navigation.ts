@@ -48,7 +48,8 @@ export const drawerSections: DrawerSection[] = [
     title: "Account",
     links: [
       { label: "Overview", href: "/account", match: "prefix" },
-      { label: "Wallet", href: "/wallet", match: "prefix" }
+      { label: "Wallet", href: "/wallet", match: "prefix" },
+      { label: "Orders", href: "/orders", match: "prefix" }
     ]
   }
   // Legacy logistics quick links were removed to match the 420.co.uk drawer (menu + account only).
