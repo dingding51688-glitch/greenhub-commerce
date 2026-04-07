@@ -81,6 +81,11 @@ export async function listMyOrders(params?: { page?: number; pageSize?: number }
   return ordersFetch<OrdersListResponse>(pathUrl);
 }
 
+export async function findOrderSummary(reference: string) {
+  const response = await listMyOrders({ page: 1, pageSize: 50 });
+  return response.data?.find((order) => order.reference === reference) || null;
+}
+
 export type OrderTrackingResponse = {
   success: boolean;
   order: OrderRecord;

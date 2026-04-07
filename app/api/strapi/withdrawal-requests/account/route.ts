@@ -1,20 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
+import { resolveServerBase } from "@/lib/server-base";
 
-function ensureStrapiDirectUrl() {
-  const value = process.env.STRAPI_DIRECT_URL?.trim();
-  if (!value) {
-    throw new Error("STRAPI_DIRECT_URL is not configured");
+const STRAPI_ACCOUNT_PATH = "/api/account/withdrawals";
+const STRAPI_PROXY_PREFIX = "/api/strapi";
+
+function resolveUpstream(path: string) {
+  const direct = process.env.STRAPI_DIRECT_URL?.trim();
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  if (direct) {
+    const normalizedDirect = direct.replace(/\/$/, "");
+    const target = normalizedDirect.endsWith("/api")
+      ? normalizedDirect.slice(0, -4)
+      : normalizedDirect;
+    return {
+      url: `${target}${normalizedPath}`,
+      isDirect: true
+    };
   }
-  return value;
+
+  const proxyPath = `${STRAPI_PROXY_PREFIX}${normalizedPath}`;
+  return {
+    url: resolveServerBase(proxyPath, { fallback: proxyPath }),
+    isDirect: false
+  };
 }
 
-function buildHeaders(request: NextRequest, directUrl: string) {
+function buildHeaders(request: NextRequest, options?: { forceHost?: string }) {
   const headers = new Headers();
   for (const key of ["authorization", "cookie", "accept", "accept-language", "user-agent"]) {
     const value = request.headers.get(key);
     if (value) headers.set(key, value);
   }
-  headers.set("host", new URL(directUrl).host);
+  if (options?.forceHost) {
+    headers.set("host", new URL(options.forceHost).host);
+  }
   return headers;
 }
 
@@ -44,7 +64,7 @@ function mapPayload(payload: any) {
 }
 
 async function handlePost(request: NextRequest) {
-  const directUrl = ensureStrapiDirectUrl();
+  const upstream = resolveUpstream(STRAPI_ACCOUNT_PATH);
   let body: Record<string, unknown>;
   try {
     const incoming = await request.json();
@@ -53,36 +73,36 @@ async function handlePost(request: NextRequest) {
     return NextResponse.json({ error: { message: error?.message || "Invalid payload" } }, { status: 400 });
   }
 
-  const target = new URL("/api/account/withdrawals", directUrl);
-  const headers = buildHeaders(request, directUrl);
+  const target = new URL(upstream.url);
+  const headers = buildHeaders(request, { forceHost: upstream.isDirect ? upstream.url : undefined });
   headers.set("Content-Type", "application/json");
 
-  const upstream = await fetch(target, {
+  const response = await fetch(target, {
     method: "POST",
     headers,
     body: JSON.stringify(body),
     redirect: "manual",
   });
-  const payload = await upstream.json().catch(() => ({}));
-  if (upstream.ok) {
+  const payload = await response.json().catch(() => ({}));
+  if (response.ok) {
     const request = payload?.data ?? payload?.request ?? payload;
     return NextResponse.json({ success: true, request }, { status: 200 });
   }
-  return NextResponse.json(payload, { status: upstream.status });
+  return NextResponse.json(payload, { status: response.status });
 }
 
 async function handleGet(request: NextRequest) {
-  const directUrl = ensureStrapiDirectUrl();
-  const target = new URL("/api/account/withdrawals", directUrl);
+  const upstream = resolveUpstream(STRAPI_ACCOUNT_PATH);
+  const target = new URL(upstream.url);
   target.search = request.nextUrl.search;
-  const headers = buildHeaders(request, directUrl);
-  const upstream = await fetch(target, { method: "GET", headers, redirect: "manual" });
-  const payload = await upstream.json().catch(() => ({}));
-  if (upstream.ok) {
+  const headers = buildHeaders(request, { forceHost: upstream.isDirect ? upstream.url : undefined });
+  const response = await fetch(target, { method: "GET", headers, redirect: "manual" });
+  const payload = await response.json().catch(() => ({}));
+  if (response.ok) {
     const request = payload?.data ?? payload?.request ?? payload;
     return NextResponse.json({ success: true, request }, { status: 200 });
   }
-  return NextResponse.json(payload, { status: upstream.status });
+  return NextResponse.json(payload, { status: response.status });
 }
 
 export async function POST(request: NextRequest) {

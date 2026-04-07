@@ -17,7 +17,7 @@ const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "
 const fallbackWithdrawals = [
   { id: 1, amount: 120, status: "processing", createdAt: new Date().toISOString() },
 ];
-const fallbackReferral = {
+const fallbackReferral: ReferralSummary = {
   code: "STORE25",
   link: "https://greenhub420.co.uk/join/STORE25",
   totalInvites: 0,

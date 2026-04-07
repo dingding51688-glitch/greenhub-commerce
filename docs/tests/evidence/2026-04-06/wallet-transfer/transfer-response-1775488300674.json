@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "transfer": {
+    "reference": "TRF-1775488300017-3-4",
+    "amount": 20,
+    "toHandle": "GH-842B3330",
+    "memo": "QA transfer test",
+    "balanceAfter": 50688592
+  }
+}

@@ -94,6 +94,9 @@ export type OrderRecord = {
   lockerNotes?: string | null;
   lockerAssignedAt?: string | null;
   lockerEta?: string | null;
+  trackingNumber?: string | null;
+  trackingUrl?: string | null;
+  carrier?: string | null;
   paymentOption?: string | null;
   walletDebit?: number | null;
   items?: OrderItem[];

@@ -7,24 +7,31 @@ import { ProductImageZoom } from "@/components/ProductImageZoom";
 import type { ProductRecord, ProductsResponse } from "@/lib/types";
 import { serverFetch } from "@/lib/server-api";
 import { ProductDetailPurchase } from "./purchase-panel";
-import { getProductListingMeta, productListingFallbacks } from "@/data/fixtures/products";
+import { getProductListingMeta } from "@/data/fixtures/products";
 import { FavoriteToggle } from "@/components/FavoriteToggle";
+
+export async function generateStaticParams() {
+  try {
+    const data = await serverFetch<ProductsResponse>("/api/products?pagination[pageSize]=50");
+    return data.data?.map((product) => ({ slug: product.slug })) ?? [];
+  } catch (error) {
+    console.warn("Failed to preload product slugs", error);
+    return [];
+  }
+}
 
 async function getProduct(slug: string) {
   const query = new URLSearchParams({
     "filters[slug][$eq]": slug,
-    "populate[weightOptions]": "*",
-    "populate[coverImage]": "*"
+    "populate[weightOptions]": "*"
   });
   try {
     const data = await serverFetch<ProductsResponse>(`/api/products?${query.toString()}`);
-    if (data.data?.[0]) {
-      return data.data[0];
-    }
+    return data.data?.[0] ?? null;
   } catch (error) {
-    console.warn("Strapi product fetch failed, falling back to fixtures", error);
+    console.warn("Strapi product fetch failed", error);
+    return null;
   }
-  return buildFallbackProduct(slug);
 }
 
 async function getRelatedProducts(slug: string) {
@@ -32,18 +39,15 @@ async function getRelatedProducts(slug: string) {
     "filters[slug][$ne]": slug,
     "pagination[pageSize]": "4",
     "sort[0]": "createdAt:desc",
-    "populate[weightOptions]": "*",
-    "populate[coverImage]": "*"
+    "populate[weightOptions]": "*"
   });
   try {
     const data = await serverFetch<ProductsResponse>(`/api/products?${query.toString()}`);
-    if (data.data) {
-      return data.data;
-    }
+    return data.data ?? [];
   } catch (error) {
-    console.warn("Strapi related-products fetch failed, using fixtures", error);
+    console.warn("Strapi related-products fetch failed", error);
+    return [];
   }
-  return productListingFallbacks.filter((product) => product.slug !== slug).slice(0, 4);
 }
 
 function formatPriceRange(product: ProductRecord) {
@@ -58,27 +62,7 @@ function formatPriceRange(product: ProductRecord) {
 }
 
 function selectCuratedProducts(products: ProductRecord[], currentSlug: string) {
-  if (products.length > 0) {
-    return products.filter((product) => product.slug !== currentSlug).slice(0, 4);
-  }
-  return productListingFallbacks.filter((product) => product.slug !== currentSlug).slice(0, 4);
-}
-
-function buildFallbackProduct(slug: string): ProductRecord | null {
-  const base = productListingFallbacks.find((product) => product.slug === slug) ?? productListingFallbacks[0];
-  if (!base) return null;
-  const meta = getProductListingMeta(base.slug);
-  return {
-    ...base,
-    coverImage: meta?.imageUrl
-      ? {
-          url: meta.imageUrl,
-          alternativeText: meta?.imageAlt ?? base.title
-        }
-      : base.coverImage,
-    rating: base.rating ?? meta?.rating ?? 4.9,
-    reviews: base.reviews ?? meta?.reviews ?? 0
-  };
+  return products.filter((product) => product.slug !== currentSlug).slice(0, 4);
 }
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {

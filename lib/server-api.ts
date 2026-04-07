@@ -3,22 +3,52 @@ import { resolveServerBase } from "@/lib/server-base";
 const RAW_API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 const FALLBACK_DIRECT = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
 const API_BASE = RAW_API_BASE ? resolveServerBase(RAW_API_BASE, { fallback: FALLBACK_DIRECT }) : FALLBACK_DIRECT;
+const BASES = Array.from(new Set([API_BASE, FALLBACK_DIRECT].filter((value): value is string => Boolean(value))));
+
+let loggedBase = false;
 
 export async function serverFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  const url = `${API_BASE}${normalizedPath}`;
-  const res = await fetch(url, {
-    ...init,
-    headers: {
-      Accept: "application/json",
-      ...(init?.headers || {})
-    },
-    cache: "no-store"
-  });
-
-  if (!res.ok) {
-    throw new Error(`Request failed: ${res.status}`);
+  if (!loggedBase) {
+    console.log(`[serverFetch] bases=${BASES.join(" -> ")}`);
+    loggedBase = true;
   }
 
-  return res.json() as Promise<T>;
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  let lastError: Error | null = null;
+
+  for (const base of BASES) {
+    const needsDedup = /\/api(\/|$)/.test(base) && normalizedPath.startsWith("/api/");
+    const dedupedPath = needsDedup ? normalizedPath.replace(/^\/api/, "") : normalizedPath;
+    const url = `${base}${dedupedPath}`;
+
+    try {
+      const res = await fetch(url, {
+        ...init,
+        headers: {
+          Accept: "application/json",
+          ...(init?.headers || {})
+        },
+        cache: "no-store"
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Request failed: ${res.status} ${url} ${errorText}`);
+      }
+
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        const errorText = await res.text();
+        throw new Error(`Unexpected content type: ${contentType} ${url} ${errorText}`);
+      }
+
+      return res.json() as Promise<T>;
+    } catch (error) {
+      const normalizedError = error instanceof Error ? error : new Error(String(error));
+      console.warn(`[serverFetch] retry via fallback (base=${base})`, normalizedError.message);
+      lastError = normalizedError;
+    }
+  }
+
+  throw lastError ?? new Error("Request failed for all server fetch bases");
 }

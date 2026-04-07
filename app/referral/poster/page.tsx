@@ -18,7 +18,7 @@ const QRCode = dynamic(
   { ssr: false }
 );
 
-const fallbackSummary = {
+const fallbackSummary: ReferralSummary = {
   code: "GREEN25",
   link: "https://greenhub420.co.uk/invite?ref=GREEN25",
   totalInvites: 0,

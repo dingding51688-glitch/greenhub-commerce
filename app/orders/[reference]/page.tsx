@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { StateMessage } from "@/components/StateMessage";
 import Button from "@/components/ui/button";
-import { getOrderTracking } from "@/lib/orders-api";
+import { findOrderSummary, getOrderTracking } from "@/lib/orders-api";
 import type { OrderRecord } from "@/lib/types";
 
 export default function OrderDetailPage({ params }: { params: { reference: string } }) {
@@ -18,8 +18,17 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
   useEffect(() => {
     if (!token) return;
     setLoading(true);
-    getOrderTracking(params.reference)
-      .then((response) => setOrder(response.order))
+    Promise.all([
+      getOrderTracking(params.reference),
+      findOrderSummary(params.reference).catch(() => null)
+    ])
+      .then(([trackingResponse, orderSummary]) => {
+        const trackingOrder = trackingResponse.order ?? null;
+        const merged = orderSummary
+          ? { ...orderSummary, status: trackingOrder?.status ?? orderSummary.status }
+          : trackingOrder;
+        setOrder(merged);
+      })
       .catch((err) => setError(err?.message || "Unable to load order"))
       .finally(() => setLoading(false));
   }, [params.reference, token]);
@@ -52,6 +61,7 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
   }
 
   const items = order.items ?? [];
+  const lockerAddressDisplay = order.lockerNotes || order.lockerAddress;
 
   return (
     <section className="space-y-6">
@@ -60,9 +70,6 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
         <h1 className="text-3xl font-semibold text-white">{order.reference}</h1>
         <p className="mt-2 text-sm text-white/60">
           Status: <span className="text-white">{order.status}</span> · Total {currency.format(order.totalAmount)}
-        </p>
-        <p className="mt-2 text-sm text-white/60">
-          Locker ETA: {order.lockerEta ? order.lockerEta : "Shared once courier scans the locker."}
         </p>
       </div>
 
@@ -86,6 +93,33 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
             ))}
           </ul>
         )}
+      </div>
+
+      <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
+        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Locker details</p>
+        <div className="mt-3 space-y-2">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Address</p>
+            <p className="text-base text-white">
+              {lockerAddressDisplay || "Pending"}
+            </p>
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Yodel tracking number</p>
+            <p className="font-mono text-lg text-white">
+              {order.trackingNumber || "Pending"}
+            </p>
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Access code</p>
+            <p className="font-mono text-lg text-white">
+              {order.lockerAccessCode || "Pending"}
+            </p>
+          </div>
+          {order.lockerEta && (
+            <p className="text-white/60">ETA: {order.lockerEta}</p>
+          )}
+        </div>
       </div>
 
       <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">

@@ -55,7 +55,7 @@ export default function WalletTransferPage() {
     setResult(null);
     try {
       await apiMutate("/api/account/transfers", "POST", {
-        recipientHandle: values.handle,
+        toHandle: values.handle,
         amount: values.amount,
         memo: values.memo || undefined,
       });

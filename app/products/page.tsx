@@ -9,11 +9,7 @@ import Button from "@/components/ui/button";
 import { Skeleton } from "@/components/Skeleton";
 import { swrFetcher } from "@/lib/api";
 import type { ProductRecord, ProductsResponse } from "@/lib/types";
-import {
-  productCategoryContent,
-  productListingFallbacks,
-  type ProductCategoryKey
-} from "@/data/fixtures/products";
+import { productCategoryContent, type ProductCategoryKey } from "@/data/fixtures/products";
 
 const CATEGORY_TABS: ProductCategoryKey[] = ["shop-all", "flowers", "pre-rolls", "vapes"];
 
@@ -36,25 +32,13 @@ export default function ProductsPage() {
   });
   const categoryFilter = productCategoryContent[category].filter;
   if (categoryFilter) {
-    requestParams.set(`filters[${categoryFilter.field}][$eq]`, categoryFilter.value);
+    requestParams.set(categoryFilter.param, categoryFilter.value);
   }
 
   const key = `/api/products?${requestParams.toString()}`;
   const { data, isLoading } = useSWR<ProductsResponse>(key, swrFetcher);
   const products = useMemo(() => data?.data ?? [], [data]);
-
-  const displayProducts = useMemo<ProductRecord[]>(() => {
-    if (products.length > 0) {
-      if (!categoryFilter) {
-        return products;
-      }
-      return products.filter((product) => product.category === categoryFilter.value || !product.category);
-    }
-    if (!categoryFilter) {
-      return productListingFallbacks;
-    }
-    return productListingFallbacks.filter((product) => product.category === categoryFilter.value);
-  }, [products, categoryFilter]);
+  const displayProducts = products;
 
   const handleCategoryChange = (value: ProductCategoryKey) => {
     const next = new URLSearchParams(searchParams.toString());

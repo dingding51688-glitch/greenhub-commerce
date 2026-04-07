@@ -1,7 +1,5 @@
-import { Suspense } from "react";
 import { HeroClassic, HowItWorksStore, ProductCategoryCard } from "@/components/sections";
 import { featuredCollectionsContent, homeHeroContent } from "@/data/fixtures/marketing";
-import ReferralBanner from "@/components/ReferralBanner";
 
 const storeJourneyContent = {
   eyebrow: "Store journey",
@@ -20,9 +18,6 @@ const storeJourneyContent = {
 export default function HomePage() {
   return (
     <div className="space-y-10 pb-20">
-      <Suspense fallback={null}>
-        <ReferralBanner />
-      </Suspense>
       <HeroClassic {...homeHeroContent} />
 
       <FeaturedCollections />

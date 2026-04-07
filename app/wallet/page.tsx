@@ -11,6 +11,14 @@ import { Button } from "@/components/ui";
 import { swrFetcher } from "@/lib/api";
 import type { WalletBalanceResponse, WalletTransaction, WalletTransactionsResponse } from "@/lib/types";
 
+type CustomerProfileResponse = {
+  data?: {
+    attributes?: {
+      transferHandle?: string;
+    };
+  };
+};
+
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 const TIMESTAMP = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" });
 
@@ -36,6 +44,8 @@ export default function WalletPage() {
     refreshInterval: 60_000,
   });
 
+  const { data: customerProfile } = useSWR<CustomerProfileResponse>(token ? "/api/account/profile" : null, swrFetcher);
+
   const {
     data: txData,
     error: txError,
@@ -48,6 +58,12 @@ export default function WalletPage() {
   );
 
   const transactions = txData?.data ?? [];
+
+  const resolveTxLink = (tx: WalletTransaction) => {
+    if (!tx.reference) return null;
+    if (tx.reference.startsWith("ORD-")) return `/orders/${tx.reference}`;
+    return null;
+  };
 
   if (!token) {
     return (
@@ -88,7 +104,12 @@ export default function WalletPage() {
           </p>
 
           {/* User ID 可复制标签 */}
-          <UserIdBadge profile={profile} copyToast={copyToast} setCopyToast={setCopyToast} />
+          <UserIdBadge
+            profile={profile}
+            transferHandle={customerProfile?.data?.attributes?.transferHandle}
+            copyToast={copyToast}
+            setCopyToast={setCopyToast}
+          />
 
           {/* 三个操作按钮 — 手机端堆叠，min-h 便于点击 */}
           <div className="relative mt-5 flex flex-col gap-2.5 sm:flex-row sm:gap-3">
@@ -135,7 +156,7 @@ export default function WalletPage() {
         ) : (
           <div className="divide-y divide-white/5 overflow-hidden rounded-3xl border border-white/10 bg-card">
             {transactions.map((tx) => (
-              <TxRow key={tx.id} tx={tx} />
+              <TxRow key={tx.id} tx={tx} link={resolveTxLink(tx)} onNavigate={(href) => router.push(href)} />
             ))}
           </div>
         )}
@@ -152,15 +173,17 @@ export default function WalletPage() {
 
 function UserIdBadge({
   profile,
+  transferHandle,
   copyToast,
   setCopyToast,
 }: {
   profile: { documentId?: string; customer?: { documentId?: string } } | null;
+  transferHandle?: string;
   copyToast: boolean;
   setCopyToast: (v: boolean) => void;
 }) {
   const rawId = profile?.customer?.documentId || profile?.documentId;
-  const userId = formatUserId(rawId);
+  const userId = transferHandle || formatUserId(rawId);
   if (!userId) return null;
 
   const handleCopy = async () => {
@@ -194,12 +217,24 @@ function UserIdBadge({
   );
 }
 
-function TxRow({ tx }: { tx: WalletTransaction }) {
+function TxRow({ tx, link, onNavigate }: { tx: WalletTransaction; link?: string | null; onNavigate?: (href: string) => void }) {
+  const Wrapper = link ? "button" : "div";
+  const handleClick = () => {
+    if (link && onNavigate) onNavigate(link);
+  };
+
   return (
-    <div className="flex items-center justify-between gap-3 px-4 py-3">
+    <Wrapper
+      type={link ? "button" : undefined}
+      onClick={link ? handleClick : undefined}
+      className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left ${
+        link ? "transition hover:bg-white/5 focus-visible:bg-white/10 focus-visible:outline-none" : ""
+      }`}
+      aria-label={link ? `View details for ${tx.reference}` : undefined}
+    >
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold capitalize text-white truncate">{tx.type.replace(/_/g, " ")}</p>
-        <p className="text-[11px] text-white/40 truncate">{tx.reference}</p>
+        <p className={`text-[11px] truncate ${link ? "text-brand-200" : "text-white/40"}`}>{tx.reference}</p>
       </div>
       <div className="shrink-0 text-right">
         <p className={`text-sm font-semibold ${tx.amount >= 0 ? "text-emerald-300" : "text-red-300"}`}>
@@ -209,6 +244,6 @@ function TxRow({ tx }: { tx: WalletTransaction }) {
           {tx.createdAt ? TIMESTAMP.format(new Date(tx.createdAt)) : ""}
         </p>
       </div>
-    </div>
+    </Wrapper>
   );
 }
