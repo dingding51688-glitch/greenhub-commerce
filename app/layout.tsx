@@ -8,8 +8,8 @@ import { DesktopHeader } from "@/components/navigation";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Bloom Vapor Dashboard",
-  description: "Account overview and orders for Bloom Vapor",
+  title: "Green Hub 420 — Order Online & Collect at InPost Lockers",
+  description: "Premium products delivered to your nearest InPost locker. Secure, anonymous, 24/7 pickup across Northern Ireland.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg"

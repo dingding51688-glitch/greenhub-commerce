@@ -10,7 +10,7 @@ export function AppHeader() {
     <header className="border-b border-white/5 bg-gradient-to-r from-brand-600/40 to-transparent">
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-4 px-4 py-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-white/60">Bloom Vapor</p>
+          <p className="text-xs uppercase tracking-[0.25em] text-white/60">Green Hub 420</p>
           <h1 className="text-lg font-semibold text-white">Customer Dashboard</h1>
         </div>
         <nav className="flex flex-1 justify-center gap-4 text-sm font-medium">

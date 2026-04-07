@@ -5,7 +5,7 @@ const orderGuideSteps = [
   {
     step: 1,
     title: "Browse & checkout",
-    description: "Pick your products, enter your postcode at checkout, and confirm payment via wallet or card. We handle the rest.",
+    description: "Pick your products, enter your postcode at checkout, and confirm payment via your wallet balance. We handle the rest.",
   },
   {
     step: 2,

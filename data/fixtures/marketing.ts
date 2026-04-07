@@ -6,7 +6,7 @@ export type HeroLink = {
 };
 
 export const heroClassicContent = {
-  eyebrow: "GreenHub NI · Premium Products",
+  eyebrow: "Green Hub 420 · Premium Products",
   title: "Cannabis you can count on, delivered across Belfast",
   subtitle:
     "Browse curated flower, carts, and edibles online — collect from convenient pickup points the moment you're ready.",
