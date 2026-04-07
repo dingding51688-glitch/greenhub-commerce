@@ -20,15 +20,22 @@ const withDevCustomerId = (path: string) => {
 const PUBLIC_ENDPOINT_PREFIXES = ["/api/products", "/api/collections"];
 
 /**
- * Next.js internal API route prefixes — requests to these paths should go
- * directly to the Next.js server (same origin), NOT through the Strapi
- * proxy.  Adding NEXT_PUBLIC_API_BASE_URL (/api/strapi) would produce
- * double-prefixed URLs like /api/strapi/api/account/transfer → 405.
+ * Next.js internal API routes — requests to these paths go directly to
+ * the Next.js server (same origin) instead of through the Strapi proxy.
+ *
+ * Everything else (e.g. /api/wallet/balance, /api/account/transfer) is
+ * Strapi-backed and must go through the proxy (BASE_URL prefix).
+ *
+ * Maintain this list when adding new app/api/ routes that are called
+ * from client code via apiFetch / swrFetcher / apiMutate.
  */
-const NEXTJS_ROUTE_PREFIXES = [
-  "/api/account/",
+const NEXTJS_ROUTES: string[] = [
+  "/api/account/favorites",
+  "/api/account/notifications",
+  "/api/account/profile",
+  "/api/account/security/",
+  "/api/account/telegram",
   "/api/auth/",
-  "/api/wallet/",
   "/api/payments/",
   "/api/referral/",
 ];
@@ -50,7 +57,9 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
 
   // If the path targets a Next.js internal API route, call it directly
   // without the Strapi proxy base URL prefix.
-  const isNextRoute = NEXTJS_ROUTE_PREFIXES.some((prefix) => finalPath.startsWith(prefix));
+  const isNextRoute = NEXTJS_ROUTES.some((route) =>
+    route.endsWith("/") ? finalPath.startsWith(route) : finalPath === route || finalPath.startsWith(route + "?") || finalPath.startsWith(route + "/")
+  );
 
   let url: string;
   if (isNextRoute) {
