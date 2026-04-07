@@ -22,13 +22,13 @@ export const heroClassicContent = {
 
 export const homeHeroContent = {
   highlight: "HOME",
-  eyebrow: "SAME-DAY DISPATCH",
-  title: "Order online & collect discreetly",
-  subtitle: "Enter your postcode and we'll route the parcel to the closest pickup point or courier.",
+  eyebrow: "ONLINE ORDER · LOCKER PICKUP",
+  title: "Order Online & Pick Up at InPost Lockers",
+  subtitle: "According to the postcode you provide, the parcel will be delivered to the nearest InPost locker.",
   bullets: [
-    "Real-time stock synced directly from our catalog",
-    "Scent-proof, tamper-evident packaging on every order",
-    "Private pickup instructions sent once dispatch begins"
+    "24-hour dispatch with real-time tracking updates",
+    "Sealed disguise packaging with scent & appearance masking",
+    "Privacy-safe delivery straight to the locker"
   ],
   primaryCta: { label: "SHOP NOW", href: "/products" } satisfies HeroLink,
   secondaryCta: { label: "HOW IT WORKS", href: "/how-it-works" } satisfies HeroLink,
