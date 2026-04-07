@@ -130,7 +130,7 @@ export default function OrdersPage() {
         <StateMessage
           variant="empty"
           title={filterId === "all" ? "No orders yet" : "Nothing matches this filter"}
-          body="Browse the menu to start a postcode request."
+          body="Browse our products to place your first order."
           actionLabel="Shop now"
           onAction={() => router.push("/products")}
         />

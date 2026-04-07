@@ -15,8 +15,8 @@ export default function HowItWorksPage() {
       <HeroClassic
         highlight="HOME / HOW IT WORKS"
         eyebrow="Order Guide"
-        title="Order online, collect from convenient pickup points in minutes"
-        subtitle="Follow three simple steps to place your order, confirm payment, and grab your parcel whenever it suits your evening."
+        title="Order online, collect from your nearest InPost locker"
+        subtitle="Follow three simple steps to place your order, confirm payment, and collect your parcel from an InPost locker whenever it suits you."
         primaryCta={{ label: "Create an account", href: "/register" }}
         secondaryCta={{ label: "Browse products", href: "/products" }}
         tone="soft"

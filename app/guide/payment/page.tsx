@@ -4,7 +4,7 @@ import Button from "@/components/ui/button";
 const walletSteps = [
   {
     title: "Copy Transfer ID",
-    detail: "Find it on /wallet. Always include it in bank/USDT references so ops can auto-match funds."
+    detail: "Find it on /wallet. Always include it in bank/USDT references so we can match your payment automatically."
   },
   {
     title: "Top up minimum £20",
@@ -12,7 +12,7 @@ const walletSteps = [
   },
   {
     title: "Watch for balance updates",
-    detail: "Wallet balance refreshes automatically. If you don’t see it, screenshot the receipt and send it to concierge." 
+    detail: "Wallet balance refreshes automatically. If you don't see it, screenshot the receipt and send it to support."
   }
 ];
 
@@ -27,22 +27,22 @@ const nowPaymentsSteps = [
   },
   {
     title: "Status updates",
-    detail: "We poll the invoice every few seconds. Once NowPayments confirms, the wallet credit posts immediately." 
+    detail: "We poll the invoice every few seconds. Once NowPayments confirms, the wallet credit posts immediately."
   }
 ];
 
 const manualSteps = [
   {
     title: "Use the bank details on /wallet/topup",
-    detail: "Account name: GreenHub Processing Ltd. Always include Transfer ID or locker email in the reference."
+    detail: "Account name: Green Hub 420 Ltd. Always include your Transfer ID or locker email in the reference."
   },
   {
     title: "USDT direct transfer",
-    detail: "Send to the TRC20/ERC20 address listed. DM concierge with TX hash + Transfer ID for manual confirmation."
+    detail: "Send to the TRC20/ERC20 address listed. Message support with TX hash + Transfer ID for manual confirmation."
   },
   {
     title: "Ops confirmation",
-    detail: "Manual transfers credit once ops verifies the receipt—usually within 15 minutes. Keep screenshots handy." 
+    detail: "Manual transfers credit once the team verifies the receipt — usually within 15 minutes. Keep screenshots handy."
   }
 ];
 
@@ -53,15 +53,15 @@ const faqs = [
   },
   {
     q: "Can I pay cash on delivery?",
-    a: "We only accept wallet, NowPayments, or bank/USDT transfers. Locker runners do not carry cash." 
+    a: "We only accept wallet, NowPayments, or bank/USDT transfers. Locker runners do not carry cash."
   },
   {
     q: "What if NowPayments flags my card?",
-    a: "They have their own risk filters. If the invoice fails twice, switch to wallet/bank or contact concierge for manual review."
+    a: "They have their own risk filters. If the invoice fails twice, switch to wallet/bank or contact support for manual review."
   },
   {
     q: "Do you refund to wallet or bank?",
-    a: "Wallet credits are instant. Bank/USDT refunds go back to the sending channel and can take 1–3 business days." 
+    a: "Wallet credits are instant. Bank/USDT refunds go back to the sending channel and can take 1-3 business days."
   }
 ];
 
@@ -76,7 +76,7 @@ export default function PaymentGuidePage() {
       <header className="rounded-[40px] border border-white/10 bg-[linear-gradient(135deg,#04130d,#020607)] px-6 py-10 text-white sm:px-12">
         <p className="text-xs uppercase tracking-[0.35em] text-white/60">Payments</p>
         <h1 className="mt-2 text-4xl font-semibold">Fund your locker in seconds</h1>
-        <p className="mt-3 text-lg text-white/80">Wallet recharges, NowPayments invoices, and manual bank/USDT transfers—here’s how each method works.</p>
+        <p className="mt-3 text-lg text-white/80">Wallet recharges, NowPayments invoices, and manual bank/USDT transfers — here&apos;s how each method works.</p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Button asChild>
             <Link href="/wallet/topup">Start a top-up</Link>
@@ -89,7 +89,7 @@ export default function PaymentGuidePage() {
 
       <GuideSection title="Wallet recharge" subtitle="Fastest way to fund lockers" steps={walletSteps} />
       <GuideSection title="NowPayments" subtitle="Card, Apple Pay, or USDT via hosted checkout" steps={nowPaymentsSteps} />
-      <GuideSection title="Bank / direct USDT" subtitle="Manual transfers with concierge confirmation" steps={manualSteps} />
+      <GuideSection title="Bank / direct USDT" subtitle="Manual transfers with support team confirmation" steps={manualSteps} />
 
       <section className="space-y-4 rounded-[32px] border border-white/10 bg-night-950/80 p-6">
         <header>
@@ -108,10 +108,10 @@ export default function PaymentGuidePage() {
 
       <section className="rounded-[32px] border border-white/10 bg-night-950/80 p-6 text-white">
         <h2 className="text-2xl font-semibold">Still need help?</h2>
-        <p className="mt-2 text-sm text-white/70">Share your Transfer ID and any receipts with concierge. We’ll match the payment and credit or refund as needed.</p>
+        <p className="mt-2 text-sm text-white/70">Share your Transfer ID and any receipts with support. We&apos;ll match the payment and credit or refund as needed.</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Button asChild>
-            <Link href="/support">Contact concierge</Link>
+            <Link href="/support">Contact support</Link>
           </Button>
           <Button asChild variant="ghost">
             <Link href="/guide/locker">Locker onboarding guide</Link>

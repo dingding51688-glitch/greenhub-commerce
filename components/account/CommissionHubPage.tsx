@@ -43,7 +43,7 @@ export default function CommissionHubPage() {
     return (
       <StateMessage
         title="Please sign in"
-        body="Connect your Bloom account to start sharing referral codes."
+        body="Log in to start sharing your referral link and earning rewards."
         actionLabel="Login"
         onAction={() => router.push("/login")}
       />
@@ -81,7 +81,7 @@ export default function CommissionHubPage() {
         <StateMessage
           variant="empty"
           title="No referrals yet"
-          body="Share your link to start tracking clicks, conversions, and payouts."
+          body="Share your referral link to start tracking clicks, conversions, and earnings."
         />
         <HowItWorksCard />
       </section>
@@ -143,8 +143,8 @@ export default function CommissionHubPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">Commission Hub</p>
-            <h1 className="text-2xl font-semibold text-white sm:text-3xl">Share products and earn cash rewards</h1>
-            <p className="text-sm text-white/60">Invite trusted friends and earn every time they buy.</p>
+            <h1 className="text-2xl font-semibold text-white sm:text-3xl">Share products, earn referral rewards</h1>
+            <p className="text-sm text-white/60">Invite friends and earn commission every time they order.</p>
           </div>
           <div className="rounded-2xl border border-white/15 bg-white/5 p-4 text-sm text-white/80 sm:rounded-3xl">
             <p className="text-xs uppercase tracking-[0.3em] text-white/40">Invite link</p>
@@ -196,7 +196,7 @@ export default function CommissionHubPage() {
           </div>
         ))}
       </div>
-      <p className="text-sm text-white/60">Every unique click pays £0.30. Every friend checkout generates 10% account credit — rewards never expire.</p>
+      <p className="text-sm text-white/60">Every unique click pays £0.30. Every friend&apos;s order earns you 10% commission — referral earnings never expire.</p>
       {lastClickTime && (
         <p className="text-xs text-white/50">
           Last click recorded {new Date(lastClickTime).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}
@@ -275,7 +275,7 @@ function TasksPanel({ tasks }: { tasks: CommissionHubTask[] }) {
 
 function CommissionTable({ rows }: { rows: CommissionTransaction[] }) {
   if (!rows.length) {
-    return <StateMessage variant="empty" title="No commissions yet" body="Share your link or remind friends to top up." />;
+    return <StateMessage variant="empty" title="No commissions yet" body="Share your referral link to start earning commission." />;
   }
   return (
     <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
@@ -369,8 +369,8 @@ function HowItWorksCard() {
       <h2 className="text-xl font-semibold text-white sm:text-2xl">How referrals work</h2>
       <ol className="mt-3 list-decimal space-y-2 pl-6 text-sm leading-relaxed text-white/70">
         <li>Share your invite link with trusted friends.</li>
-        <li>They sign up and browse the product catalogue.</li>
-        <li>When they place an order, 10% of their spend is credited to your account.</li>
+        <li>They sign up and browse our products.</li>
+        <li>When they place an order, 10% of their spend is credited to your wallet as referral earnings.</li>
       </ol>
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-3">
         <Button asChild className="w-full min-h-[48px] sm:w-auto">

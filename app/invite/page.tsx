@@ -263,7 +263,7 @@ function FAQSection() {
   return (
     <section className="space-y-4 rounded-[32px] border border-white/10 bg-card p-6 shadow-card">
       <p className="text-xs uppercase tracking-[0.35em] text-white/50">FAQ</p>
-      <h2 className="text-2xl font-semibold text-white">Questions ops hears daily</h2>
+      <h2 className="text-2xl font-semibold text-white">Common questions</h2>
       <div className="space-y-4">
         {faqs.map((faq) => (
           <div key={faq.question} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/80">
@@ -282,7 +282,7 @@ function ConciergeCTA({ contact, inviteUrl, code, onCopy }: { contact: any; invi
     <section className="rounded-[32px] border border-white/10 bg-[linear-gradient(135deg,#07130c,#030705)] p-6 text-white">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-emerald-300">Need concierge?</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-emerald-300">Need help?</p>
           <h2 className="text-2xl font-semibold">Ping {contact.title}</h2>
           <p className="text-sm text-white/70">Share your Transfer ID or referral code so we can verify rewards faster.</p>
         </div>
@@ -293,7 +293,7 @@ function ConciergeCTA({ contact, inviteUrl, code, onCopy }: { contact: any; invi
           )}
           {contact.href && (
             <Link href={contact.href} className="rounded-full border border-white/20 px-5 py-2 text-sm font-semibold text-white hover:border-white/50">
-              Message concierge
+              Message support
             </Link>
           )}
         </div>

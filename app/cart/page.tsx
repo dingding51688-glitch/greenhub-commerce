@@ -20,7 +20,7 @@ export default function CartPage() {
       <section className="mx-auto mt-16 max-w-md space-y-6 text-center">
         <p className="text-5xl">🛒</p>
         <h1 className="text-2xl font-semibold text-white">Your cart is empty</h1>
-        <p className="text-sm text-white/50">Browse the menu and add something you like.</p>
+        <p className="text-sm text-white/50">Browse our products and add something you like.</p>
         <Button onClick={() => router.push("/products")}>Browse products</Button>
       </section>
     );
@@ -168,9 +168,9 @@ export default function CartPage() {
             <p className="font-semibold text-white/80">Shipping info</p>
             <ul className="mt-2 space-y-1 text-xs">
               <li>📦 Vacuum-sealed, discreet packaging</li>
-              <li>🚚 Same-day dispatch (orders before 2pm)</li>
-              <li>📍 UK mainland (England, Scotland, Wales)</li>
-              <li>🔒 Tracking number within 24h</li>
+              <li>🚚 Same-evening dispatch (orders before 8 pm)</li>
+              <li>📍 InPost locker delivery across Northern Ireland</li>
+              <li>🔒 Collection code sent by SMS within 24h</li>
             </ul>
           </div>
         </aside>

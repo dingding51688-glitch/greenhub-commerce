@@ -4,26 +4,26 @@ import Button from "@/components/ui/button";
 const prepSteps = [
   {
     title: "Set up your wallet",
-    detail: "Top up at least £20 and copy your Transfer ID. You’ll need it in every payment reference."
+    detail: "Top up at least £20 and copy your Transfer ID. You'll need it in every payment reference."
   },
   {
     title: "Share your postcode",
-    detail: "At checkout just enter the postcode closest to you. Concierge matches the nearest locker and holds it for 120 minutes once the parcel is ready."
+    detail: "At checkout, enter the postcode closest to you. Our team matches the nearest InPost locker and holds it for 120 minutes once the parcel is ready."
   },
   {
     title: "Choose payment",
-    detail: "Wallet is instant. Bank / USDT payments are also accepted — remember to include the Transfer ID."
+    detail: "Wallet is instant. Bank / USDT payments are also accepted - remember to include the Transfer ID."
   }
 ];
 
 const pickupSteps = [
   {
     title: "Watch for SMS + email",
-    detail: "You’ll get the locker address, PIN, and a QR link once concierge loads your parcel."
+    detail: "You'll get the locker address, PIN, and a QR link once our team loads your parcel."
   },
   {
     title: "Go to the locker",
-    detail: "Scan the QR or enter the PIN on the keypad. Most lockers open within 2 seconds." 
+    detail: "Scan the QR or enter the PIN on the keypad. Most lockers open within 2 seconds."
   },
   {
     title: "Grab & close",
@@ -33,35 +33,35 @@ const pickupSteps = [
 
 const incidentSteps = [
   {
-    title: "Locker jam or won’t open",
-    detail: "Reply HELP + locker ID to the SMS thread or Telegram concierge. Ops reroutes you within 15 minutes."
+    title: "Locker jam or won't open",
+    detail: "Reply HELP + locker ID to the SMS thread or message our Telegram support. Our team will reroute you within 15 minutes."
   },
   {
     title: "Missed window",
-    detail: "Lockers auto-lock after 120 minutes. Text the thread and we’ll reassign the parcel to the next available unit." 
+    detail: "Lockers auto-lock after 120 minutes. Text the thread and we'll reassign the parcel to the next available unit."
   },
   {
     title: "Need re-delivery",
-    detail: "If you can’t reach the site that night, we can return the parcel to Belfast HQ for collection the next day."
+    detail: "If you can't reach the site that night, we can return the parcel to Belfast HQ for collection the next day."
   }
 ];
 
 const faqs = [
   {
     q: "Why do you need my Transfer ID?",
-    a: "It’s the unique reference that links payments and locker drops to your account. Add it to every bank/USDT transfer."
+    a: "It's the unique reference that links payments and locker drops to your account. Add it to every bank/USDT transfer."
   },
   {
     q: "How long do lockers hold my parcel?",
-    a: "We hold for 120 minutes after the “ready” SMS. If you need longer, reply to the thread before the timer expires."
+    a: "We hold for 120 minutes after the 'ready' SMS. If you need longer, reply to the thread before the timer expires."
   },
   {
     q: "Can someone else pick up for me?",
-    a: "Yes — just forward them the SMS/Email with the locker PIN. You are still responsible for closing the door and replying DONE."
+    a: "Yes - just forward them the SMS/Email with the locker PIN. You are still responsible for closing the door and replying DONE."
   },
   {
     q: "What happens if the parcel looks tampered?",
-    a: "Take photos, close the locker, and text HELP immediately. Ops will dispatch a runner or refund depending on the inspection." 
+    a: "Take photos, close the locker, and text HELP immediately. Our team will dispatch a runner or arrange a refund depending on the inspection."
   }
 ];
 
@@ -89,7 +89,7 @@ export default function LockerGuidePage() {
             <Link href="/wallet/topup">Top up wallet</Link>
           </Button>
           <Button asChild variant="secondary">
-            <Link href="/support">Talk to concierge</Link>
+            <Link href="/support">Talk to support</Link>
           </Button>
         </div>
       </header>

@@ -93,7 +93,7 @@ export default function DashboardPage() {
     <section className="space-y-6">
       <div className="rounded-[40px] border border-white/10 bg-night-950/80 p-6">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Welcome back</p>
-        <h1 className="text-3xl font-semibold text-white">{profile?.fullName || "Store member"}</h1>
+        <h1 className="text-3xl font-semibold text-white">{profile?.fullName || "Member"}</h1>
         <p className="mt-1 text-sm text-white/60">Store services live — Belfast & Derry 24/7 · Support team on duty until 21:00 GMT.</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Button onClick={() => router.push("/products")}>Go to products</Button>
@@ -149,7 +149,7 @@ export default function DashboardPage() {
           ) : ordersError ? (
             <StateMessage variant="error" title="Unable to load orders" body={ordersError.message} actionLabel="Retry" />
           ) : latestOrders.length === 0 ? (
-            <StateMessage variant="empty" title="No orders yet" body="Browse the catalog to place your first order." />
+            <StateMessage variant="empty" title="No orders yet" body="Browse our products to place your first order." />
           ) : (
             <div className="mt-3 space-y-3">
               {latestOrders.map((order) => (

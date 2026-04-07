@@ -169,7 +169,7 @@ export default function WalletWithdrawPage() {
         <Link href="/wallet" className="text-xs text-white/40 hover:text-white/60">← Back to wallet</Link>
         <h1 className="text-2xl font-semibold text-white sm:text-3xl">Withdraw funds</h1>
         <p className="text-sm leading-relaxed text-white/70">
-          Request a payout to your bank, crypto wallet, or another member handle. The team will verify within 12 hours.
+          Request a payout to your bank, crypto wallet, or another member handle. Our team will verify within 12 hours.
         </p>
       </header>
 
@@ -393,7 +393,7 @@ function ReviewStep({
         </div>
       )}
       <label className="text-sm text-white">
-        <span className="font-medium">Note to ops (optional)</span>
+        <span className="font-medium">Note to the team (optional)</span>
         <Textarea className="mt-1" value={note} onChange={(event) => onNoteChange(event.target.value)} placeholder="Any notes for the team" />
       </label>
     </section>
@@ -406,7 +406,7 @@ function SuccessCard({ request }: { request: WithdrawalRequest }) {
       <p className="text-sm uppercase tracking-[0.3em] text-emerald-200">Request submitted</p>
       <h2 className="text-3xl font-semibold">Reference {request.reference}</h2>
       <p className="text-sm text-white/70">
-        Ops will verify and update the status to <strong>approved</strong> once the payout is queued. Expect a DM or email if more information is required.
+        Our team will verify and update the status to <strong>approved</strong> once the payout is queued. Expect a message or email if more information is required.
       </p>
       <dl className="grid gap-2 text-sm text-white/80 sm:grid-cols-2">
         <div>

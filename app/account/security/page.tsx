@@ -166,7 +166,7 @@ export default function AccountSecurityPage() {
       <header className="rounded-3xl border border-white/10 bg-card p-6 shadow-card">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Account security</p>
         <h1 className="hidden text-3xl font-semibold text-white sm:block">Keep your locker safe</h1>
-        <p className="mt-2 hidden text-sm text-white/60 sm:block">Security reminder: avoid saving passwords on shared devices and enable concierge approvals for sensitive changes.</p>
+        <p className="mt-2 hidden text-sm text-white/60 sm:block">Security reminder: avoid saving passwords on shared devices and enable support team approvals for sensitive changes.</p>
       </header>
 
       <div className="rounded-3xl border border-white/10 bg-night-950/80 p-6">
@@ -243,7 +243,7 @@ export default function AccountSecurityPage() {
       <div className="rounded-3xl border border-white/10 bg-night-950/70 p-6">
         <h2 className="text-xl font-semibold text-white">Two-factor reminders</h2>
         <p className="text-sm text-white/60">
-          Telegram concierge approvals double-check sensitive actions today. Full OTP-based 2FA is coming soon - watch the
+          Support team approvals double-check sensitive actions today. Full OTP-based 2FA is coming soon — watch the
           <Link href="/referral" className="underline"> updates feed</Link> for beta access.
         </p>
         <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-white/70">

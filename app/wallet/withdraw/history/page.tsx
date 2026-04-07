@@ -83,7 +83,7 @@ export default function WithdrawalHistoryPage() {
       <header className="space-y-2">
         <a href="/wallet" className="text-xs text-white/40 hover:text-white/60">← Back to wallet</a>
         <h1 className="text-2xl font-semibold text-white sm:text-3xl">Withdrawal history</h1>
-        <p className="text-sm leading-relaxed text-white/70">Track every payout request. Pending items will be updated by the team once verified.</p>
+        <p className="text-sm leading-relaxed text-white/70">Track every payout request. Pending items will be updated by our team once verified.</p>
       </header>
 
       {/* Filter pills — horizontally scrollable on mobile */}

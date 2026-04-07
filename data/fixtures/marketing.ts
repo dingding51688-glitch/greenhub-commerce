@@ -7,12 +7,12 @@ export type HeroLink = {
 
 export const heroClassicContent = {
   eyebrow: "Green Hub 420 · Premium Products",
-  title: "Cannabis you can count on, delivered across Belfast",
+  title: "Premium products, locker delivery across NI",
   subtitle:
-    "Browse curated flower, carts, and edibles online — collect from convenient pickup points the moment you're ready.",
+    "Browse curated flower, carts, and edibles online — order now and collect from your nearest InPost locker whenever you're ready.",
   primaryCta: { label: "Browse products", href: "/products" } satisfies HeroLink,
   secondaryCta: { label: "How it works", href: "/#how-it-works" } satisfies HeroLink,
-  highlight: "Now shipping subscription refills across NI",
+  highlight: "Now delivering via InPost lockers across NI",
   stats: [
     { label: "Dispatch window", value: "24/7" },
     { label: "Members served", value: "3.1k" },
@@ -492,20 +492,20 @@ export type AboutHighlight = {
 };
 
 export const aboutHighlights: AboutHighlight[] = [
-  { icon: "🔒", title: "Discreet delivery", description: "50+ Belfast & Derry pickup points with 24/7 availability." },
-  { icon: "⚡", title: "Same-evening dispatch", description: "Order by 8pm, collect before midnight with live SMS tracking." },
-  { icon: "🤝", title: "Dedicated support", description: "NI-based team on Telegram + email every day 10:00–00:00." },
-  { icon: "🌿", title: "Curated products", description: "We partner with EU craft growers and test every batch." }
+  { icon: "🔒", title: "Discreet delivery", description: "50+ InPost lockers across Belfast & Derry, available 24/7." },
+  { icon: "⚡", title: "Same-evening dispatch", description: "Order by 8 pm, collect from your InPost locker before midnight with live SMS tracking." },
+  { icon: "🤝", title: "Dedicated support", description: "NI-based team on Telegram + email every day, 10:00–00:00." },
+  { icon: "🌿", title: "Curated products", description: "We partner with EU craft growers and test every batch before it goes live." }
 ];
 
 export const coverageStats = [
-  { label: "Delivery cities", value: "2", description: "Belfast & Derry" },
+  { label: "Delivery cities", value: "2", description: "Belfast & Derry via InPost locker network" },
   { label: "Postcodes served", value: "47", description: "Titanic Quarter → Lisburn" },
-  { label: "Partners", value: "3", description: "InPost, Rapid courier, NowPayments" }
+  { label: "Partners", value: "3", description: "InPost locker network, Rapid courier, NowPayments" }
 ];
 
 export const supportCommitments = [
-  { title: "Telegram support", detail: "@greenhub_support · replies < 5 min" },
-  { title: "Email", detail: "support@greenhub420.co.uk · 4h resolution" },
-  { title: "Ticket SLA", detail: "Refunds processed in 4h, replacements scheduled same evening" }
+  { title: "Telegram support", detail: "@greenhub_support · replies in under 5 min" },
+  { title: "Email", detail: "support@greenhub420.co.uk · 4-hour resolution target" },
+  { title: "Ticket SLA", detail: "Refunds processed within 4 hours, replacements scheduled the same evening" }
 ];

@@ -3,8 +3,8 @@ import Card from "@/components/ui/card";
 import { aboutHighlights, coverageStats, supportCommitments } from "@/data/fixtures/marketing";
 
 export const metadata = {
-  title: "About GreenHub",
-  description: "Why Northern Ireland members choose GreenHub for quality products and dedicated support."
+  title: "About Green Hub 420",
+  description: "Why Northern Ireland members choose Green Hub 420 for premium products and dedicated support."
 };
 
 export default function AboutPage() {
@@ -12,11 +12,11 @@ export default function AboutPage() {
     <div className="space-y-10 pb-20">
       <HeroClassic
         eyebrow="About"
-        title="Northern Ireland's premier online cannabis store"
-        subtitle="We blend curated products, discreet delivery, and dedicated support so you can shop on your schedule."
+        title="Northern Ireland's premium product distributor"
+        subtitle="We blend curated products, discreet InPost locker delivery, and dedicated support so you can shop on your schedule."
         primaryCta={{ label: "How it works", href: "/how-it-works" }}
         secondaryCta={{ label: "Contact support", href: "/contact" }}
-        highlight="Serving 3k+ members"
+        highlight="Serving 3,000+ members across NI"
       />
 
       <HighlightsSection />
@@ -30,7 +30,7 @@ function HighlightsSection() {
   return (
     <section className="space-y-6 rounded-3xl border border-white/5 bg-night-950/80 p-6 shadow-surface sm:p-10">
       <header className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">Why choose GreenHub</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">Why choose Green Hub 420</p>
         <h2 className="text-3xl font-semibold text-white">We obsess over quality, logistics, and people</h2>
       </header>
       <div className="grid gap-4 md:grid-cols-2">
@@ -53,7 +53,7 @@ function CoverageSection() {
         <div className="flex-1 space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-500">Coverage & partners</p>
           <h2 className="text-3xl font-semibold text-white">Delivery network + trusted partners</h2>
-          <p className="text-sm text-ink-400">We place pickup points where members already spend their evenings and partner with couriers that keep parcels safe.</p>
+          <p className="text-sm text-ink-400">We use InPost lockers where members already spend their evenings and partner with couriers that keep parcels safe.</p>
         </div>
         <div className="flex flex-1 flex-col gap-4">
           {coverageStats.map((stat) => (

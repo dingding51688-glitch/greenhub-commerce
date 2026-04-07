@@ -15,7 +15,7 @@ export default function ShippingPage() {
         highlight="HOME / SHIPPING"
         eyebrow="Shipping & delivery guide"
         title="Same-evening delivery across Belfast & Derry"
-        subtitle="Order before 20:00, receive your collection code before midnight, and follow the etiquette below to avoid late fees."
+        subtitle="Order before 20:00, receive your InPost locker collection code before midnight, and follow the etiquette below to avoid late fees."
         primaryCta={{ label: "How it works", href: "/how-it-works" }}
         secondaryCta={{ label: "Contact support", href: "/contact" }}
         alignment="left"

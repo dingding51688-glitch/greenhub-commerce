@@ -82,7 +82,7 @@ export default function ProductsPage() {
 
       {isLoading && (
         <div className="space-y-2">
-          <p className="text-sm text-ink-500">Loading store inventory…</p>
+          <p className="text-sm text-ink-500">Loading store inventory...</p>
           <div className="grid gap-4 md:grid-cols-2">
             {Array.from({ length: 6 }).map((_, idx) => (
               <Skeleton key={idx} className="h-64" />
@@ -93,7 +93,7 @@ export default function ProductsPage() {
 
       {!isLoading && displayProducts.length === 0 && (
         <div className="rounded-3xl border border-white/10 bg-night-950/60 p-6 text-center text-sm text-ink-400">
-          No products available for this filter. Try another category later tonight.
+          No products available for this category. Try another filter or check back later.
         </div>
       )}
 
@@ -107,7 +107,7 @@ export default function ProductsPage() {
 
       <div className="rounded-3xl border border-white/10 bg-night-900/50 p-5 text-sm text-ink-500">
         <p className="font-semibold text-white">Need curated help?</p>
-        <p>Message our support team on Telegram or email and we’ll recommend a bundle that matches your palette.</p>
+        <p>Message our support team on Telegram or email and we&apos;ll recommend a bundle that suits your taste.</p>
         <Button asChild variant="ghost" className="mt-3 w-full sm:w-auto">
           <a href="mailto:support@greenhub420.co.uk">Contact support</a>
         </Button>

@@ -16,7 +16,7 @@ export default function FavoritesPage() {
     return (
       <StateMessage
         title="Sign in to view favorites"
-        body="Create an account to save your favourite products."
+        body="Sign in or create an account to save your favourite products."
         actionLabel="Go to register"
         onAction={() => router.push("/register")}
       />

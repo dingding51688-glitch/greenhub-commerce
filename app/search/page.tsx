@@ -93,8 +93,8 @@ export default function SearchPage() {
     <section className="space-y-8">
       <header className="rounded-3xl border border-white/10 bg-night-950/80 p-6">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Search</p>
-        <h1 className="text-3xl font-semibold text-white">Find a locker-ready product</h1>
-        <p className="mt-2 text-sm text-white/60">Search by name, strain, or THC potency. Filters refine Strapi results in real time.</p>
+        <h1 className="text-3xl font-semibold text-white">Find a product</h1>
+        <p className="mt-2 text-sm text-white/60">Search by name, strain, or THC potency. Filters refine results in real time.</p>
         <form className="mt-4 flex flex-col gap-3 sm:flex-row" onSubmit={handleSubmit}>
           <input
             type="search"
@@ -104,7 +104,7 @@ export default function SearchPage() {
             className="flex-1 rounded-2xl border border-white/15 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/40"
           />
           <Button type="submit" className="w-full sm:w-auto">
-            Search menu
+            Search products
           </Button>
         </form>
         {recentSearches.length > 0 && (

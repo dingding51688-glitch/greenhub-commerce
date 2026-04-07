@@ -13,7 +13,7 @@ export default function ContactPage() {
       <HeroClassic
         highlight="HOME / CONTACT"
         eyebrow="Contact"
-        title="Talk directly to the Green Hub team"
+        title="Talk directly to the Green Hub 420 team"
         subtitle="Same-day responses, 7 days a week. Ping us about orders, delivery ETA, or wholesale inventory."
         primaryCta={{ label: "Chat on Telegram", href: "https://t.me/greenhub_support" }}
         secondaryCta={{ label: "Email support", href: "mailto:support@greenhub.app" }}

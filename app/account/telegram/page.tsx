@@ -149,7 +149,7 @@ export default function TelegramLinkingPage() {
       <header className="rounded-3xl border border-white/10 bg-card p-6 shadow-card">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Telegram linking</p>
         <h1 className="text-3xl font-semibold text-white">Connect @GreenHubBot for approvals</h1>
-        <p className="mt-2 text-sm text-white/60">Linked accounts receive order updates, referral pings, and concierge verifications inside Telegram.</p>
+        <p className="mt-2 text-sm text-white/60">Linked accounts receive order updates, referral notifications, and support verifications inside Telegram.</p>
       </header>
 
       {stepAlert && (
@@ -255,7 +255,7 @@ export default function TelegramLinkingPage() {
         <h2 className="text-xl font-semibold text-white">Why link Telegram?</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-white/70">
           <li>Instant locker alerts + referral bonuses pushed to your DM.</li>
-          <li>Approve sensitive changes (payouts, device sign-ins) via concierge chat.</li>
+          <li>Approve sensitive changes (payouts, device sign-ins) via support chat.</li>
           <li>Fallback channel when SMS or email is delayed.</li>
         </ul>
         <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">

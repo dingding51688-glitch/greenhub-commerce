@@ -25,7 +25,7 @@ export default function ReferralLeaderboardPage() {
 
   const heroCopy = {
     title: "Top ambassadors",
-    body: "Every quarter we spotlight the members who bring in the most referrals. Top 3 receive a bonus reward and limited merch drop.",
+    body: "Each quarter we spotlight the members who bring in the most referrals. Top 3 receive a bonus reward and a limited merch drop.",
     nextReset: "Reset April 30, 2026"
   };
 

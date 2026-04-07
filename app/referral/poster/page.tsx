@@ -128,7 +128,7 @@ export default function ReferralPosterPage() {
       <header className="space-y-2">
         <Link href="/referral" className="text-xs text-white/40 hover:text-white/60">← Back to referral dashboard</Link>
         <h1 className="text-2xl font-semibold text-white sm:text-3xl">Generate a shareable poster</h1>
-        <p className="text-sm leading-relaxed text-white/70">Drop your invite link + Transfer ID into eye-catching artwork ready for Telegram, Discord, or Instagram stories.</p>
+        <p className="text-sm leading-relaxed text-white/70">Turn your invite link and Transfer ID into eye-catching artwork ready for Telegram, Discord, or Instagram Stories.</p>
       </header>
 
       <div className="grid gap-4 lg:grid-cols-[2fr,1fr]">
