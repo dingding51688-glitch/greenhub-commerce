@@ -19,6 +19,20 @@ const withDevCustomerId = (path: string) => {
 
 const PUBLIC_ENDPOINT_PREFIXES = ["/api/products", "/api/collections"];
 
+/**
+ * Next.js internal API route prefixes — requests to these paths should go
+ * directly to the Next.js server (same origin), NOT through the Strapi
+ * proxy.  Adding NEXT_PUBLIC_API_BASE_URL (/api/strapi) would produce
+ * double-prefixed URLs like /api/strapi/api/account/transfer → 405.
+ */
+const NEXTJS_ROUTE_PREFIXES = [
+  "/api/account/",
+  "/api/auth/",
+  "/api/wallet/",
+  "/api/payments/",
+  "/api/referral/",
+];
+
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   if (!BASE_URL) {
     throw new Error("NEXT_PUBLIC_API_BASE_URL is not configured");
@@ -34,10 +48,21 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
     headers.set("Authorization", `Bearer ${authToken}`);
   }
 
-  const normalizedBase = normalizeBase(BASE_URL);
-  const needsDedup = /\/api\/?$/.test(normalizedBase) && finalPath.startsWith("/api/");
-  const dedupedPath = needsDedup ? finalPath.replace(/^\/api/, "") : finalPath;
-  const response = await fetch(`${normalizedBase}${dedupedPath}`, {
+  // If the path targets a Next.js internal API route, call it directly
+  // without the Strapi proxy base URL prefix.
+  const isNextRoute = NEXTJS_ROUTE_PREFIXES.some((prefix) => finalPath.startsWith(prefix));
+
+  let url: string;
+  if (isNextRoute) {
+    url = finalPath;
+  } else {
+    const normalizedBase = normalizeBase(BASE_URL);
+    const needsDedup = /\/api\/?$/.test(normalizedBase) && finalPath.startsWith("/api/");
+    const dedupedPath = needsDedup ? finalPath.replace(/^\/api/, "") : finalPath;
+    url = `${normalizedBase}${dedupedPath}`;
+  }
+
+  const response = await fetch(url, {
     ...init,
     headers,
     cache: "no-store",
