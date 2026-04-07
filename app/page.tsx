@@ -22,6 +22,45 @@ export default function HomePage() {
 
       <FeaturedCollections />
 
+      {/* ── How Locker Delivery Works ── */}
+      <section className="rounded-3xl border border-white/10 bg-[linear-gradient(135deg,#080808,#050505)] px-5 py-8 shadow-card sm:rounded-[40px] sm:px-12 sm:py-10">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/60">SECURE DELIVERY</p>
+        <h2 className="mt-2 text-xl font-semibold text-white sm:text-3xl">How locker delivery works</h2>
+
+        <div className="mt-8 grid gap-6 sm:grid-cols-3">
+          {[
+            {
+              icon: "📦",
+              title: "Enter your postcode",
+              description: "At checkout, just type your postcode. We\u2019ll find the nearest secure locker automatically.",
+            },
+            {
+              icon: "🔐",
+              title: "Receive your access code",
+              description: "Once dispatched, you\u2019ll get an email with the locker address and a unique access code.",
+            },
+            {
+              icon: "✅",
+              title: "Collect anytime",
+              description: "Head to the locker whenever suits you. Open with your code\u00a0\u2014 no queues, no signatures.",
+            },
+          ].map((step) => (
+            <div
+              key={step.title}
+              className="space-y-3 rounded-3xl border border-white/10 bg-card p-5"
+            >
+              <span className="text-3xl">{step.icon}</span>
+              <h3 className="text-base font-semibold text-white">{step.title}</h3>
+              <p className="text-sm leading-relaxed text-white/70">{step.description}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-emerald-400/30 bg-emerald-400/5 px-4 py-3 text-sm text-emerald-200">
+          🛡️ Secure &amp; Anonymous — No name required, no ID checks. Just your code.
+        </div>
+      </section>
+
       <div id="store-journey">
         <HowItWorksStore {...storeJourneyContent} />
       </div>

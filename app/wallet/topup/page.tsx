@@ -79,9 +79,9 @@ export default function WalletTopupPage() {
     return (
       <section className="px-4 py-10">
         <StateMessage
-          title="请先登录"
-          body="登录后即可创建 NowPayments 充值单。"
-          actionLabel="去登录"
+          title="Please sign in"
+          body="Sign in to create a NowPayments top-up invoice."
+          actionLabel="Go to login"
           onAction={() => router.push("/login")}
         />
       </section>

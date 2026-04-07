@@ -22,8 +22,8 @@ const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "
 /* ── schema (wallet-only, no paymentOption field) ── */
 
 const formSchema = z.object({
-  email: z.string().email("请输入有效的邮箱地址"),
-  postcode: z.string().min(4, "请输入邮编"),
+  email: z.string().email("Please enter a valid email"),
+  postcode: z.string().min(4, "Please enter your postcode"),
 });
 type CheckoutFormValues = z.infer<typeof formSchema>;
 
@@ -81,9 +81,9 @@ export default function CheckoutPage() {
     return (
       <section className="px-4 py-10">
         <StateMessage
-          title="请先登录"
-          body="登录后即可完成下单。"
-          actionLabel="去登录"
+          title="Please sign in"
+          body="Sign in to complete your order."
+          actionLabel="Go to login"
           onAction={() => router.push("/login")}
         />
       </section>
@@ -95,9 +95,9 @@ export default function CheckoutPage() {
       <section className="px-4 py-10">
         <StateMessage
           variant="empty"
-          title="购物车是空的"
-          body="先去挑选一些商品吧。"
-          actionLabel="浏览商品"
+          title="Your cart is empty"
+          body="Browse our products to get started."
+          actionLabel="Browse products"
           onAction={() => router.push("/products")}
         />
       </section>
@@ -155,11 +155,11 @@ export default function CheckoutPage() {
         <div className="space-y-5">
           <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
 
-            {/* 联络信息 */}
+            {/* Delivery details */}
             <div className="space-y-4 rounded-3xl border border-white/10 bg-night-950/70 p-4 sm:p-6">
               <header className="space-y-1">
                 <p className="text-xs uppercase tracking-[0.3em] text-white/50">Contact</p>
-                <h2 className="text-lg font-semibold text-white sm:text-xl">收货信息</h2>
+                <h2 className="text-lg font-semibold text-white sm:text-xl">Delivery details</h2>
               </header>
               <FormField label="Email" error={form.formState.errors.email?.message}>
                 <input
@@ -177,13 +177,15 @@ export default function CheckoutPage() {
                   {...form.register("postcode")}
                 />
               </FormField>
+              <p className="text-xs text-white/50">We&apos;ll assign the nearest locker to your postcode</p>
+              <p className="flex items-start gap-1.5 text-xs leading-relaxed text-emerald-300/80">🔒 Locker assigned within 1–2 hours. You&apos;ll receive the address and access code by email.</p>
             </div>
 
-            {/* Wallet 付款卡片 */}
+            {/* Wallet payment */}
             <div className="space-y-4 rounded-3xl border border-white/10 bg-night-950/70 p-4 sm:p-6">
               <header className="space-y-1">
                 <p className="text-xs uppercase tracking-[0.3em] text-white/50">Payment</p>
-                <h2 className="text-lg font-semibold text-white sm:text-xl">钱包付款</h2>
+                <h2 className="text-lg font-semibold text-white sm:text-xl">Wallet payment</h2>
               </header>
 
               <div className="rounded-2xl border border-emerald-400/40 bg-emerald-400/5 p-4">
@@ -197,17 +199,17 @@ export default function CheckoutPage() {
                   </span>
                 </div>
                 <p className="mt-2 text-sm leading-relaxed text-white/60">
-                  订单金额将从钱包余额中即时扣除，无需额外操作。
+                  Payment will be deducted from your wallet balance instantly.
                 </p>
               </div>
 
-              {/* 余额不足提示 */}
+              {/* Insufficient balance notice */}
               {insufficientBalance && (
                 <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
-                  <p className="font-semibold text-amber-200">余额不足</p>
+                  <p className="font-semibold text-amber-200">Insufficient balance</p>
                   <p className="mt-1 leading-relaxed text-amber-200/70">
-                    需要 {currency.format(subtotal)}，当前余额 {currency.format(walletBalance)}，
-                    差额 {currency.format(subtotal - walletBalance)}。
+                    Required: {currency.format(subtotal)}, current balance {currency.format(walletBalance)},
+                    shortfall {currency.format(subtotal - walletBalance)}.
                   </p>
                   <Button
                     variant="secondary"
@@ -215,7 +217,7 @@ export default function CheckoutPage() {
                     className="mt-3 w-full min-h-[48px] text-base sm:w-auto"
                     onClick={() => router.push("/wallet/topup")}
                   >
-                    去充值
+                    Top up
                   </Button>
                 </div>
               )}
@@ -228,16 +230,16 @@ export default function CheckoutPage() {
               className="w-full min-h-[52px] text-base font-semibold"
             >
               {submitting
-                ? "正在下单…"
+                ? "Placing order…"
                 : insufficientBalance
-                  ? "余额不足，请先充值"
-                  : `支付 ${currency.format(subtotal)}`}
+                  ? "Top up your wallet first"
+                  : `Pay ${currency.format(subtotal)}`}
             </Button>
 
             {insufficientBalance && (
               <p className="text-center text-xs text-white/40">
-                余额不足时无法提交订单。请先
-                <Link href="/wallet/topup" className="text-emerald-300 underline"> 充值</Link>。
+                You need sufficient balance to place an order.
+                <Link href="/wallet/topup" className="text-emerald-300 underline"> Top up</Link>.
               </p>
             )}
           </form>
@@ -247,8 +249,8 @@ export default function CheckoutPage() {
         <aside className="space-y-4">
           <div className="space-y-4 rounded-3xl border border-white/10 bg-night-950/60 p-4 sm:p-5">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs uppercase tracking-[0.3em] text-white/50">订单摘要</h3>
-              <Link href="/cart" className="text-xs text-white/40 hover:text-white/60">修改购物车</Link>
+              <h3 className="text-xs uppercase tracking-[0.3em] text-white/50">Order summary</h3>
+              <Link href="/cart" className="text-xs text-white/40 hover:text-white/60">Edit cart</Link>
             </div>
             <ul className="space-y-3">
               {items.map((item) => (
@@ -257,24 +259,24 @@ export default function CheckoutPage() {
             </ul>
             <div className="space-y-2 border-t border-white/10 pt-3">
               <div className="flex justify-between text-sm text-white/70">
-                <span>小计 ({totalItems} 件)</span>
+                <span>Subtotal ({totalItems} items)</span>
                 <span className="text-white">{currency.format(subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm text-white/70">
-                <span>运费</span>
-                <span className="text-emerald-300">免费</span>
+                <span>Delivery</span>
+                <span className="text-emerald-300">Free</span>
               </div>
               <div className="flex justify-between pt-1 text-base font-semibold text-white">
-                <span>合计</span>
+                <span>Total</span>
                 <span>{currency.format(subtotal)}</span>
               </div>
             </div>
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-night-950/60 p-4 text-sm leading-relaxed text-white/60 sm:p-5">
-            <p className="font-semibold text-white/80">需要帮助？</p>
+            <p className="font-semibold text-white/80">Need help?</p>
             <p className="mt-1">
-              访问 <Link href="/support" className="underline">支持中心</Link> 解决付款或订单问题。
+              Visit our <Link href="/support" className="underline">support centre</Link> for payment or order queries.
             </p>
           </div>
         </aside>

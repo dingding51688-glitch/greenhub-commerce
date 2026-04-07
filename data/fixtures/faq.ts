@@ -30,6 +30,42 @@ const deliveryEntries: FaqEntry[] = [
     question: "What if I miss the pickup?",
     answer: "Reply to the SMS or message us on Telegram @greenhub_support. We can reschedule or arrange redelivery once the courier returns.",
     keywords: ["miss", "pickup"]
+  },
+  {
+    id: "locker-how",
+    question: "How does locker delivery work?",
+    answer: "At checkout, enter your postcode and we'll assign the nearest secure locker. Once your order is dispatched, you'll receive an email with the locker address and a unique access code. Head to the locker at any time, enter your code, and collect your parcel.",
+    keywords: ["locker", "delivery", "postcode"]
+  },
+  {
+    id: "locker-lost-code",
+    question: "What if I lose my access code?",
+    answer: "Check the confirmation email we sent when your order was dispatched. If you still can't find it, contact our support team and we'll reissue a new code for you.",
+    keywords: ["locker", "code", "lost"]
+  },
+  {
+    id: "locker-full",
+    question: "What if the locker is full?",
+    answer: "This is rare, but if it happens we'll automatically assign the next nearest locker and notify you by email with the updated address and code.",
+    keywords: ["locker", "full"]
+  },
+  {
+    id: "locker-identity",
+    question: "Is my identity required?",
+    answer: "No. You don't need to show ID or give your name to collect. Just your access code — that's it. We keep things simple and private.",
+    keywords: ["locker", "identity", "anonymous", "ID"]
+  },
+  {
+    id: "locker-collect-time",
+    question: "How long do I have to collect?",
+    answer: "You have 48 hours from the time we notify you that your order is ready. After that, the parcel is returned to our hub and we'll arrange a re-delivery or refund.",
+    keywords: ["locker", "collect", "time", "48 hours"]
+  },
+  {
+    id: "locker-choose",
+    question: "Can I choose a specific locker?",
+    answer: "Currently, the system assigns the nearest locker based on your postcode. You can't pick a specific unit, but you can update your postcode in your account settings to influence which locker is selected.",
+    keywords: ["locker", "choose", "specific"]
   }
 ];
 

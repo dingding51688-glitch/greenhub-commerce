@@ -42,9 +42,9 @@ export default function WalletTransferPage() {
     return (
       <section className="px-4 py-10">
         <StateMessage
-          title="请先登录"
-          body="登录后即可转账。"
-          actionLabel="去登录"
+          title="Please sign in"
+          body="Sign in to make a transfer."
+          actionLabel="Go to login"
           onAction={() => router.push("/login")}
         />
       </section>
@@ -59,9 +59,9 @@ export default function WalletTransferPage() {
         amount: values.amount,
         memo: values.memo || undefined,
       });
-      setResult({ type: "success", message: `已转账 ${GBP.format(values.amount)} 给 ${values.handle}` });
+      setResult({ type: "success", message: `Transferred ${GBP.format(values.amount)} to ${values.handle}` });
     } catch (err: any) {
-      setResult({ type: "error", message: err?.message || "转账失败" });
+      setResult({ type: "error", message: err?.message || "Transfer failed" });
     }
   };
 
@@ -69,11 +69,11 @@ export default function WalletTransferPage() {
     return (
       <section className="mx-auto max-w-md space-y-6 px-4 py-10 text-center">
         <p className="text-4xl">✅</p>
-        <h1 className="text-2xl font-semibold text-white">转账成功</h1>
+        <h1 className="text-2xl font-semibold text-white">Transfer successful</h1>
         <p className="text-sm text-white/60">{result.message}</p>
         <div className="flex flex-col gap-3">
-          <Button onClick={() => router.push("/wallet")}>返回钱包</Button>
-          <Button variant="secondary" onClick={() => { setResult(null); form.reset(); }}>继续转账</Button>
+          <Button onClick={() => router.push("/wallet")}>Back to wallet</Button>
+          <Button variant="secondary" onClick={() => { setResult(null); form.reset(); }}>Make another transfer</Button>
         </div>
       </section>
     );
@@ -82,16 +82,16 @@ export default function WalletTransferPage() {
   return (
     <section className="mx-auto max-w-md space-y-6 px-4 py-10">
       <header>
-        <Link href="/wallet" className="text-xs text-white/40 hover:text-white/60">← 返回钱包</Link>
-        <h1 className="mt-2 text-2xl font-semibold text-white">转账</h1>
+        <Link href="/wallet" className="text-xs text-white/40 hover:text-white/60">← Back to wallet</Link>
+        <h1 className="mt-2 text-2xl font-semibold text-white">Transfer</h1>
         {balanceData && (
-          <p className="mt-1 text-sm text-white/50">可用余额：{GBP.format(balanceData.balance)}</p>
+          <p className="mt-1 text-sm text-white/50">Available balance: {GBP.format(balanceData.balance)}</p>
         )}
       </header>
 
       <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <div>
-          <label className="block text-xs uppercase tracking-[0.3em] text-white/50 mb-1">收款人 Handle</label>
+          <label className="block text-xs uppercase tracking-[0.3em] text-white/50 mb-1">Recipient handle</label>
           <input
             type="text"
             placeholder="GH-XXXXXXXX"
@@ -104,7 +104,7 @@ export default function WalletTransferPage() {
         </div>
 
         <div>
-          <label className="block text-xs uppercase tracking-[0.3em] text-white/50 mb-1">金额 (£)</label>
+          <label className="block text-xs uppercase tracking-[0.3em] text-white/50 mb-1">Amount (£)</label>
           <input
             type="number"
             step="0.01"
@@ -119,10 +119,10 @@ export default function WalletTransferPage() {
         </div>
 
         <div>
-          <label className="block text-xs uppercase tracking-[0.3em] text-white/50 mb-1">备注（可选）</label>
+          <label className="block text-xs uppercase tracking-[0.3em] text-white/50 mb-1">Memo (optional)</label>
           <input
             type="text"
-            placeholder="例如：分摊订单"
+            placeholder="e.g. splitting an order"
             {...form.register("memo")}
             className={inputCls}
           />
@@ -139,7 +139,7 @@ export default function WalletTransferPage() {
           disabled={form.formState.isSubmitting}
           className="w-full py-3 text-base"
         >
-          {form.formState.isSubmitting ? "转账中…" : "确认转账"}
+          {form.formState.isSubmitting ? "Transferring…" : "Confirm transfer"}
         </Button>
       </form>
     </section>

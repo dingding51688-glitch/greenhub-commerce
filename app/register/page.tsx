@@ -115,6 +115,7 @@ export default function RegisterPage() {
             placeholder="BT1 1AA"
             autoComplete="postal-code"
           />
+          <p className="mt-1 text-[10px] text-ink-500">Used to find the nearest locker for your orders</p>
         </Field>
 
         <Field label="Phone number" error={errors.phone?.message}>

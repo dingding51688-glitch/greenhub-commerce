@@ -69,9 +69,9 @@ export default function WalletPage() {
     return (
       <section className="px-4 py-10">
         <StateMessage
-          title="请先登录"
-          body="登录后查看钱包余额。"
-          actionLabel="去登录"
+          title="Please sign in"
+          body="Sign in to view your wallet balance."
+          actionLabel="Go to login"
           onAction={() => router.push("/login")}
         />
       </section>
@@ -80,15 +80,15 @@ export default function WalletPage() {
 
   return (
     <section className="space-y-6 px-4 py-8">
-      {/* ── 主卡片：余额 + 操作按钮 ── */}
+      {/* ── Balance card + action buttons ── */}
       {balanceLoading ? (
         <Skeleton className="h-56 w-full rounded-3xl" />
       ) : balanceError ? (
         <StateMessage
           variant="error"
-          title="无法加载余额"
+          title="Unable to load balance"
           body={balanceError.message}
-          actionLabel="重试"
+          actionLabel="Retry"
           onAction={() => refreshBalance()}
         />
       ) : balanceData ? (
@@ -103,7 +103,7 @@ export default function WalletPage() {
             · Bonus <span className="font-semibold text-white/80">{GBP.format(balanceData.bonusAwarded)}</span>
           </p>
 
-          {/* User ID 可复制标签 */}
+          {/* User ID copyable badge */}
           <UserIdBadge
             profile={profile}
             transferHandle={customerProfile?.data?.attributes?.transferHandle}
@@ -111,7 +111,7 @@ export default function WalletPage() {
             setCopyToast={setCopyToast}
           />
 
-          {/* 三个操作按钮 — 手机端堆叠，min-h 便于点击 */}
+          {/* Three action buttons — stack on mobile, min-h for easy tapping */}
           <div className="relative mt-5 flex flex-col gap-2.5 sm:flex-row sm:gap-3">
             <Button asChild className="flex-1 min-h-[48px] text-base font-semibold">
               <Link href="/wallet/topup">Top up</Link>
@@ -126,7 +126,7 @@ export default function WalletPage() {
         </div>
       ) : null}
 
-      {/* ── 近期交易 ── */}
+      {/* ── Recent transactions ── */}
       <section>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Recent activity</h2>
@@ -146,13 +146,13 @@ export default function WalletPage() {
         ) : txError ? (
           <StateMessage
             variant="error"
-            title="无法加载交易记录"
+            title="Unable to load transactions"
             body={txError.message}
-            actionLabel="重试"
+            actionLabel="Retry"
             onAction={() => refreshTx()}
           />
         ) : transactions.length === 0 ? (
-          <StateMessage variant="empty" title="暂无记录" body="充值或下单后，交易记录会出现在这里。" />
+          <StateMessage variant="empty" title="No transactions yet" body="Transactions will appear here once you top up or place an order." />
         ) : (
           <div className="divide-y divide-white/5 overflow-hidden rounded-3xl border border-white/10 bg-card">
             {transactions.map((tx) => (
@@ -162,7 +162,7 @@ export default function WalletPage() {
         )}
       </section>
 
-      {/* ── 底部链接 ── */}
+      {/* ── Footer links ── */}
       <div className="flex flex-wrap gap-3 text-sm">
         <Link href="/wallet/withdraw/history" className="text-white/60 underline">Withdrawal history</Link>
         <Link href="/account" className="text-white/40 hover:text-white/60">← Back to account</Link>
