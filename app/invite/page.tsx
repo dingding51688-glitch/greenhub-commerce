@@ -147,6 +147,7 @@ function HeroSection({
             <p className="font-mono text-2xl text-white">{activeCode}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button size="sm" onClick={() => onCopy(inviteUrl, "Invite link copied")}>Copy invite link</Button>
+              <Button size="sm" variant="secondary" onClick={() => onCopy(`${typeof window !== "undefined" ? window.location.origin : ""}/?ref=${activeCode}`, "Homepage link copied")}>Copy homepage link</Button>
               <Link href={`/register?ref=${activeCode}`} className="rounded-full border border-white/20 px-5 py-2 text-sm font-semibold text-white hover:border-white/50">
                 Register now
               </Link>
