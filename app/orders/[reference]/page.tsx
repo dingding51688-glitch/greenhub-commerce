@@ -1,12 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { StateMessage } from "@/components/StateMessage";
 import Button from "@/components/ui/button";
 import { findOrderSummary, getOrderTracking } from "@/lib/orders-api";
 import type { OrderRecord } from "@/lib/types";
+
+function CopyButton({ value, label }: { value: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* fallback */ }
+  }, [value]);
+  return (
+    <button
+      onClick={handleCopy}
+      className="ml-2 inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-white/70 transition hover:bg-white/10 hover:text-white active:scale-95"
+      aria-label={`Copy ${label}`}
+    >
+      {copied ? "✓ Copied" : "Copy"}
+    </button>
+  );
+}
 
 export default function OrderDetailPage({ params }: { params: { reference: string } }) {
   const { token } = useAuth();
@@ -120,21 +140,24 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
         <div className="mt-3 space-y-2">
           <div>
             <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Address</p>
-            <p className="text-base text-white">
-              {lockerAddressDisplay || "Pending"}
-            </p>
+            <div className="flex items-center">
+              <p className="text-base text-white">{lockerAddressDisplay || "Pending"}</p>
+              {lockerAddressDisplay && <CopyButton value={lockerAddressDisplay} label="address" />}
+            </div>
           </div>
           <div>
             <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Yodel tracking number</p>
-            <p className="font-mono text-lg text-white">
-              {order.trackingNumber || "Pending"}
-            </p>
+            <div className="flex items-center">
+              <p className="font-mono text-lg text-white">{order.trackingNumber || "Pending"}</p>
+              {order.trackingNumber && <CopyButton value={order.trackingNumber} label="tracking number" />}
+            </div>
           </div>
           <div>
             <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Access code</p>
-            <p className="font-mono text-lg text-white">
-              {order.lockerAccessCode || "Pending"}
-            </p>
+            <div className="flex items-center">
+              <p className="font-mono text-lg text-white">{order.lockerAccessCode || "Pending"}</p>
+              {order.lockerAccessCode && <CopyButton value={order.lockerAccessCode} label="access code" />}
+            </div>
           </div>
           {order.lockerEta && (
             <p className="text-white/60">ETA: {order.lockerEta}</p>
