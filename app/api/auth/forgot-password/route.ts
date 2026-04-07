@@ -29,8 +29,6 @@ export async function POST(request: Request) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: email.trim().toLowerCase(),
-        // Strapi uses this URL as the base for the reset link in the email
-        url: `${process.env.APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://www.greenhub420.co.uk"}/reset-password`,
       }),
     });
 

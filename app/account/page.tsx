@@ -17,7 +17,7 @@ import { swrFetcher, apiMutate } from "@/lib/api";
 /* ─── constants ─── */
 
 const phoneRegex = /^\+?[0-9]{7,15}$/;
-const telegramRegex = /^@?[a-zA-Z0-9_]{5,32}$/;
+const postcodeRegex = /^[A-Za-z0-9\s]{4,9}$/;
 const inputCls = "w-full rounded-2xl border border-white/15 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none";
 
 /* ─── profile schema ─── */
@@ -25,7 +25,7 @@ const profileSchema = z.object({
   fullName: z.string().nonempty(),
   email: z.string().email(),
   phone: z.string().optional().or(z.literal("")).refine((v) => !v || phoneRegex.test(v), { message: "Enter a valid phone number" }),
-  telegramHandle: z.string().optional().or(z.literal("")).refine((v) => !v || telegramRegex.test(v), { message: "Enter a valid Telegram handle" }),
+  postcode: z.string().optional().or(z.literal("")).refine((v) => !v || postcodeRegex.test(v), { message: "Enter a valid UK postcode" }),
 });
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
@@ -36,7 +36,7 @@ type CustomerProfileResponse = {
       fullName?: string;
       email?: string;
       phone?: string | null;
-      telegramHandle?: string | null;
+      postcode?: string | null;
       transferHandle?: string;
       emailVerifiedAt?: string | null;
       pendingEmail?: string | null;
@@ -207,7 +207,7 @@ function OverviewSection({
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    defaultValues: { fullName: "", email: "", phone: "", telegramHandle: "" },
+    defaultValues: { fullName: "", email: "", phone: "", postcode: "" },
   });
 
   useEffect(() => {
@@ -216,7 +216,7 @@ function OverviewSection({
       fullName: attrs.fullName || profile?.fullName || "",
       email: attrs.email || profile?.email || userEmail || "",
       phone: attrs.phone || "",
-      telegramHandle: attrs.telegramHandle || "",
+      postcode: attrs.postcode || "",
 
     });
   }, [customer, profileForm, profile, userEmail, attrs]);
@@ -237,7 +237,7 @@ function OverviewSection({
     try {
       await apiMutate<{ data?: unknown }>("/api/account/profile", "PUT", {
         phone: values.phone?.trim() || null,
-        telegramHandle: values.telegramHandle ? values.telegramHandle.replace(/^@/, "") : null,
+        postcode: values.postcode?.trim().toUpperCase() || null,
 
       });
       setProfileAlert({ type: "success", message: "Profile updated" });
@@ -312,8 +312,8 @@ function OverviewSection({
             <Field label="Phone" error={profileForm.formState.errors.phone?.message}>
               <input type="tel" placeholder="+44 7700 900000" {...profileForm.register("phone")} className={inputCls} />
             </Field>
-            <Field label="Telegram" error={profileForm.formState.errors.telegramHandle?.message}>
-              <input type="text" placeholder="@your_handle" {...profileForm.register("telegramHandle")} className={inputCls} />
+            <Field label="Postcode" error={profileForm.formState.errors.postcode?.message}>
+              <input type="text" placeholder="BT1 1AA" {...profileForm.register("postcode")} className={inputCls} autoComplete="postal-code" />
             </Field>
           </div>
           {profileAlert && (
