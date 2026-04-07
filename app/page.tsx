@@ -1,19 +1,28 @@
-import { HeroClassic, HowItWorksStore, ProductCategoryCard } from "@/components/sections";
+import { HeroClassic, ProductCategoryCard } from "@/components/sections";
 import { featuredCollectionsContent, homeHeroContent } from "@/data/fixtures/marketing";
 
-const storeJourneyContent = {
-  eyebrow: "Store journey",
-  title: "How ordering works",
-  steps: [
-    { icon: "①", title: "Reserve online", description: "Browse the catalog, add what you need to cart, and confirm checkout with wallet or card." },
-    { icon: "②", title: "We prep & dispatch", description: "Support verifies payment, seals packaging, and texts you tracking + pickup instructions." },
-    { icon: "③", title: "Collect or receive", description: "Head to the pickup point or accept the courier hand-off, then reply DONE so we can reset the slot." }
-  ],
-  tip: {
-    label: "Service coverage",
-    content: "Belfast & Derry orders dispatch same-evening; other NI postcodes leave our hub by 10:00 the next morning."
-  }
-};
+const orderGuideSteps = [
+  {
+    step: 1,
+    title: "Browse & checkout",
+    description: "Pick your products, enter your postcode at checkout, and confirm payment via wallet or card. We handle the rest.",
+  },
+  {
+    step: 2,
+    title: "Locker dispatch notification",
+    description: "When the parcel arrives at the InPost locker, you receive an email + SMS with the pickup code.",
+  },
+  {
+    step: 3,
+    title: "Head to the assigned locker",
+    description: "Visit the selected InPost terminal at any time that suits you within the 72h holding window.",
+  },
+  {
+    step: 4,
+    title: "Scan or enter the code",
+    description: "Enter the pickup digits or scan the QR code at the kiosk. The door pops open and your parcel is inside.",
+  },
+];
 
 export default function HomePage() {
   return (
@@ -22,36 +31,29 @@ export default function HomePage() {
 
       <FeaturedCollections />
 
-      {/* ── How Locker Delivery Works ── */}
-      <section className="rounded-3xl border border-white/10 bg-[linear-gradient(135deg,#080808,#050505)] px-5 py-8 shadow-card sm:rounded-[40px] sm:px-12 sm:py-10">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/60">SECURE DELIVERY</p>
-        <h2 className="mt-2 text-xl font-semibold text-white sm:text-3xl">How locker delivery works</h2>
+      {/* ── Order Guide ── */}
+      <section id="store-journey" className="rounded-3xl border border-white/10 bg-[linear-gradient(135deg,#080808,#050505)] px-5 py-8 shadow-card sm:rounded-[40px] sm:px-12 sm:py-10">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-amber-400/80">ORDER GUIDE</p>
+        <h2 className="mt-2 text-xl font-semibold text-white sm:text-3xl">How your order arrives</h2>
 
-        <div className="mt-8 grid gap-6 sm:grid-cols-3 animate-stagger">
-          {[
-            {
-              icon: "📦",
-              title: "Enter your postcode",
-              description: "At checkout, just type your postcode. We\u2019ll find the nearest secure locker automatically.",
-            },
-            {
-              icon: "🔐",
-              title: "Receive your access code",
-              description: "Once dispatched, you\u2019ll get an email with the locker address and a unique access code.",
-            },
-            {
-              icon: "✅",
-              title: "Collect anytime",
-              description: "Head to the locker whenever suits you. Open with your code\u00a0\u2014 no queues, no signatures.",
-            },
-          ].map((step) => (
-            <div
-              key={step.title}
-              className="space-y-3 rounded-3xl border border-white/10 bg-card p-5"
-            >
-              <span className="text-3xl">{step.icon}</span>
-              <h3 className="text-base font-semibold text-white">{step.title}</h3>
-              <p className="text-sm leading-relaxed text-white/70">{step.description}</p>
+        <div className="relative mt-8 flex flex-col gap-5 animate-stagger">
+          {orderGuideSteps.map((step, i) => (
+            <div key={step.step} className="relative flex gap-5">
+              {/* Timeline connector */}
+              <div className="flex flex-col items-center">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-400 text-sm font-bold text-black">
+                  {step.step}
+                </div>
+                {i < orderGuideSteps.length - 1 && (
+                  <div className="mt-1 w-px flex-1 bg-gradient-to-b from-amber-400/40 to-transparent" />
+                )}
+              </div>
+              {/* Card */}
+              <div className="flex-1 rounded-2xl border border-white/8 bg-white/[0.02] p-5 card-hover">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-amber-400/70">Step {step.step}</p>
+                <h3 className="mt-1.5 text-base font-semibold text-white">{step.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/65">{step.description}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -60,10 +62,6 @@ export default function HomePage() {
           🛡️ Secure &amp; Anonymous — No name required, no ID checks. Just your code.
         </div>
       </section>
-
-      <div id="store-journey">
-        <HowItWorksStore {...storeJourneyContent} />
-      </div>
 
       <SupportCta />
     </div>
