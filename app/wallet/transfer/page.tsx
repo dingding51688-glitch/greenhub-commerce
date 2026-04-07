@@ -17,7 +17,7 @@ const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" 
 const inputCls = "w-full rounded-2xl border border-white/15 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none";
 
 const transferSchema = z.object({
-  handle: z.string().min(3, "Enter recipient handle"),
+  handle: z.string().min(3, "Enter recipient user ID"),
   amount: z.preprocess((v) => Number(v), z.number().min(1, "Min £1")),
   memo: z.string().optional().or(z.literal("")),
 });
@@ -91,7 +91,7 @@ export default function WalletTransferPage() {
 
       <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <div>
-          <label className="block text-xs uppercase tracking-[0.3em] text-white/50 mb-1">Recipient handle</label>
+          <label className="block text-xs uppercase tracking-[0.3em] text-white/50 mb-1">Recipient User ID</label>
           <input
             type="text"
             placeholder="GH-XXXXXXXX"
@@ -119,7 +119,7 @@ export default function WalletTransferPage() {
         </div>
 
         <div>
-          <label className="block text-xs uppercase tracking-[0.3em] text-white/50 mb-1">Memo (optional)</label>
+          <label className="block text-xs uppercase tracking-[0.3em] text-white/50 mb-1">Reference (optional)</label>
           <input
             type="text"
             placeholder="e.g. splitting an order"
