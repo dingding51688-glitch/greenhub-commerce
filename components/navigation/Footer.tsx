@@ -3,7 +3,7 @@ import { footerColumns, footerContact, socialLinks, marketingLinks } from "@/dat
 
 export function Footer() {
   return (
-    <footer className="mt-20 border-t border-white/5 bg-[rgba(5,5,5,0.92)]">
+    <footer className="mt-20 border-t border-white/[0.06] bg-gradient-to-b from-white/[0.02] to-transparent">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-10 md:flex-row">
         <div className="flex-1 space-y-3">
           <p className="text-[10px] uppercase tracking-[0.35em] text-[rgba(255,255,255,0.6)]">GreenHub NI</p>

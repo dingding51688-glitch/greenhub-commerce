@@ -31,7 +31,7 @@ export function HeroClassic(props: Partial<HeroClassicProps>) {
   return (
     <section className={sectionClasses}>
       <div className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(circle at 20% -10%, rgba(19,168,107,0.45), transparent 55%)" }} aria-hidden="true" />
-      <div className={`relative z-10 mx-auto flex max-w-4xl flex-col gap-8 ${textAlignment}`}>
+      <div className={`relative z-10 mx-auto flex max-w-4xl flex-col gap-8 animate-fade-in-up ${textAlignment}`}>
         {content.highlight && (
           <span className={`inline-flex items-center justify-center rounded-pill border border-white/20 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-[rgba(255,255,255,0.7)] ${alignment === "left" ? "self-start" : "self-center"}`}>
             {content.highlight}

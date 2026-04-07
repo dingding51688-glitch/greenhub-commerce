@@ -27,7 +27,7 @@ export default function HomePage() {
         <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/60">SECURE DELIVERY</p>
         <h2 className="mt-2 text-xl font-semibold text-white sm:text-3xl">How locker delivery works</h2>
 
-        <div className="mt-8 grid gap-6 sm:grid-cols-3">
+        <div className="mt-8 grid gap-6 sm:grid-cols-3 animate-stagger">
           {[
             {
               icon: "📦",
@@ -72,7 +72,7 @@ export default function HomePage() {
 
 function FeaturedCollections() {
   return (
-    <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 animate-stagger">
       {featuredCollectionsContent.map((collection) => (
         <ProductCategoryCard key={collection.title} {...collection} />
       ))}

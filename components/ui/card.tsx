@@ -20,7 +20,7 @@ const paddingMap = {
 };
 
 const toneMap: Record<CardTone, string> = {
-  neutral: "bg-[linear-gradient(180deg,#0a0a0a,#050505)]",
+  neutral: "bg-gradient-to-b from-white/[0.03] to-transparent",
   green: "bg-card-green",
   orange: "bg-card-orange"
 };
@@ -44,7 +44,7 @@ export function Card({
   return (
     <section
       className={clsx(
-        "rounded-[32px] text-[rgba(255,255,255,0.85)] backdrop-blur-sm",
+        "rounded-[32px] text-[rgba(255,255,255,0.85)] backdrop-blur-sm card-hover",
         toneMap[tone],
         variantMap[variant],
         paddingMap[padding],

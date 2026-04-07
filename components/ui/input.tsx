@@ -10,11 +10,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     <input
       ref={ref}
       className={clsx(
-        "w-full h-11 rounded-lg bg-night-800/70 border text-white placeholder:text-ink-600",
-        "px-md text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum-500",
+        "w-full h-12 rounded-xl bg-white/[0.03] border text-white placeholder:text-white/35",
+        "px-4 text-sm focus-visible:outline-none input-glow",
         isInvalid
-          ? "border-amber-500 focus-visible:ring-amber-500"
-          : "border-night-700 focus-visible:ring-plum-600",
+          ? "border-amber-500/60 focus-visible:ring-amber-500"
+          : "border-white/10 hover:border-white/15",
         className
       )}
       {...props}

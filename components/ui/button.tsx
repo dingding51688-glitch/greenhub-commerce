@@ -17,11 +17,11 @@ const baseStyles =
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "cta-gradient text-white shadow-cta border border-transparent hover:opacity-95",
+    "cta-gradient text-white shadow-cta border border-white/10 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200",
   secondary:
-    "border border-white/30 text-[rgba(255,255,255,0.85)] hover:text-white hover:border-white/60",
+    "border border-white/20 bg-white/[0.03] text-white/85 backdrop-blur-sm hover:bg-white/[0.06] hover:border-white/40 hover:text-white active:scale-[0.98] transition-all duration-200",
   ghost:
-    "text-[rgba(255,255,255,0.7)] hover:text-white"
+    "text-white/60 hover:text-white hover:bg-white/[0.04] active:scale-[0.98] transition-all duration-200"
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

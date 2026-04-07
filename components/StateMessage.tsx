@@ -14,7 +14,7 @@ export function StateMessage({ title, body, variant = "info", actionLabel, onAct
   return (
     <div
       className={clsx(
-        "rounded-2xl border px-4 py-6 text-center",
+        "rounded-2xl border px-4 py-6 text-center backdrop-blur-sm",
         variant === "error" && "border-red-500/30 bg-red-500/5 text-red-200",
         variant === "empty" && "border-white/10 bg-white/5 text-white/70",
         variant === "info" && "border-brand-500/40 bg-brand-500/10 text-brand-50"

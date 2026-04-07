@@ -18,6 +18,14 @@ const colors = {
   orange: {
     start: "#af5a13",
     end: "#f2a33a"
+  },
+  accent: {
+    DEFAULT: "#a78bfa",
+    dim: "rgba(167,139,250,0.15)"
+  },
+  glass: {
+    DEFAULT: "rgba(255,255,255,0.03)",
+    border: "rgba(255,255,255,0.06)"
   }
 };
 
@@ -46,7 +54,12 @@ const config: Config = {
       boxShadow: {
         header: "var(--gh-shadow-header)",
         card: "var(--gh-shadow-card)",
-        cta: "var(--gh-shadow-cta)"
+        cta: "var(--gh-shadow-cta)",
+        "card-hover": "var(--gh-shadow-card-hover)",
+        glow: "var(--gh-shadow-glow)"
+      },
+      animation: {
+        "fade-in-up": "fadeInUp 0.5s ease-out both"
       },
       backgroundImage: {
         "hero-gradient": "linear-gradient(135deg,#050505,#0f1412)",

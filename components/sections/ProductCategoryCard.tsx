@@ -52,7 +52,7 @@ export function ProductCategoryCard({
   return (
     <Link
       href={href}
-      className="group relative flex min-h-[220px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#050505] text-white shadow-[0_25px_70px_rgba(0,0,0,0.35)] sm:min-h-[260px] sm:flex-row sm:rounded-[40px]"
+      className="group relative flex min-h-[220px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#050505] text-white shadow-[0_25px_70px_rgba(0,0,0,0.35)] sm:min-h-[260px] sm:flex-row sm:rounded-[40px] card-hover"
       style={{ background }}
     >
       <div className="relative z-10 flex w-full flex-col justify-between gap-4 px-4 py-5 sm:w-3/5 sm:gap-5 sm:px-6 sm:py-6">

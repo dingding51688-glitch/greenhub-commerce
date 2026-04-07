@@ -37,7 +37,7 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
   const priceRange = formatPriceRange(product);
 
   return (
-    <Card className="flex flex-col gap-4 bg-night-950/70 p-5">
+    <Card className="flex flex-col gap-4 bg-night-950/70 p-5 card-hover">
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-[radial-gradient(circle_at_top,#0d1b13,#050505)] sm:w-40 sm:flex-none">
           {imageUrl ? (
