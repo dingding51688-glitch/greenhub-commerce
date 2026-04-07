@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => ({}));
-  const { fullName, email, password, phone, telegramHandle, referralCode } = body || {};
+  const { fullName, email, password, phone, postcode, telegramHandle, referralCode } = body || {};
 
   if (!email || !password) {
     return NextResponse.json({ error: { message: "Email and password are required" } }, { status: 400 });
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 
     // 2. Provision customer record (fire-and-forget, don't block registration)
     if (jwt && userId) {
-      provisionCustomer(jwt, userId, email, fullName, referralCode).catch((err) => {
+      provisionCustomer(jwt, userId, email, fullName, referralCode, phone, postcode).catch((err) => {
         console.error("[register] Customer provisioning failed:", err?.message || err);
       });
     }
@@ -64,7 +64,9 @@ async function provisionCustomer(
   userId: number,
   email: string,
   fullName?: string,
-  referralCode?: string
+  referralCode?: string,
+  phone?: string,
+  postcode?: string
 ) {
   const base = getStrapiDirect();
   const headers = {
@@ -78,6 +80,23 @@ async function provisionCustomer(
     await fetch(`${base}/api/customers/me`, { headers, cache: "no-store" });
   } catch {
     // Ignore — the afterCreate lifecycle should have handled it
+  }
+
+  // Update customer with phone/postcode if provided
+  const profileUpdates: Record<string, string> = {};
+  if (phone && typeof phone === "string" && phone.trim()) profileUpdates.phone = phone.trim();
+  if (postcode && typeof postcode === "string" && postcode.trim()) profileUpdates.postcode = postcode.trim().toUpperCase();
+
+  if (Object.keys(profileUpdates).length > 0) {
+    try {
+      await fetch(`${base}/api/customers/me`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify(profileUpdates),
+      });
+    } catch {
+      // Non-critical
+    }
   }
 
   // If referralCode provided, register the referral

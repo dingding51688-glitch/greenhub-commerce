@@ -17,6 +17,7 @@ type RegisterPayload = {
   email: string;
   password: string;
   phone?: string;
+  postcode?: string;
   telegramHandle?: string;
 };
 
@@ -250,12 +251,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const register = useCallback(
-    async ({ fullName, email, password, phone, telegramHandle }: RegisterPayload) => {
+    async ({ fullName, email, password, phone, postcode, telegramHandle }: RegisterPayload) => {
       const referralCode = getStoredReferralCode();
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName, email, password, phone, telegramHandle, referralCode })
+        body: JSON.stringify({ fullName, email, password, phone, postcode, telegramHandle, referralCode })
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) {

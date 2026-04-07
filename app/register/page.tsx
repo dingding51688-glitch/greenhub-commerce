@@ -11,27 +11,32 @@ import Button from "@/components/ui/button";
 
 const registerSchema = z
   .object({
-    fullName: z.string().min(2, "Full name is required"),
+    fullName: z.string().min(2, "Name must be at least 2 characters"),
     email: z.string().email("Enter a valid email"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    confirm: z.string().min(8, "Confirm password"),
+    postcode: z
+      .string()
+      .min(1, "Postcode is required")
+      .regex(/^[A-Za-z0-9\s]{4,9}$/, "Enter a valid UK postcode (e.g. BT1 1AA)"),
     phone: z
       .string()
-      .optional()
-      .refine((value) => !value || /^[+\d\s-]{7,18}$/.test(value), "Phone must be 7-18 digits"),
-    telegramHandle: z
+      .min(1, "Phone number is required")
+      .regex(/^[+\d\s-]{7,18}$/, "Phone must be 7–18 digits (may include +, spaces, dashes)"),
+    password: z
       .string()
-      .optional()
-      .refine((value) => !value || /^@?[A-Za-z0-9_]{5,32}$/.test(value), "Telegram handle is invalid")
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Password must contain at least 1 uppercase letter")
+      .regex(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, "Password must contain at least 1 symbol (!@#$%^&*)"),
+    confirm: z.string().min(1, "Confirm your password"),
   })
   .refine((data) => data.password === data.confirm, {
     path: ["confirm"],
-    message: "Passwords must match"
+    message: "Passwords must match",
   });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-const inputClass = "mt-1 w-full rounded-2xl border border-white/15 bg-transparent px-3 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40";
+const inputClass =
+  "mt-1 w-full rounded-2xl border border-white/15 bg-transparent px-3 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -40,29 +45,31 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false);
   const [countdown, setCountdown] = useState(3);
 
-  /* Auto-redirect after successful registration */
   useEffect(() => {
     if (!success) return;
     const interval = setInterval(() => setCountdown((c) => c - 1), 1000);
     const timeout = setTimeout(() => router.push("/products"), 2000);
-    return () => { clearInterval(interval); clearTimeout(timeout); };
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
   }, [success, router]);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    reset
+    reset,
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       fullName: "",
       email: "",
+      postcode: "",
+      phone: "",
       password: "",
       confirm: "",
-      phone: "",
-      telegramHandle: ""
-    }
+    },
   });
 
   const onSubmit = async (values: RegisterFormValues) => {
@@ -73,8 +80,8 @@ export default function RegisterPage() {
         fullName: values.fullName,
         email: values.email,
         password: values.password,
-        phone: values.phone?.trim() || undefined,
-        telegramHandle: values.telegramHandle?.replace(/^@/, "") || undefined
+        phone: values.phone.trim(),
+        postcode: values.postcode.trim().toUpperCase(),
       });
       setSuccess(true);
       reset({ ...values, password: "", confirm: "" });
@@ -92,27 +99,45 @@ export default function RegisterPage() {
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
-        <Field label="Full name" error={errors.fullName?.message}>
+        <Field label="Name" error={errors.fullName?.message}>
           <input type="text" {...register("fullName")} className={inputClass} placeholder="Jane Doe" />
         </Field>
+
         <Field label="Email" error={errors.email?.message}>
           <input type="email" {...register("email")} className={inputClass} placeholder="you@email.com" />
         </Field>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Telegram handle (optional)" error={errors.telegramHandle?.message}>
-            <input type="text" {...register("telegramHandle")} className={inputClass} placeholder="@greenhub_member" />
-          </Field>
-          <Field label="Phone (optional)" error={errors.phone?.message}>
-            <input type="tel" {...register("phone")} className={inputClass} placeholder="+44 7700 900000" />
-          </Field>
-        </div>
+
+        <Field label="Postcode" error={errors.postcode?.message}>
+          <input
+            type="text"
+            {...register("postcode")}
+            className={inputClass}
+            placeholder="BT1 1AA"
+            autoComplete="postal-code"
+          />
+        </Field>
+
+        <Field label="Phone number" error={errors.phone?.message}>
+          <input
+            type="tel"
+            {...register("phone")}
+            className={inputClass}
+            placeholder="+44 7700 900000"
+            autoComplete="tel"
+          />
+        </Field>
+
         <Field label="Password" error={errors.password?.message}>
           <input type="password" {...register("password")} className={inputClass} placeholder="••••••••" />
+          <p className="mt-1 text-[10px] text-ink-500">Min 8 chars, 1 uppercase, 1 symbol</p>
         </Field>
+
         <Field label="Confirm password" error={errors.confirm?.message}>
           <input type="password" {...register("confirm")} className={inputClass} placeholder="••••••••" />
         </Field>
+
         {submissionError && <p className="text-sm text-red-300">{submissionError}</p>}
+
         <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? "Creating account…" : "Create account"}
         </Button>

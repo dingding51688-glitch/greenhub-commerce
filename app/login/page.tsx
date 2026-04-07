@@ -75,6 +75,11 @@ export default function LoginPage() {
           {errors.password && <p className="mt-1 text-xs text-red-300">{errors.password.message}</p>}
         </label>
         {submissionError && <p className="text-sm text-red-300">{submissionError}</p>}
+        <div className="flex items-center justify-between">
+          <Link href="/forgot-password" className="text-xs text-ink-400 hover:text-white underline">
+            Forgot password?
+          </Link>
+        </div>
         <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? "Signing in…" : "Sign in"}
         </Button>
