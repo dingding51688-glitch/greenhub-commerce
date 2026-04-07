@@ -178,7 +178,6 @@ export default function CheckoutPage() {
                 />
               </FormField>
               <p className="text-xs text-white/50">We&apos;ll assign the nearest locker to your postcode</p>
-              <p className="flex items-start gap-1.5 text-xs leading-relaxed text-emerald-300/80">🔒 Locker assigned within 1–2 hours. You&apos;ll receive the address and access code by email.</p>
             </div>
 
             {/* Wallet payment */}

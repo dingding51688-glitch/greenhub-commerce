@@ -88,6 +88,7 @@ export type OrderRecord = {
   currency: string;
   createdAt?: string;
   updatedAt?: string;
+  contactEmail?: string | null;
   dropoffPostcode?: string | null;
   lockerAddress?: string | null;
   lockerAccessCode?: string | null;

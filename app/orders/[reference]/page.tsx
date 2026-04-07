@@ -53,7 +53,7 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
       <StateMessage
         variant="error"
         title="Order not found"
-        body={error || "We can't locate this reference. Double-check the link or contact concierge."}
+        body={error || "We can't locate this reference. Double-check the link or contact support."}
         actionLabel="Back to account"
         onAction={() => router.push("/account")}
       />
@@ -95,6 +95,26 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
         )}
       </div>
 
+      {(order.contactEmail || order.dropoffPostcode) && (
+        <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
+          <p className="text-xs uppercase tracking-[0.3em] text-white/40">Delivery info</p>
+          <div className="mt-3 space-y-2">
+            {order.contactEmail && (
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Email</p>
+                <p className="text-base text-white">{order.contactEmail}</p>
+              </div>
+            )}
+            {order.dropoffPostcode && (
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Postcode</p>
+                <p className="text-base text-white">{order.dropoffPostcode}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
         <p className="text-xs uppercase tracking-[0.3em] text-white/40">Locker details</p>
         <div className="mt-3 space-y-2">
@@ -124,10 +144,10 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
 
       <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
         <p className="font-semibold text-white">Need to change locker or payment?</p>
-        <p className="mt-1">Contact concierge ASAP if you want to reroute this drop or settle via another method.</p>
+        <p className="mt-1">Contact support if you need to change the locker or payment method.</p>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
           <Button asChild className="w-full sm:w-auto">
-            <a href="/contact">Contact concierge</a>
+            <a href="/support">Contact support</a>
           </Button>
           <Button asChild variant="ghost" className="w-full sm:w-auto">
             <a href="/orders">View all orders</a>
