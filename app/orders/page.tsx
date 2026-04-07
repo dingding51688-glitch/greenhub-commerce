@@ -68,14 +68,15 @@ export default function OrdersPage() {
     return orders.filter((order) => statuses.has(order.status));
   }, [orders, selectedFilter]);
 
-  const summarySource = orders.length ? orders : ordersFixture;
-  const totalOrders = summarySource.length;
-  const totalSpend = summarySource.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
-  const latestOrder = summarySource
-    .slice()
-    .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())[0];
+  const totalOrders = orders.length;
+  const totalSpend = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+  const latestOrder = orders.length
+    ? orders
+        .slice()
+        .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())[0]
+    : null;
 
-  const lastPostcode = latestOrder?.dropoffPostcode || "Assigned";
+  const lastPostcode = latestOrder?.dropoffPostcode || "—";
   const lastOrderAt = latestOrder?.createdAt ? DATE_FMT.format(new Date(latestOrder.createdAt)) : "—";
 
   if (!token) {
