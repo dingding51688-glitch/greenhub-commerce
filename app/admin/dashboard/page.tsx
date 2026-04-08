@@ -59,8 +59,9 @@ interface LeaderEntry {
 
 /* ── Helpers ── */
 const GBP = (n: number) => `£${n.toFixed(2)}`;
-const timeAgo = (iso: string) => {
-  const diff = Date.now() - new Date(iso).getTime();
+const timeAgo = (ts: string | number) => {
+  const time = typeof ts === "number" || /^\d+$/.test(String(ts)) ? Number(ts) : new Date(ts).getTime();
+  const diff = Date.now() - time;
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return "刚刚";
   if (mins < 60) return `${mins}分钟前`;
