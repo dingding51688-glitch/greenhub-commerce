@@ -63,11 +63,9 @@ export async function listNotifications(params?: { page?: number; pageSize?: num
 }
 
 export async function getUnreadCount() {
-  // Use the list route with unreadOnly flag and count from response
-  // This avoids needing a separate endpoint
   try {
-    const response = await authFetch<ListNotificationsResponse>(`${NOTIFICATIONS_ROUTE}?unreadOnly=true&pageSize=100`);
-    return { count: response.data?.filter((n) => !n.read).length ?? 0 };
+    const response = await authFetch<{ success: boolean; unreadCount: number }>(`${NOTIFICATIONS_ROUTE}/unread-count`);
+    return { count: response.unreadCount ?? 0 };
   } catch {
     return { count: 0 };
   }

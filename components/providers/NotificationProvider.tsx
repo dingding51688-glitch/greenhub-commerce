@@ -61,7 +61,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       if (!ids.length || !token) return;
       await apiMarkRead(ids);
       setNotifications((prev) => prev.map((notification) => (ids.includes(notification.id) ? { ...notification, read: true } : notification)));
-      mutateUnread();
+      // Force immediate revalidation of unread count
+      await mutateUnread(undefined, { revalidate: true });
     },
     [mutateUnread, token]
   );
@@ -70,7 +71,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     if (!token) return;
     await apiMarkAllRead();
     setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })));
-    mutateUnread();
+    // Optimistically set to 0 and revalidate
+    await mutateUnread(0, { revalidate: true });
   }, [mutateUnread, token]);
 
   const value = useMemo(
