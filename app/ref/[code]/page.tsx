@@ -9,7 +9,8 @@ type ReferralParams = {
 export default function ReferralRedirectPage({ params }: ReferralParams) {
   const code = params.code?.trim();
   if (!code) {
-    redirect("/invite");
+    redirect("/");
   }
-  redirect(`/invite?ref=${encodeURIComponent(code)}`);
+  // Redirect to homepage with ref param — client-side code will store the code
+  redirect(`/?ref=${encodeURIComponent(code)}`);
 }

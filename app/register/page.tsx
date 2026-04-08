@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/components/providers/AuthProvider";
 import Button from "@/components/ui/button";
+import { getStoredReferralCode, clearStoredReferralCode } from "@/lib/referral-tracking";
 
 const registerSchema = z
   .object({
@@ -40,10 +41,14 @@ const inputClass =
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { register: registerUser } = useAuth();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [countdown, setCountdown] = useState(3);
+
+  // Get referral code from URL param or localStorage
+  const referralCode = searchParams?.get("ref")?.trim() || getStoredReferralCode() || "";
 
   useEffect(() => {
     if (!success) return;
@@ -82,7 +87,9 @@ export default function RegisterPage() {
         password: values.password,
         phone: values.phone.trim(),
         postcode: values.postcode.trim().toUpperCase(),
+        referralCode: referralCode || undefined,
       });
+      clearStoredReferralCode();
       setSuccess(true);
       reset({ ...values, password: "", confirm: "" });
     } catch (error: any) {

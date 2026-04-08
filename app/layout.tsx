@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { CartProvider } from "@/components/providers/CartProvider";
 import { NotificationProvider } from "@/components/providers/NotificationProvider";
 import { DesktopHeader } from "@/components/navigation";
+import { ReferralCapture } from "@/components/ReferralCapture";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <CartProvider>
             <NotificationProvider>
+              <Suspense fallback={null}><ReferralCapture /></Suspense>
               <div className="min-h-screen flex flex-col">
                 <DesktopHeader />
                 <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>

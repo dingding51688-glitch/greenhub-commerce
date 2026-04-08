@@ -19,6 +19,7 @@ type RegisterPayload = {
   phone?: string;
   postcode?: string;
   telegramHandle?: string;
+  referralCode?: string;
 };
 
 type AuthProfile = {

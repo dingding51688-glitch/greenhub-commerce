@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Input } from "@/components/ui";
 import { contactChannels, featuredCollectionsContent } from "@/data/fixtures/marketing";
+import { setStoredReferralCode } from "@/lib/referral-tracking";
 
 const examplePayouts = [
   { label: "50 clicks", amount: "£15.00", description: "£0.30 per click" },
@@ -52,10 +53,19 @@ const MIN_TRANSFER = 20;
 
 export default function InvitePage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const incomingRef = searchParams?.get("ref")?.trim() || "";
   const [customRef, setCustomRef] = useState("");
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
   const [origin, setOrigin] = useState("https://greenhub.app");
+
+  // If visitor arrives via shared invite link (?ref=xxx), store code and redirect to homepage
+  useEffect(() => {
+    if (incomingRef && typeof window !== "undefined") {
+      setStoredReferralCode(incomingRef);
+      router.replace("/?ref=" + encodeURIComponent(incomingRef));
+    }
+  }, [incomingRef, router]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -64,7 +74,7 @@ export default function InvitePage() {
   }, []);
 
   const activeCode = (incomingRef || customRef).toUpperCase();
-  const inviteUrl = activeCode ? `${origin}/register?ref=${encodeURIComponent(activeCode)}` : `${origin}/register`;
+  const inviteUrl = activeCode ? `${origin}/invite?ref=${encodeURIComponent(activeCode)}` : `${origin}/register`;
 
   const handleCopy = async (value: string, toastLabel?: string) => {
     try {
