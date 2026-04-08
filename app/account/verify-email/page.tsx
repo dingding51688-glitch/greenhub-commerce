@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/button";
@@ -14,6 +14,7 @@ export default function VerifyEmailPage() {
   const [message, setMessage] = useState("");
   const [rewardGranted, setRewardGranted] = useState(false);
   const [rewardAmount, setRewardAmount] = useState(0);
+  const calledRef = useRef(false);
 
   useEffect(() => {
     if (!token) {
@@ -22,7 +23,9 @@ export default function VerifyEmailPage() {
       return;
     }
 
-    let cancelled = false;
+    // Prevent double-fire in React StrictMode
+    if (calledRef.current) return;
+    calledRef.current = true;
 
     async function verify() {
       try {
@@ -33,8 +36,6 @@ export default function VerifyEmailPage() {
         });
         const payload = await response.json().catch(() => ({}));
 
-        if (cancelled) return;
-
         if (response.ok && payload.success) {
           setState("success");
           setMessage(payload.message || "Your email has been verified and updated.");
@@ -42,6 +43,13 @@ export default function VerifyEmailPage() {
             setRewardGranted(true);
             setRewardAmount(payload.rewardAmount || 5);
           }
+        } else if (
+          response.status === 400 &&
+          (payload.error?.message || payload.message || "").toLowerCase().includes("already verified")
+        ) {
+          // Token was already consumed — email is verified, show success
+          setState("success");
+          setMessage("Your email has already been verified.");
         } else {
           setState("error");
           setMessage(
@@ -49,15 +57,12 @@ export default function VerifyEmailPage() {
           );
         }
       } catch {
-        if (!cancelled) {
-          setState("error");
-          setMessage("Unable to connect to the server. Please try again later.");
-        }
+        setState("error");
+        setMessage("Unable to connect to the server. Please try again later.");
       }
     }
 
     verify();
-    return () => { cancelled = true; };
   }, [token]);
 
   return (
