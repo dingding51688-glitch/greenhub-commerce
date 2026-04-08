@@ -72,21 +72,28 @@ const timeAgo = (ts: string | number) => {
 
 const STATUS_CN: Record<string, string> = {
   pending: "待处理",
+  paid: "已付款",
   confirmed: "已确认",
   processing: "处理中",
-  shipped: "已发货",
+  dispatched: "已发货",
   delivered: "已完成",
+  canceled: "已取消",
   cancelled: "已取消",
   finished: "已完成",
   waiting: "等待中",
+  awaiting_confirmations: "确认中",
+  expired: "已过期",
+  failed: "失败",
+  refunded: "已退款",
   open: "待处理",
+  new: "新工单",
   closed: "已关闭",
 };
 
 const statusColor = (s: string) => {
-  if (["pending", "waiting", "open", "processing"].includes(s)) return "text-yellow-300 border-yellow-500/30";
-  if (["confirmed", "shipped", "finished", "closed", "delivered"].includes(s)) return "text-green-300 border-green-500/30";
-  if (["cancelled", "failed", "expired"].includes(s)) return "text-red-300 border-red-500/30";
+  if (["pending", "waiting", "open", "processing", "new", "awaiting_confirmations"].includes(s)) return "text-yellow-300 border-yellow-500/30";
+  if (["paid", "confirmed", "dispatched", "finished", "closed", "delivered"].includes(s)) return "text-green-300 border-green-500/30";
+  if (["cancelled", "canceled", "failed", "expired", "refunded"].includes(s)) return "text-red-300 border-red-500/30";
   return "text-white/50 border-white/10";
 };
 
