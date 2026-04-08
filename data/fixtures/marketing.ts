@@ -236,7 +236,7 @@ export type ContactChannel = {
 
 export const contactHeroDetails: ContactHeroDetail[] = [
   { label: "Secure chat", value: "In-app encrypted messenger" },
-  { label: "Operating hours", value: "09:00–21:00 GMT · Mon–Sun" }
+  { label: "Operating hours", value: "12:00–24:00 GMT · Mon–Sun" }
 ];
 
 export const contactChannels: ContactChannel[] = [

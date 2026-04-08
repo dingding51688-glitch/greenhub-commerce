@@ -81,18 +81,6 @@ export default function SupportPage() {
       <header className="rounded-[40px] border border-white/10 bg-night-950/80 p-6">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Customer support</p>
         <h1 className="mt-2 text-3xl font-semibold text-white">We&apos;re available 09:00–21:00 GMT daily</h1>
-        <p className="mt-2 text-sm text-white/70">Telegram is fastest for order queries. Email or SMS for escalations. In emergencies, text HELP + your order reference.</p>
-        <div className="mt-3 flex flex-wrap gap-3">
-          <Button asChild variant="secondary" size="sm">
-            <Link href="/how-it-works">Getting started guide</Link>
-          </Button>
-          <Button asChild variant="secondary" size="sm">
-            <Link href="/guide/payment">Payment guide</Link>
-          </Button>
-          <Button asChild variant="ghost" size="sm">
-            <a href="/invite">Share referral link</a>
-          </Button>
-        </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {contactHeroDetails.map((item) => (
             <div key={item.label} className="rounded-3xl border border-white/15 bg-white/5 p-4 text-sm text-white/80">
