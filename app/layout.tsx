@@ -6,6 +6,7 @@ import { CartProvider } from "@/components/providers/CartProvider";
 import { NotificationProvider } from "@/components/providers/NotificationProvider";
 import { DesktopHeader } from "@/components/navigation";
 import { ReferralCapture } from "@/components/ReferralCapture";
+import { ReferralTrackingProvider } from "@/components/providers/ReferralTrackingProvider";
 import PageTracker from "@/components/tracking/PageTracker";
 
 export const dynamic = "force-dynamic";
@@ -27,11 +28,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CartProvider>
             <NotificationProvider>
               <Suspense fallback={null}><ReferralCapture /></Suspense>
+              <ReferralTrackingProvider>
               <PageTracker />
               <div className="min-h-screen flex flex-col">
                 <DesktopHeader />
                 <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
               </div>
+              </ReferralTrackingProvider>
             </NotificationProvider>
           </CartProvider>
         </AuthProvider>
