@@ -15,6 +15,8 @@ interface Stats {
   shippedOrders: number;
   todayCommission: number;
   allCommission: number;
+  todayBonus: number;
+  allBonus: number;
   totalCustomers: number;
   totalOrders: number;
 }
@@ -270,6 +272,7 @@ export default function DashboardPage() {
               <StatCard icon="⚠️" label="未处理订单" value={stats.pendingOrders} />
               <StatCard icon="📦" label="已发货订单" value={stats.shippedOrders} />
               <StatCard icon="🏅" label="今日佣金" value={GBP(stats.todayCommission)} sub={`总计 ${GBP(stats.allCommission)}`} />
+              <StatCard icon="🎁" label="今日奖励" value={GBP(stats.todayBonus)} sub="邮箱验证/推荐奖励等" />
             </div>
 
             {/* Recent Activity */}
