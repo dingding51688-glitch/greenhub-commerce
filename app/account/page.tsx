@@ -252,11 +252,7 @@ function OverviewSection({
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-white/50">Account Center</p>
-          <h2 className="text-2xl font-semibold text-white">Overview</h2>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href="/account/security" className="text-xs font-semibold uppercase tracking-[0.3em] text-white/60 underline">Security settings</Link>
-          <button onClick={() => refreshCustomer()} className="text-xs font-semibold uppercase tracking-[0.3em] text-white/60 underline">Reload</button>
+          <h2 className="text-2xl font-semibold text-white">Profile</h2>
         </div>
       </div>
 
@@ -386,4 +382,3 @@ function Field({ label, error, children }: { label: string; error?: string; chil
     </label>
   );
 }
-

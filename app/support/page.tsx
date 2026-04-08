@@ -18,19 +18,27 @@ const ticketSchema = z.object({
 
 type TicketFormValues = z.infer<typeof ticketSchema>;
 
-const faqTopics = [
-  { title: "Delivery issues", answer: "Text HELP + your order reference to our SMS hotline (+44 7441 902134) and we reroute within 15 minutes. Include a photo if the parcel looks tampered." },
-  { title: "Payments & balance", answer: "Account top-ups post instantly; bank / crypto confirmations can take up to 30 min. Send receipts to support@greenhub.app if you don't see a balance update." },
-  { title: "Order tracking", answer: "Check /orders for live status. If an order is stuck in 'preparing', message support on Telegram with your reference and we'll expedite it." },
-];
-
-const deliveryFaq = faqCategories.find((category) => category.id === "delivery")?.entries.slice(0, 1) ?? [];
-const paymentFaq = faqCategories.find((category) => category.id === "payment")?.entries.slice(0, 1) ?? [];
-
 const supportFaq = [
-  ...faqTopics,
-  ...deliveryFaq.map((faq) => ({ title: faq.question, answer: faq.answer })),
-  ...paymentFaq.map((faq) => ({ title: faq.question, answer: faq.answer }))
+  {
+    title: "Locker delivery",
+    answer:
+      "Enter your postcode at checkout and we automatically reserve the closest InPost locker. Once the parcel lands, you'll receive an email with the locker address and access code. Lockers are open 24/7 — please collect within 72 hours.",
+  },
+  {
+    title: "Payments & balance",
+    answer:
+      "Top up with USDT (TRC-20); balances display in GBP with live FX. Wallet-to-wallet transfers settle instantly. Withdrawals carry a 3% fee, arrive within 24 hours, and require a £100 minimum (commission earnings count toward that).",
+  },
+  {
+    title: "Track your order",
+    answer:
+      "Open Account → Orders, tap the order number, and you'll see the live status plus the locker tracking ID. We also email you whenever the status changes so you have inbox + dashboard updates.",
+  },
+  {
+    title: "First-time ordering",
+    answer:
+      "Register, browse the menu, and at checkout simply provide your postcode so we can match a locker. We'll email the locker address and access code once it's ready. Tip: start with a small USDT top-up to run through the pickup flow before placing larger orders.",
+  },
 ];
 
 export default function SupportPage() {
