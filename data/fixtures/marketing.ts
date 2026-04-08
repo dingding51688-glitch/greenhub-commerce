@@ -235,7 +235,6 @@ export type ContactChannel = {
 };
 
 export const contactHeroDetails = [
-  { label: "Email", value: "support@greenhub.app", href: "mailto:support@greenhub.app" },
   { label: "Secure chat", value: "In-app encrypted messenger" },
   { label: "Operating hours", value: "09:00–21:00 GMT · Mon–Sun" }
 ];
@@ -247,24 +246,6 @@ export const contactChannels: ContactChannel[] = [
     description: "Fastest replies between 09:00–21:00 GMT. Share your order reference for priority handling.",
     href: "https://t.me/greenhub_support",
     badge: "< 5 min"
-  },
-  {
-    title: "Email support",
-    detail: "support@greenhub.app",
-    description: "Best for delivery changes, payment confirmations, and general support threads.",
-    href: "mailto:support@greenhub.app"
-  },
-  {
-    title: "Wholesale & media",
-    detail: "partners@greenhub.app",
-    description: "For corporate orders, influencer partnerships, or press enquiries.",
-    href: "mailto:partners@greenhub.app"
-  },
-  {
-    title: "SMS hotline",
-    detail: "+44 7441 902134",
-    description: "Pickup or code issues only. Text HELP + your order reference for the on-call agent.",
-    href: "sms:+447441902134"
   }
 ];
 
