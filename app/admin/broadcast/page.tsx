@@ -318,44 +318,38 @@ export default function BroadcastPage() {
                   key={c.id}
                   className="rounded-3xl border border-white/10 bg-[#0b0b0b] p-4"
                 >
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs text-white/40">#{c.id}</span>
-                        <span className={`rounded-full border px-2 py-0.5 text-xs ${st.color}`}>{st.label}</span>
-                        <span className="rounded-full border border-white/10 px-2 py-0.5 text-xs text-white/40">
-                          {AUDIENCE_LABELS[c.audienceType] || c.audienceType}
-                        </span>
-                        {c.channels?.includes("in_app") && <span className="text-xs text-white/40">📱站内</span>}
-                        {c.channels?.includes("email") && <span className="text-xs text-white/40">📧邮件</span>}
-                      </div>
-                      <h3 className="mt-1 font-semibold text-white">{c.title}</h3>
-                      <p className="mt-1 text-sm text-white/60 line-clamp-2">{c.body}</p>
-                      {(c.status === "done" || c.status === "sending") && (
-                        <p className="mt-1 text-xs text-white/40">
-                          已发送 {c.sentCount}/{c.totalRecipients}
-                          {c.failedCount > 0 && <span className="text-red-300"> · {c.failedCount} 失败</span>}
-                        </p>
-                      )}
-                      <p className="mt-1 text-xs text-white/30">
-                        {c.sentAt
-                          ? `发送于 ${new Date(c.sentAt).toLocaleString("zh-CN", { dateStyle: "medium", timeStyle: "short" })}`
-                          : `创建于 ${new Date(c.createdAt).toLocaleString("zh-CN", { dateStyle: "medium", timeStyle: "short" })}`
-                        }
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 gap-2">
-                      {(c.status === "draft" || c.status === "failed") && (
-                        <Button
-                          size="sm"
-                          onClick={() => handleSend(c.id)}
-                          disabled={sending === c.id}
-                        >
-                          {sending === c.id ? "发送中…" : "🚀 发送"}
-                        </Button>
-                      )}
-                    </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs text-white/40">#{c.id}</span>
+                    <span className={`rounded-full border px-2 py-0.5 text-xs ${st.color}`}>{st.label}</span>
+                    <span className="rounded-full border border-white/10 px-2 py-0.5 text-xs text-white/40">
+                      {AUDIENCE_LABELS[c.audienceType] || c.audienceType}
+                    </span>
+                    {c.channels?.includes("in_app") && <span className="text-xs text-white/40">📱站内</span>}
+                    {c.channels?.includes("email") && <span className="text-xs text-white/40">📧邮件</span>}
                   </div>
+                  <h3 className="mt-2 font-semibold text-white">{c.title}</h3>
+                  <p className="mt-1 text-sm text-white/60 line-clamp-2">{c.body}</p>
+                  {(c.status === "done" || c.status === "sending") && (
+                    <p className="mt-2 text-xs text-white/40">
+                      已发送 {c.sentCount}/{c.totalRecipients}
+                      {c.failedCount > 0 && <span className="text-red-300"> · {c.failedCount} 失败</span>}
+                    </p>
+                  )}
+                  <p className="mt-1 text-xs text-white/30">
+                    {c.sentAt
+                      ? `发送于 ${new Date(c.sentAt).toLocaleString("zh-CN", { dateStyle: "medium", timeStyle: "short" })}`
+                      : `创建于 ${new Date(c.createdAt).toLocaleString("zh-CN", { dateStyle: "medium", timeStyle: "short" })}`
+                    }
+                  </p>
+                  {(c.status === "draft" || c.status === "failed") && (
+                    <Button
+                      className="mt-3 w-full"
+                      onClick={() => handleSend(c.id)}
+                      disabled={sending === c.id}
+                    >
+                      {sending === c.id ? "发送中…" : "🚀 确认发送"}
+                    </Button>
+                  )}
                 </article>
               );
             })}
