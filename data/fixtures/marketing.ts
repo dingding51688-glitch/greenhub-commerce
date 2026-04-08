@@ -234,7 +234,7 @@ export type ContactChannel = {
   badge?: string;
 };
 
-export const contactHeroDetails = [
+export const contactHeroDetails: ContactHeroDetail[] = [
   { label: "Secure chat", value: "In-app encrypted messenger" },
   { label: "Operating hours", value: "09:00–21:00 GMT · Mon–Sun" }
 ];
