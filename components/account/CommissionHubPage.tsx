@@ -213,13 +213,14 @@ export default function CommissionHubPage() {
           <HistoryTable
             rows={conversions.map((conversion) => ({
               id: String(
-                conversion.id ?? `${conversion.email ?? 'conversion'}-${conversion.createdAt ?? Date.now()}`
+                conversion.id ?? `${conversion.handle ?? 'conversion'}-${conversion.createdAt ?? Date.now()}`
               ),
-              primary: conversion.email || "Unknown contact",
-              secondary: conversion.locker || "—",
+              primary: conversion.handle || "—",
+              secondary: conversion.status || "pending",
               status: conversion.status || "pending",
               timestamp: conversion.createdAt,
-              amount: conversion.orderValue ?? conversion.commission ?? null
+              amount: conversion.orderValue ?? conversion.commission ?? null,
+              copyValue: conversion.handle || undefined
             }))}
           />
         </div>
@@ -310,11 +311,19 @@ function CommissionTable({ rows }: { rows: CommissionTransaction[] }) {
 function HistoryTable({
   rows
 }: {
-  rows: { id: string; primary: string; secondary?: string | null; status?: string | null; timestamp?: string | null; amount?: number | null }[];
+  rows: { id: string; primary: string; secondary?: string | null; status?: string | null; timestamp?: string | null; amount?: number | null; copyValue?: string }[];
 }) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   if (!rows.length) {
     return <StateMessage variant="empty" title="No conversions yet" body="Share your link to see activity here." />;
   }
+  const handleCopy = async (id: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {}
+  };
   return (
     <div className="space-y-3">
       {rows.map((row) => (
@@ -322,9 +331,16 @@ function HistoryTable({
           key={row.id}
           className="flex flex-col gap-2 rounded-3xl border border-white/10 bg-[#0b0b0b] px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
         >
-          <div>
-            <p className="font-semibold text-white">{row.primary}</p>
-            <p className="text-sm text-white/60">{row.secondary || "—"}</p>
+          <div className="flex items-center gap-2">
+            <p className="font-mono font-semibold text-white">{row.primary}</p>
+            {row.copyValue && (
+              <button
+                onClick={() => handleCopy(row.id, row.copyValue!)}
+                className="shrink-0 rounded-lg border border-white/10 px-2 py-1 text-xs text-white/50 transition hover:border-white/20 hover:text-white/70"
+              >
+                {copiedId === row.id ? "✓" : "Copy"}
+              </button>
+            )}
           </div>
           <div className="flex flex-col items-start gap-2 text-sm text-white/60 sm:flex-row sm:items-center sm:gap-4">
             <StatusPill status={row.status} />

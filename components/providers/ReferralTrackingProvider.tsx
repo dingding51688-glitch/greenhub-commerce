@@ -97,7 +97,7 @@ export function ReferralTrackingProvider({ children }: { children: ReactNode }) 
 
     const body = {
       code,
-      token,
+      turnstileToken: token,
       landingPath,
       utm: utmParams,
       userAgent: navigator.userAgent,

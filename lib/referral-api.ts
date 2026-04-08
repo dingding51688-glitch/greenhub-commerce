@@ -155,8 +155,7 @@ export type CommissionHubTask = {
 
 export type CommissionHubConversion = {
   id: number | string;
-  email?: string;
-  locker?: string;
+  handle?: string;
   status?: string;
   createdAt?: string;
   orderValue?: number;
