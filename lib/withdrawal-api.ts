@@ -24,6 +24,7 @@ const normalizePayload = (payload: CreateWithdrawalPayload) => {
     body.bankFullName = details.accountName;
     body.bankAccountNumber = details.accountNumber;
     body.bankSortCode = details.sortCode;
+    if (details.reference) body.bankReference = details.reference;
   } else if (method === "usdt_wallet") {
     body.usdtNetwork = (details.network || "TRC20").toUpperCase();
     body.usdtAddress = details.address;
