@@ -1,5 +1,13 @@
 import { HeroClassic, ProductCategoryCard } from "@/components/sections";
 import { featuredCollectionsContent, homeHeroContent } from "@/data/fixtures/marketing";
+import { serverFetch } from "@/lib/server-api";
+
+const CMS_BASE = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
+function strapiMedia(path?: string | null): string | undefined {
+  if (!path) return undefined;
+  if (path.startsWith("http")) return path;
+  return `${CMS_BASE}${path}`;
+}
 
 const orderGuideSteps = [
   {
@@ -68,11 +76,32 @@ export default function HomePage() {
   );
 }
 
-function FeaturedCollections() {
+async function FeaturedCollections() {
+  let collections: Array<{ title: string; label?: string; subtitle?: string; href: string; imageUrl?: string; imageAlt?: string; tone?: string }> = featuredCollectionsContent;
+
+  try {
+    const res = await serverFetch<{ data: any[] }>(
+      "/api/collections?filters[featured]=true&populate=cover&sort=sortOrder:asc&pagination[pageSize]=6"
+    );
+    if (res.data?.length) {
+      collections = res.data.map((c: any) => ({
+        title: c.title,
+        label: c.label || undefined,
+        subtitle: c.subtitle || undefined,
+        href: c.href || `/products?category=${c.slug}`,
+        imageUrl: strapiMedia(c.cover?.url) || undefined,
+        imageAlt: c.cover?.alternativeText || c.title,
+        tone: c.tone || "green",
+      }));
+    }
+  } catch {
+    // Fallback to fixtures
+  }
+
   return (
     <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 animate-stagger">
-      {featuredCollectionsContent.map((collection) => (
-        <ProductCategoryCard key={collection.title} {...collection} />
+      {collections.map((collection) => (
+        <ProductCategoryCard key={collection.title} {...collection} tone={collection.tone as any} />
       ))}
     </section>
   );
