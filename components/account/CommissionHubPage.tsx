@@ -27,11 +27,9 @@ const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" 
 
 /* ─── Tier system (matches backend TIER_RATES) ─── */
 const TIERS = [
-  { name: "Starter", emoji: "🌱", min: 0,  rate: 10, color: "text-white/60" },
-  { name: "Bronze",  emoji: "🥉", min: 3,  rate: 10, color: "text-amber-400" },
-  { name: "Silver",  emoji: "🥈", min: 10, rate: 10, color: "text-gray-300" },
-  { name: "Gold",    emoji: "🥇", min: 25, rate: 12, color: "text-yellow-300" },
-  { name: "Diamond", emoji: "💎", min: 50, rate: 15, color: "text-cyan-300" },
+  { name: "Bronze",  emoji: "🥉", min: 0,   rate: 10, color: "text-amber-400" },
+  { name: "Silver",  emoji: "🥈", min: 100, rate: 15, color: "text-gray-300" },
+  { name: "Gold",    emoji: "🥇", min: 200, rate: 20, color: "text-yellow-300" },
 ];
 
 function getTier(conversions: number) {
@@ -308,36 +306,49 @@ export default function CommissionHubPage() {
           )}
         </div>
 
-        {/* Progress bar */}
-        {tierInfo.nextTier && (
-          <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-brand-400 transition-all duration-500"
-              style={{ width: `${tierInfo.progress * 100}%` }}
-            />
-          </div>
-        )}
-        {tierInfo.nextTier && (
-          <p className="mt-1.5 text-[11px] text-white/40 text-right">{totalFriends} / {tierInfo.nextTier.min} friends</p>
-        )}
-
-        {/* Tier roadmap */}
+        {/* Tier roadmap with inline progress bars */}
         <div className="mt-4 border-t border-white/5 pt-3">
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             {TIERS.map((t, i) => {
               const isCurrent = t.name === tierInfo.tier.name;
               const isReached = totalFriends >= t.min;
+              const nextMin = TIERS[i + 1]?.min ?? t.min;
+              const segmentTotal = nextMin - t.min;
+              const segmentProgress = segmentTotal > 0
+                ? Math.min(1, Math.max(0, (totalFriends - t.min) / segmentTotal))
+                : (isReached ? 1 : 0);
+              const isLast = i === TIERS.length - 1;
+
               return (
-                <div key={t.name} className={`flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs ${isCurrent ? "bg-white/5 ring-1 ring-white/10" : ""}`}>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">{t.emoji}</span>
-                    <span className={isReached ? t.color + " font-semibold" : "text-white/30"}>{t.name}</span>
-                    {isCurrent && <span className="rounded-full bg-emerald-400/20 px-1.5 py-px text-[9px] font-bold uppercase text-emerald-300">You</span>}
+                <div key={t.name} className={`rounded-xl px-3 py-2 ${isCurrent ? "bg-white/5 ring-1 ring-white/10" : ""}`}>
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">{t.emoji}</span>
+                      <span className={isReached ? t.color + " font-semibold" : "text-white/30"}>{t.name}</span>
+                      {isCurrent && <span className="rounded-full bg-emerald-400/20 px-1.5 py-px text-[9px] font-bold uppercase text-emerald-300">You</span>}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className={isReached ? "text-white/60" : "text-white/25"}>{t.min === 0 ? "Start" : `${t.min}+ friends`}</span>
+                      <span className={`font-mono font-semibold ${isReached ? "text-emerald-300" : "text-white/25"}`}>{t.rate}%</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className={isReached ? "text-white/60" : "text-white/25"}>{t.min}+ friends</span>
-                    <span className={`font-mono font-semibold ${isReached ? "text-emerald-300" : "text-white/25"}`}>{t.rate}%</span>
-                  </div>
+                  {/* Progress bar for each tier segment */}
+                  {!isLast && (
+                    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          isReached ? "bg-gradient-to-r from-emerald-500 to-brand-400" : "bg-white/5"
+                        }`}
+                        style={{ width: `${segmentProgress * 100}%` }}
+                      />
+                    </div>
+                  )}
+                  {!isLast && isReached && totalFriends < nextMin && (
+                    <p className="mt-1 text-[10px] text-white/40 text-right">{totalFriends} / {nextMin} friends</p>
+                  )}
+                  {isLast && isReached && (
+                    <div className="mt-1.5 h-1.5 w-full rounded-full bg-gradient-to-r from-emerald-500 to-brand-400" />
+                  )}
                 </div>
               );
             })}
