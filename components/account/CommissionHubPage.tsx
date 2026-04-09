@@ -269,7 +269,7 @@ export default function CommissionHubPage() {
 
       {/* ── 3. Stats Grid ── */}
       <div className="grid grid-cols-3 gap-2.5">
-        <StatCard label="Clicks" value={clicks.toString()} sub={`${validClicks} valid · ${GBP.format(clickCommission)}`} />
+        <StatCard label="Clicks" value={validClicks.toString()} sub={GBP.format(clickCommission)} />
         <StatCard label="Friends" value={totalFriends.toString()} sub={conversionRate ? `${(conversionRate * 100).toFixed(0)}% convert` : `${topups} topped up`} />
         <StatCard label="Orders" value={orderCount.toString()} sub="10% commission" />
       </div>
