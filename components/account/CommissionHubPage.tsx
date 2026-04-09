@@ -287,6 +287,7 @@ export default function CommissionHubPage() {
 
       {/* ── 4. Tier Progress ── */}
       <div className="rounded-2xl border border-white/10 bg-card p-4">
+        {/* Current tier header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl">{tierInfo.tier.emoji}</span>
@@ -306,6 +307,8 @@ export default function CommissionHubPage() {
             </div>
           )}
         </div>
+
+        {/* Progress bar */}
         {tierInfo.nextTier && (
           <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
             <div
@@ -314,6 +317,32 @@ export default function CommissionHubPage() {
             />
           </div>
         )}
+        {tierInfo.nextTier && (
+          <p className="mt-1.5 text-[11px] text-white/40 text-right">{totalFriends} / {tierInfo.nextTier.min} friends</p>
+        )}
+
+        {/* Tier roadmap */}
+        <div className="mt-4 border-t border-white/5 pt-3">
+          <div className="flex flex-col gap-1.5">
+            {TIERS.map((t, i) => {
+              const isCurrent = t.name === tierInfo.tier.name;
+              const isReached = totalFriends >= t.min;
+              return (
+                <div key={t.name} className={`flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs ${isCurrent ? "bg-white/5 ring-1 ring-white/10" : ""}`}>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">{t.emoji}</span>
+                    <span className={isReached ? t.color + " font-semibold" : "text-white/30"}>{t.name}</span>
+                    {isCurrent && <span className="rounded-full bg-emerald-400/20 px-1.5 py-px text-[9px] font-bold uppercase text-emerald-300">You</span>}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={isReached ? "text-white/60" : "text-white/25"}>{t.min}+ friends</span>
+                    <span className={`font-mono font-semibold ${isReached ? "text-emerald-300" : "text-white/25"}`}>{t.rate}%</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Tasks removed per request */}
