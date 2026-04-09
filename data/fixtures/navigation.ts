@@ -28,7 +28,7 @@ export type MenuCTAGroup = {
 };
 
 export const menuCtas: MenuCTAGroup = {
-  primary: { label: "Commission hub", href: "/account/commission" },
+  primary: { label: "Earn Hub", href: "/account/commission" },
   secondary: { label: "Recharge balance", href: "/wallet/topup" }
 };
 
@@ -82,7 +82,7 @@ export const footerColumns: FooterColumn[] = [
     links: [
       { label: "Overview", href: "/account" },
       { label: "Wallet", href: "/wallet" },
-      { label: "Commission hub", href: "/referral" }
+      { label: "Earn Hub", href: "/referral" }
     ]
   }
 ];

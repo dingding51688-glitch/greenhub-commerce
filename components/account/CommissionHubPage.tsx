@@ -17,7 +17,28 @@ import {
 } from "@/lib/referral-api";
 import { consumeClickError, getLastTrackedClickTime } from "@/lib/referral-tracking";
 
-const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+
+/* ─── Tier system ─── */
+const TIERS = [
+  { name: "Starter", emoji: "🌱", min: 0, color: "text-white/60" },
+  { name: "Bronze", emoji: "🥉", min: 3, color: "text-amber-400" },
+  { name: "Silver", emoji: "🥈", min: 10, color: "text-gray-300" },
+  { name: "Gold", emoji: "🥇", min: 25, color: "text-yellow-300" },
+  { name: "Diamond", emoji: "💎", min: 50, color: "text-cyan-300" },
+];
+
+function getTier(conversions: number) {
+  let tier = TIERS[0];
+  for (const t of TIERS) {
+    if (conversions >= t.min) tier = t;
+  }
+  const nextTier = TIERS[TIERS.indexOf(tier) + 1];
+  const progress = nextTier
+    ? (conversions - tier.min) / (nextTier.min - tier.min)
+    : 1;
+  return { tier, nextTier, progress: Math.min(1, Math.max(0, progress)), conversions };
+}
 
 export default function CommissionHubPage() {
   const { token } = useAuth();
@@ -63,7 +84,7 @@ export default function CommissionHubPage() {
     return (
       <StateMessage
         variant="error"
-        title="Unable to load commission hub"
+        title="Unable to load Earn Hub"
         body={error?.message || "Please refresh and try again."}
         actionLabel="Retry"
         onAction={() => mutate()}
@@ -72,18 +93,18 @@ export default function CommissionHubPage() {
   }
 
   if (isLoading && !hasSnapshot) {
-    return <StateMessage title="Loading commission hub" body="Fetching your referral data…" />;
+    return <StateMessage title="Loading Earn Hub" body="Fetching your referral data…" />;
   }
 
   if (showEmpty) {
     return (
-      <section className="space-y-6">
+      <section className="space-y-6 px-4 py-8">
         <StateMessage
           variant="empty"
           title="No referrals yet"
           body="Share your referral link to start tracking clicks, conversions, and earnings."
         />
-        <HowItWorksCard />
+        <HowItWorks />
       </section>
     );
   }
@@ -93,43 +114,26 @@ export default function CommissionHubPage() {
   );
 
   const clicks = summary?.clicks ?? 0;
-  const ctr = summary?.ctr ?? 0;
   const registrations = summary?.registrations ?? 0;
   const topups = summary?.topups ?? 0;
   const conversionRate = summary?.conversionRate ?? 0;
   const lifetimeCommission = summary?.bonusEarned ?? 0;
   const clickCommission = summary?.clickPayoutTotal ?? 0;
   const orderCommission = Math.max(0, lifetimeCommission - clickCommission);
+  const monthlyCommission = summary?.monthCommission ?? summary?.thirtyDayCommission ?? 0;
   const summaryLink = summary?.link ?? "";
   const referralCode = summary?.code ?? "—";
   const shareText = encodeURIComponent("Join GreenHub and get great deals. Use my invite link!");
   const shareUrl = summaryLink ? encodeURIComponent(summaryLink) : "";
   const telegramShare = summaryLink ? `https://t.me/share/url?url=${shareUrl}&text=${shareText}` : null;
   const whatsappShare = summaryLink ? `https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}` : null;
-
-  const statCards = [
-      {
-        label: "Clicks",
-        value: clicks.toString(),
-        sub: ctr ? `CTR ${(ctr * 100).toFixed(1)}%` : undefined
-      },
-      {
-        label: "Registrations / Topups",
-        value: `${registrations} / ${topups}`,
-        sub: conversionRate ? `Conversion ${(conversionRate * 100).toFixed(1)}%` : undefined
-      },
-      {
-        label: "Lifetime commission",
-        value: currency.format(lifetimeCommission),
-        sub: `£${clickCommission.toFixed(2)} clicks · £${orderCommission.toFixed(2)} orders`
-      }
-  ];
+  const tierInfo = getTier(registrations);
 
   const handleCopy = async () => {
     if (!summaryLink) return;
     try {
       await navigator.clipboard.writeText(summaryLink);
-      setCopyToast("Link copied");
+      setCopyToast("Copied!");
       setTimeout(() => setCopyToast(null), 2500);
     } catch {
       setCopyToast("Copy failed");
@@ -138,131 +142,175 @@ export default function CommissionHubPage() {
   };
 
   return (
-    <section className="space-y-8">
-      <header className="rounded-3xl border border-white/10 bg-night-950/80 p-4 sm:rounded-[40px] sm:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-white/50">Commission Hub</p>
-            <h1 className="text-2xl font-semibold text-white sm:text-3xl">Share products, earn referral rewards</h1>
-            <p className="text-sm text-white/60">Invite friends and earn commission every time they order.</p>
-          </div>
-          <div className="rounded-2xl border border-white/15 bg-white/5 p-4 text-sm text-white/80 sm:rounded-3xl">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/40">Invite link</p>
-            <p className="mt-1 break-all font-mono text-sm text-white">{summaryLink || "Link pending"}</p>
-            <p className="mt-2 text-xs text-white/60">Referral code: {referralCode || "—"}</p>
-            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-              <Button size="sm" onClick={handleCopy} disabled={!summaryLink} className="min-h-[44px] w-full sm:w-auto">
-                Copy link
-              </Button>
-              {telegramShare ? (
-                <Button asChild variant="secondary" size="sm" className="min-h-[44px] w-full sm:w-auto">
-                  <a href={telegramShare} target="_blank" rel="noreferrer">
-                    Share Telegram
-                  </a>
-                </Button>
-              ) : null}
-              {whatsappShare ? (
-                <Button asChild variant="secondary" size="sm" className="min-h-[44px] w-full sm:w-auto">
-                  <a href={whatsappShare} target="_blank" rel="noreferrer">
-                    Share WhatsApp
-                  </a>
-                </Button>
-              ) : null}
-            </div>
-            {copyToast && <p className="mt-2 text-xs text-emerald-200">{copyToast}</p>}
-          </div>
-        </div>
-      </header>
+    <section className="space-y-5 px-4 py-8">
 
+      {/* ── 1. Hero: Total Earnings ── */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-night-900 via-night-950 to-night-900 p-6 shadow-2xl shadow-brand-600/10">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-emerald-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-brand-500/8 blur-2xl" />
+
+        <p className="relative text-xs font-medium uppercase tracking-[0.3em] text-white/50">💰 Earn Hub</p>
+        <p className="relative mt-2 text-4xl font-extrabold leading-none text-white drop-shadow-sm sm:text-5xl">
+          {GBP.format(lifetimeCommission)}
+        </p>
+        <p className="relative mt-1 text-sm text-white/50">Total earnings</p>
+
+        <div className="relative mt-4 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+          <span className="text-white/60">🔗 Clicks: <span className="font-semibold text-emerald-300">{GBP.format(clickCommission)}</span></span>
+          <span className="text-white/60">🛒 Orders: <span className="font-semibold text-emerald-300">{GBP.format(orderCommission)}</span></span>
+          {monthlyCommission > 0 && (
+            <span className="text-white/60">📅 This month: <span className="font-semibold text-emerald-300">+{GBP.format(monthlyCommission)}</span></span>
+          )}
+        </div>
+      </div>
+
+      {/* ── Commission alert ── */}
       {commissionAlert && (
-        <div className="rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
+        <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
           <p className="font-semibold">{commissionAlert.title}</p>
           <p className="text-white/80">{commissionAlert.message}</p>
         </div>
       )}
 
       {clickWarning && (
-        <div className="rounded-3xl border border-yellow-400/40 bg-yellow-400/10 p-3 text-sm text-yellow-100">
-          We couldn’t record the latest click. Please refresh and try again.
+        <div className="rounded-2xl border border-yellow-400/40 bg-yellow-400/10 p-3 text-sm text-yellow-100">
+          We couldn&apos;t record the latest click. Please refresh and try again.
         </div>
       )}
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        {statCards.map((card) => (
-          <div key={card.label} className="rounded-2xl border border-white/10 bg-card p-4 sm:rounded-3xl">
-            <p className="text-[11px] uppercase tracking-[0.25em] text-white/50 sm:text-xs sm:tracking-[0.3em]">{card.label}</p>
-            <p className="mt-1.5 text-2xl font-semibold text-white sm:mt-2 sm:text-3xl">{card.value}</p>
-            {card.sub && <p className="text-sm text-white/60">{card.sub}</p>}
-          </div>
-        ))}
+      {/* ── 2. Share Section ── */}
+      <div className="rounded-3xl border border-white/10 bg-card p-5">
+        <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/50">📤 Your Invite Link</p>
+        <p className="mt-2 break-all rounded-xl bg-white/5 px-3 py-2.5 font-mono text-sm text-white">
+          {summaryLink || "Link pending…"}
+        </p>
+        <p className="mt-1.5 text-xs text-white/40">Referral code: <span className="font-mono text-white/60">{referralCode}</span></p>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button size="sm" onClick={handleCopy} disabled={!summaryLink} className="min-h-[44px]">
+            {copyToast || "📋 Copy link"}
+          </Button>
+          {whatsappShare && (
+            <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
+              <a href={whatsappShare} target="_blank" rel="noreferrer">📱 WhatsApp</a>
+            </Button>
+          )}
+          {telegramShare && (
+            <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
+              <a href={telegramShare} target="_blank" rel="noreferrer">✈️ Telegram</a>
+            </Button>
+          )}
+          <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
+            <Link href="/referral/poster">📷 Poster</Link>
+          </Button>
+        </div>
       </div>
-      <p className="text-sm text-white/60">Every unique click pays £0.30. Every friend&apos;s order earns you 10% commission — referral earnings never expire.</p>
+
+      {/* ── 3. Stats Grid ── */}
+      <div className="grid grid-cols-3 gap-2.5">
+        <StatCard label="Clicks" value={clicks.toString()} sub={`${GBP.format(0.30)} each`} />
+        <StatCard label="Friends" value={registrations.toString()} sub={conversionRate ? `${(conversionRate * 100).toFixed(0)}% convert` : `${topups} topped up`} />
+        <StatCard label="Orders" value={(summary?.totalConverted ?? conversions.filter(c => c.orderValue).length).toString()} sub="10% commission" />
+      </div>
+
       {lastClickTime && (
-        <p className="text-xs text-white/50">
-          Last click recorded {new Date(lastClickTime).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}
+        <p className="text-xs text-white/40">
+          Last click: {new Date(lastClickTime).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}
         </p>
       )}
 
+      {/* ── 4. Tier Progress ── */}
+      <div className="rounded-2xl border border-white/10 bg-card p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">{tierInfo.tier.emoji}</span>
+            <div>
+              <p className={`font-semibold ${tierInfo.tier.color}`}>{tierInfo.tier.name} Promoter</p>
+              <p className="text-xs text-white/40">{registrations} friends referred</p>
+            </div>
+          </div>
+          {tierInfo.nextTier && (
+            <p className="text-xs text-white/50">
+              {tierInfo.nextTier.min - registrations} more → {tierInfo.nextTier.emoji} {tierInfo.nextTier.name}
+            </p>
+          )}
+        </div>
+        {tierInfo.nextTier && (
+          <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-brand-400 transition-all duration-500"
+              style={{ width: `${tierInfo.progress * 100}%` }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* ── 5. Tasks ── */}
       <TasksPanel tasks={tasks} />
 
+      {/* ── 6. Activity: Conversions + Commission History ── */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-3xl border border-white/10 bg-night-950/70 p-4 sm:rounded-[40px] sm:p-6">
-          <div className="mb-3 flex items-center justify-between sm:mb-4">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/50">Conversions</p>
-          </div>
-          <HistoryTable
-            rows={conversions.map((conversion) => ({
-              id: String(
-                conversion.id ?? `${conversion.handle ?? 'conversion'}-${conversion.createdAt ?? Date.now()}`
-              ),
-              primary: conversion.handle || "—",
-              secondary: conversion.status || "pending",
-              status: conversion.status || "pending",
-              timestamp: conversion.createdAt,
-              amount: conversion.orderValue ?? conversion.commission ?? null,
-              copyValue: conversion.handle || undefined
-            }))}
-          />
+        <div className="rounded-3xl border border-white/10 bg-card p-4">
+          <p className="mb-3 text-xs font-medium uppercase tracking-[0.3em] text-white/50">👥 Conversions</p>
+          <ConversionsList conversions={conversions} />
         </div>
-        <div className="rounded-3xl border border-white/10 bg-night-950/70 p-4 sm:rounded-[40px] sm:p-6">
-          <div className="mb-3 flex items-center justify-between sm:mb-4">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/50">Commission history</p>
+        <div className="rounded-3xl border border-white/10 bg-card p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/50">📊 Commission History</p>
             <Button size="sm" variant="ghost" onClick={() => router.push("/dashboard")}>
               Dashboard
             </Button>
           </div>
-          <CommissionTable rows={history} />
+          <CommissionList rows={history} />
         </div>
       </div>
 
-      <HowItWorksCard />
+      {/* ── 7. How It Works ── */}
+      <HowItWorks />
+
+      {/* ── 8. Rules ── */}
+      <div className="rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-3 text-xs leading-relaxed text-white/40">
+        <p>💡 Every unique click pays <span className="text-white/60">£0.30</span> (24h dedup per visitor). Every friend&apos;s order earns you <span className="text-white/60">10% commission</span>. Referral earnings never expire and are credited to your wallet instantly.</p>
+      </div>
     </section>
+  );
+}
+
+/* ─── Sub-components ─── */
+
+function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-card p-3 text-center">
+      <p className="text-[10px] uppercase tracking-[0.25em] text-white/50">{label}</p>
+      <p className="mt-1 text-2xl font-bold text-white">{value}</p>
+      {sub && <p className="mt-0.5 text-[11px] text-white/40">{sub}</p>}
+    </div>
   );
 }
 
 function TasksPanel({ tasks }: { tasks: CommissionHubTask[] }) {
   if (!tasks.length) return null;
   return (
-    <div className="rounded-3xl border border-white/10 bg-night-950/70 p-4 sm:rounded-[40px] sm:p-6">
-      <p className="mb-3 text-xs uppercase tracking-[0.3em] text-white/50 sm:mb-4">Tasks</p>
-      <div className="space-y-3">
+    <div className="rounded-3xl border border-white/10 bg-card p-4">
+      <p className="mb-3 text-xs font-medium uppercase tracking-[0.3em] text-white/50">🎯 Tasks</p>
+      <div className="space-y-2.5">
         {tasks.map((task) => (
-          <article key={task.id} className="rounded-3xl border border-white/10 bg-[#0b0b0b] p-4">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="font-semibold text-white">{task.title}</p>
-                {task.description && <p className="text-sm text-white/60">{task.description}</p>}
+          <article key={task.id} className="rounded-2xl border border-white/10 bg-white/[0.02] p-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-white truncate">{task.title}</p>
+                {task.description && <p className="text-xs text-white/50 truncate">{task.description}</p>}
               </div>
               {task.rewardLabel && (
-                <span className="rounded-full border border-white/20 px-3 py-1 text-xs uppercase tracking-[0.3em] text-white/70">
+                <span className="shrink-0 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
                   {task.rewardLabel}
                 </span>
               )}
             </div>
             {typeof task.progress === "number" && (
-              <div className="mt-3 h-2 rounded-full bg-white/10">
+              <div className="mt-2 h-1.5 rounded-full bg-white/10">
                 <div
-                  className="h-full rounded-full bg-emerald-400"
+                  className="h-full rounded-full bg-emerald-400 transition-all"
                   style={{ width: `${Math.min(100, Math.max(0, task.progress * 100))}%` }}
                 />
               </div>
@@ -274,49 +322,13 @@ function TasksPanel({ tasks }: { tasks: CommissionHubTask[] }) {
   );
 }
 
-function CommissionTable({ rows }: { rows: CommissionTransaction[] }) {
-  if (!rows.length) {
-    return <StateMessage variant="empty" title="No commissions yet" body="Share your referral link to start earning commission." />;
-  }
-  return (
-    <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-      <table className="w-full min-w-[400px] text-left text-sm text-white/80">
-        <thead className="text-[11px] uppercase tracking-wider text-white/50 sm:text-xs">
-          <tr>
-            <th className="py-2">Amount</th>
-            <th>Type</th>
-            <th>Friend</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.id} className="border-t border-white/10">
-              <td className="py-2 pr-2">{currency.format(row.amount ?? 0)}</td>
-              <td className="pr-2">{row.type || "Commission"}</td>
-              <td className="max-w-[120px] truncate pr-2">{row.sourceInvitee || "—"}</td>
-              <td className="whitespace-nowrap">
-                {row.createdAt
-                  ? new Date(row.createdAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })
-                  : "—"}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function HistoryTable({
-  rows
-}: {
-  rows: { id: string; primary: string; secondary?: string | null; status?: string | null; timestamp?: string | null; amount?: number | null; copyValue?: string }[];
-}) {
+function ConversionsList({ conversions }: { conversions: { id: number | string; handle?: string; status?: string; createdAt?: string; orderValue?: number; commission?: number }[] }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  if (!rows.length) {
+
+  if (!conversions.length) {
     return <StateMessage variant="empty" title="No conversions yet" body="Share your link to see activity here." />;
   }
+
   const handleCopy = async (id: string, value: string) => {
     try {
       await navigator.clipboard.writeText(value);
@@ -324,34 +336,66 @@ function HistoryTable({
       setTimeout(() => setCopiedId(null), 2000);
     } catch {}
   };
+
   return (
-    <div className="space-y-3">
-      {rows.map((row) => (
-        <article
-          key={row.id}
-          className="flex flex-col gap-2 rounded-3xl border border-white/10 bg-[#0b0b0b] px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <div className="flex items-center gap-2">
-            <p className="font-mono font-semibold text-white">{row.primary}</p>
-            {row.copyValue && (
-              <button
-                onClick={() => handleCopy(row.id, row.copyValue!)}
-                className="shrink-0 rounded-lg border border-white/10 px-2 py-1 text-xs text-white/50 transition hover:border-white/20 hover:text-white/70"
-              >
-                {copiedId === row.id ? "✓" : "Copy"}
-              </button>
-            )}
+    <div className="space-y-2">
+      {conversions.map((c) => {
+        const id = String(c.id ?? `${c.handle ?? "c"}-${c.createdAt ?? Date.now()}`);
+        return (
+          <div key={id} className="flex items-center justify-between gap-2 rounded-xl bg-white/[0.03] px-3 py-2.5">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="font-mono text-sm font-semibold text-white truncate">{c.handle || "—"}</span>
+              {c.handle && (
+                <button
+                  onClick={() => handleCopy(id, c.handle!)}
+                  className="shrink-0 text-[10px] text-white/30 hover:text-white/50"
+                >
+                  {copiedId === id ? "✓" : "📋"}
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-3 shrink-0 text-xs">
+              <StatusPill status={c.status} />
+              {(c.orderValue ?? c.commission) != null && (
+                <span className="text-emerald-300 font-semibold">{GBP.format(c.orderValue ?? c.commission ?? 0)}</span>
+              )}
+              <span className="text-white/30">
+                {c.createdAt ? new Date(c.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "—"}
+              </span>
+            </div>
           </div>
-          <div className="flex flex-col items-start gap-2 text-sm text-white/60 sm:flex-row sm:items-center sm:gap-4">
-            <StatusPill status={row.status} />
-            {row.amount != null && <span>{currency.format(row.amount)}</span>}
-            <span>
-              {row.timestamp
-                ? new Date(row.timestamp).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })
-                : "—"}
+        );
+      })}
+    </div>
+  );
+}
+
+function CommissionList({ rows }: { rows: CommissionTransaction[] }) {
+  if (!rows.length) {
+    return <StateMessage variant="empty" title="No commissions yet" body="Share your referral link to start earning." />;
+  }
+
+  return (
+    <div className="space-y-2">
+      {rows.map((row) => (
+        <div key={row.id} className="flex items-center justify-between gap-2 rounded-xl bg-white/[0.03] px-3 py-2.5">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm">{row.type === "click_bonus" || row.type === "referral_click_bonus" ? "🔗" : "🛒"}</span>
+              <p className="text-sm text-white truncate">
+                {row.type === "click_bonus" || row.type === "referral_click_bonus"
+                  ? "Click reward"
+                  : row.sourceInvitee ? `From ${row.sourceInvitee}` : "Commission"}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="text-sm font-semibold text-emerald-300">+{GBP.format(row.amount ?? 0)}</span>
+            <span className="text-[11px] text-white/30">
+              {row.createdAt ? new Date(row.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "—"}
             </span>
           </div>
-        </article>
+        </div>
       ))}
     </div>
   );
@@ -359,40 +403,50 @@ function HistoryTable({
 
 function StatusPill({ status }: { status?: string | null }) {
   if (!status) {
-    return <span className="rounded-full border border-white/20 px-3 py-1 text-xs uppercase tracking-[0.3em] text-white/60">Pending</span>;
+    return <span className="rounded-full border border-white/20 px-2 py-0.5 text-[10px] uppercase text-white/50">Pending</span>;
   }
   const palette: Record<string, string> = {
     paid: "bg-emerald-400/10 text-emerald-200 border-emerald-400/40",
     active: "bg-brand-500/10 text-brand-200 border-brand-500/40",
     completed: "bg-emerald-400/10 text-emerald-200 border-emerald-400/40",
     pending: "bg-yellow-400/10 text-yellow-200 border-yellow-400/40",
-    processing: "bg-blue-400/10 text-blue-200 border-blue-400/40"
+    processing: "bg-blue-400/10 text-blue-200 border-blue-400/40",
   };
   const key = status.toLowerCase();
   const classes = palette[key] || "bg-white/5 text-white/70 border-white/20";
-  return <span className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.3em] ${classes}`}>{formatStatus(status)}</span>;
-}
-
-function formatStatus(label: string) {
-  return label
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
-function HowItWorksCard() {
   return (
-    <div className="rounded-3xl border border-white/10 bg-night-950/60 p-4 sm:rounded-[40px] sm:p-6">
-      <h2 className="text-xl font-semibold text-white sm:text-2xl">How referrals work</h2>
-      <ol className="mt-3 list-decimal space-y-2 pl-6 text-sm leading-relaxed text-white/70">
-        <li>Share your invite link with trusted friends.</li>
-        <li>They sign up and browse our products.</li>
-        <li>When they place an order, 10% of their spend is credited to your wallet as referral earnings.</li>
-      </ol>
+    <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase ${classes}`}>
+      {status.replace(/_/g, " ")}
+    </span>
+  );
+}
+
+function HowItWorks() {
+  return (
+    <div className="rounded-3xl border border-white/10 bg-card p-5">
+      <h2 className="text-lg font-semibold text-white">How it works</h2>
+      <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+        <div>
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/10 text-2xl">📤</div>
+          <p className="mt-2 text-sm font-semibold text-white">Share</p>
+          <p className="mt-0.5 text-xs text-white/50">Send your invite link to friends</p>
+        </div>
+        <div>
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-2xl">🛒</div>
+          <p className="mt-2 text-sm font-semibold text-white">They Shop</p>
+          <p className="mt-0.5 text-xs text-white/50">Friends sign up and place orders</p>
+        </div>
+        <div>
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 text-2xl">💰</div>
+          <p className="mt-2 text-sm font-semibold text-white">You Earn</p>
+          <p className="mt-0.5 text-xs text-white/50">£0.30/click + 10% of orders</p>
+        </div>
+      </div>
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-3">
-        <Button asChild className="w-full min-h-[48px] sm:w-auto">
+        <Button asChild className="w-full min-h-[44px] sm:w-auto">
           <a href="/contact">Contact support</a>
         </Button>
-        <Button variant="ghost" asChild className="w-full min-h-[48px] sm:w-auto">
+        <Button variant="ghost" asChild className="w-full min-h-[44px] sm:w-auto">
           <Link href="/referral/poster">Poster generator</Link>
         </Button>
       </div>
