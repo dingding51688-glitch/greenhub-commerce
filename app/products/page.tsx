@@ -11,7 +11,7 @@ import { swrFetcher } from "@/lib/api";
 import type { ProductRecord, ProductsResponse } from "@/lib/types";
 import { productCategoryContent, type ProductCategoryKey } from "@/data/fixtures/products";
 
-const CATEGORY_TABS: ProductCategoryKey[] = ["shop-all", "flowers", "pre-rolls", "vapes"];
+const CATEGORY_TABS: ProductCategoryKey[] = ["shop-all", "flowers", "pre-rolls", "vapes", "edibles", "hash"];
 
 function resolveCategory(value: string | null): ProductCategoryKey {
   if (value && CATEGORY_TABS.includes(value as ProductCategoryKey)) {

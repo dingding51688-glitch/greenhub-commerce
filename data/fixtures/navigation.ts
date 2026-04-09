@@ -18,6 +18,8 @@ export const primaryNav: NavItem[] = [
   { label: "Flowers", href: "/products?category=flowers" },
   { label: "Pre-rolls", href: "/products?category=pre-rolls" },
   { label: "Vapes", href: "/products?category=vapes" },
+  { label: "Edibles", href: "/products?category=edibles" },
+  { label: "Hash", href: "/products?category=hash" },
   { label: "Ordering guide", href: "/how-it-works", match: "exact" },
   { label: "Support", href: "/support", match: "exact" }
 ];
@@ -66,7 +68,9 @@ export const footerColumns: FooterColumn[] = [
     links: [
       { label: "All products", href: "/products" },
       { label: "Flowers", href: "/products?category=flowers" },
-      { label: "Vapes", href: "/products?category=vapes" }
+      { label: "Vapes", href: "/products?category=vapes" },
+      { label: "Edibles", href: "/products?category=edibles" },
+      { label: "Hash", href: "/products?category=hash" }
     ]
   },
   {

@@ -1,4 +1,4 @@
-export type ProductCategoryKey = "shop-all" | "flowers" | "pre-rolls" | "vapes";
+export type ProductCategoryKey = "shop-all" | "flowers" | "pre-rolls" | "vapes" | "edibles" | "hash";
 
 export type ProductCategoryContent = {
   breadcrumb: string;
@@ -32,6 +32,18 @@ export const productCategoryContent: Record<ProductCategoryKey, ProductCategoryC
     title: "Full-ceramic carts & pods",
     description: "Live resin and distillate carts with heavy metal testing on file. Works with Bloom pods or 510 batteries.",
     filter: { param: "filters[collection][slug][$eqi]", value: "vapes" }
+  },
+  edibles: {
+    breadcrumb: "HOME / SHOP ALL / EDIBLES",
+    title: "Gummies, chocolates & more",
+    description: "Lab-tested edibles with precise dosing. From fruity gummies to rich chocolates — discreet and delicious.",
+    filter: { param: "filters[collection][slug][$eqi]", value: "edibles" }
+  },
+  hash: {
+    breadcrumb: "HOME / SHOP ALL / HASH",
+    title: "Premium pressed hash",
+    description: "Traditional and modern hash varieties. Hand-pressed, dry-sift, and bubble hash from top cultivars.",
+    filter: { param: "filters[collection][slug][$eqi]", value: "hash" }
   }
 };
 
