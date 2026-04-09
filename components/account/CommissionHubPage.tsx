@@ -513,12 +513,9 @@ function HowItWorks() {
           <p className="mt-0.5 text-xs text-white/50">£0.30/click + 10% of orders</p>
         </div>
       </div>
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-3">
+      <div className="mt-4">
         <Button asChild className="w-full min-h-[44px] sm:w-auto">
           <a href="/contact">Contact support</a>
-        </Button>
-        <Button variant="ghost" asChild className="w-full min-h-[44px] sm:w-auto">
-          <Link href="/referral/poster">Poster generator</Link>
         </Button>
       </div>
     </div>
