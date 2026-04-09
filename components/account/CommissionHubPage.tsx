@@ -17,6 +17,7 @@ import {
 } from "@/lib/referral-api";
 import { consumeClickError, getLastTrackedClickTime } from "@/lib/referral-tracking";
 import dynamic from "next/dynamic";
+import { useRef, useCallback } from "react";
 
 const QRCode = dynamic(
   () => import("qrcode.react").then((mod) => mod.QRCodeCanvas ?? mod.default),
@@ -53,6 +54,7 @@ export default function CommissionHubPage() {
   const [copyToast, setCopyToast] = useState<string | null>(null);
   const [lastClickTime, setLastClickTime] = useState<number | null>(null);
   const [clickWarning, setClickWarning] = useState(false);
+  const qrRef = useRef<HTMLDivElement>(null);
 
   const { data, error, isLoading, mutate } = useSWR<CommissionHubSnapshot>(
     token ? "commission-hub" : null,
@@ -120,8 +122,10 @@ export default function CommissionHubPage() {
   );
 
   const clicks = summary?.clicks ?? 0;
+  const validClicks = summary?.validClicks ?? 0;
   const totalFriends = summary?.totalInvites ?? conversions.length;
   const registrations = summary?.registrations ?? 0;
+  const orderCount = history.filter(h => h.type === "订单佣金" || h.type === "topup_commission" || h.type === "commission").length;
   const topups = summary?.topups ?? 0;
   const conversionRate = summary?.conversionRate ?? 0;
   const lifetimeCommission = summary?.bonusEarned ?? 0;
@@ -189,10 +193,54 @@ export default function CommissionHubPage() {
       <div className="rounded-3xl border border-white/10 bg-card p-5">
         <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/50">📤 Your Invite Link</p>
         <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start">
-          {/* QR Code */}
+          {/* QR Code - tap to copy/save */}
           {summaryLink && (
-            <div className="shrink-0 self-center rounded-xl bg-white p-2 sm:self-start">
-              <QRCode value={summaryLink} size={120} />
+            <div className="shrink-0 self-center sm:self-start">
+              <div ref={qrRef} className="rounded-xl bg-white p-3">
+                <QRCode value={summaryLink} size={120} />
+              </div>
+              <div className="mt-1.5 flex justify-center gap-2">
+                <button
+                  onClick={async () => {
+                    try {
+                      const canvas = qrRef.current?.querySelector("canvas");
+                      if (!canvas) return;
+                      const blob = await new Promise<Blob | null>(r => (canvas as HTMLCanvasElement).toBlob(r, "image/png"));
+                      if (blob) {
+                        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+                        setCopyToast("QR copied!");
+                        setTimeout(() => setCopyToast(null), 2000);
+                      }
+                    } catch {
+                      // Fallback: download instead
+                      const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
+                      if (canvas) {
+                        const a = document.createElement("a");
+                        a.href = canvas.toDataURL("image/png");
+                        a.download = "greenhub-invite-qr.png";
+                        a.click();
+                      }
+                    }
+                  }}
+                  className="text-[10px] text-white/40 hover:text-white/60"
+                >
+                  📋 Copy QR
+                </button>
+                <button
+                  onClick={() => {
+                    const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
+                    if (canvas) {
+                      const a = document.createElement("a");
+                      a.href = canvas.toDataURL("image/png");
+                      a.download = "greenhub-invite-qr.png";
+                      a.click();
+                    }
+                  }}
+                  className="text-[10px] text-white/40 hover:text-white/60"
+                >
+                  ⬇ Save
+                </button>
+              </div>
             </div>
           )}
           <div className="flex-1 min-w-0">
@@ -221,9 +269,9 @@ export default function CommissionHubPage() {
 
       {/* ── 3. Stats Grid ── */}
       <div className="grid grid-cols-3 gap-2.5">
-        <StatCard label="Clicks" value={clicks.toString()} sub={`${GBP.format(0.30)} each`} />
+        <StatCard label="Clicks" value={clicks.toString()} sub={`${validClicks} valid · ${GBP.format(clickCommission)}`} />
         <StatCard label="Friends" value={totalFriends.toString()} sub={conversionRate ? `${(conversionRate * 100).toFixed(0)}% convert` : `${topups} topped up`} />
-        <StatCard label="Orders" value={(summary?.totalConverted ?? conversions.filter(c => (c.orderValue ?? c.commission ?? 0) > 0).length).toString()} sub="10% commission" />
+        <StatCard label="Orders" value={orderCount.toString()} sub="10% commission" />
       </div>
 
       {lastClickTime && (
@@ -388,24 +436,34 @@ function CommissionList({ rows }: { rows: CommissionTransaction[] }) {
     return <StateMessage variant="empty" title="No commissions yet" body="Share your referral link to start earning." />;
   }
 
+  const isClick = (type?: string) => type === "click_bonus" || type === "referral_click_bonus" || type === "点击奖励";
+
   return (
     <div className="space-y-2">
       {rows.map((row) => (
-        <div key={row.id} className="flex items-center justify-between gap-2 rounded-xl bg-white/[0.03] px-3 py-2.5">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm">{row.type === "click_bonus" || row.type === "referral_click_bonus" ? "🔗" : "🛒"}</span>
-              <p className="text-sm text-white truncate">
-                {row.type === "click_bonus" || row.type === "referral_click_bonus"
-                  ? "Click reward"
-                  : row.sourceInvitee ? `From ${row.sourceInvitee}` : "Commission"}
-              </p>
+        <div key={row.id} className="rounded-xl bg-white/[0.03] px-3 py-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm">{isClick(row.type) ? "🔗" : "🛒"}</span>
+                <p className="text-sm font-medium text-white truncate">
+                  {isClick(row.type)
+                    ? "Click reward"
+                    : row.sourceInvitee ? `Order commission` : "Commission"}
+                </p>
+              </div>
             </div>
+            <span className="text-sm font-semibold text-emerald-300 shrink-0">+{GBP.format(row.amount ?? 0)}</span>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <span className="text-sm font-semibold text-emerald-300">+{GBP.format(row.amount ?? 0)}</span>
-            <span className="text-[11px] text-white/30">
-              {row.createdAt ? new Date(row.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "—"}
+          {/* Detail line */}
+          <div className="mt-1 flex items-center gap-2 text-[11px] text-white/40">
+            {row.sourceInvitee && !isClick(row.type) && (
+              <span>From <span className="font-mono text-white/60">{row.sourceInvitee}</span></span>
+            )}
+            {isClick(row.type) && <span>£0.30 per valid click</span>}
+            {row.reference && <span className="font-mono truncate">{row.reference}</span>}
+            <span className="ml-auto shrink-0">
+              {row.createdAt ? new Date(row.createdAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}
             </span>
           </div>
         </div>
