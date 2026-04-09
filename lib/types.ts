@@ -16,9 +16,32 @@ export type WalletTransaction = {
   reference: string;
   description?: string;
   reviewStatus?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
   createdAt?: string;
-  balanceBefore?: number;
-  balanceAfter?: number;
+  updatedAt?: string;
+  balanceBefore?: number | null;
+  balanceAfter?: number | null;
+  relatedOrder?: {
+    id: number;
+    reference: string;
+    status: string;
+    totalAmount: number;
+    items?: { title?: string; name?: string; quantity?: number; unitPrice?: number; lineTotal?: number; weight?: string }[];
+    trackingNumber?: string;
+    carrier?: string;
+    lockerAddress?: string;
+    lockerAccessCode?: string;
+    deliveredAt?: string;
+    dispatchedAt?: string;
+    dropoffPostcode?: string;
+  } | null;
+  relatedTopup?: {
+    id: number;
+    amount: number;
+    status: string;
+    paymentMethod?: string;
+  } | null;
 };
 
 export type WalletTransactionsResponse = {

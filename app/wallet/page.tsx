@@ -237,63 +237,69 @@ function UserIdBadge({
   );
 }
 
+
+const TX_TYPE_ICONS: Record<string, string> = {
+  withdrawal: "💳",
+  transfer_out: "↗️",
+  transfer_in: "↙️",
+  bonus: "🎁",
+  topup: "💰",
+  commission: "🤝",
+  purchase: "🛒",
+  referral_click_bonus: "🔗",
+};
+
+const WD_STATUS: Record<string, { label: string; color: string }> = {
+  pending: { label: "⏳ Pending", color: "text-amber-300" },
+  approved: { label: "✅ Approved", color: "text-emerald-300" },
+  paid: { label: "💸 Paid", color: "text-brand-200" },
+  rejected: { label: "❌ Rejected", color: "text-red-300" },
+};
+
 function TxRow({ tx, link, onNavigate }: { tx: WalletTransaction; link?: string | null; onNavigate?: (href: string) => void }) {
   const isWithdrawal = tx.type === "withdrawal" && tx.reference?.startsWith("withdrawal-");
+  const isOrderLink = !!link;
   const [expanded, setExpanded] = useState(false);
-  const [detail, setDetail] = useState<WithdrawalDetail | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [wdDetail, setWdDetail] = useState<WithdrawalDetail | null>(null);
+  const [wdLoading, setWdLoading] = useState(false);
 
   const withdrawalId = isWithdrawal ? tx.reference.replace("withdrawal-", "") : null;
 
   const handleClick = useCallback(async () => {
-    if (link && onNavigate) {
+    if (isOrderLink && link && onNavigate) {
       onNavigate(link);
       return;
     }
-    if (isWithdrawal && withdrawalId) {
-      if (expanded) {
-        setExpanded(false);
-        return;
-      }
-      setExpanded(true);
-      if (!detail) {
-        setLoading(true);
-        try {
-          const res = await apiFetch<{ success: boolean; data: WithdrawalDetail }>(`/api/account/withdrawals/${withdrawalId}`);
-          if (res?.data) setDetail(res.data);
-        } catch { /* ignore */ }
-        setLoading(false);
-      }
+    if (expanded) { setExpanded(false); return; }
+    setExpanded(true);
+    if (isWithdrawal && withdrawalId && !wdDetail) {
+      setWdLoading(true);
+      try {
+        const res = await apiFetch<{ success: boolean; data: WithdrawalDetail }>(`/api/account/withdrawals/${withdrawalId}`);
+        if (res?.data) setWdDetail(res.data);
+      } catch { /* ignore */ }
+      setWdLoading(false);
     }
-  }, [link, onNavigate, isWithdrawal, withdrawalId, expanded, detail]);
+  }, [isOrderLink, link, onNavigate, expanded, isWithdrawal, withdrawalId, wdDetail]);
 
-  const isClickable = !!link || isWithdrawal;
-
-  const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-    pending: { label: "⏳ Pending", color: "text-amber-300" },
-    approved: { label: "✅ Approved", color: "text-emerald-300" },
-    paid: { label: "💸 Paid", color: "text-brand-200" },
-    rejected: { label: "❌ Rejected", color: "text-red-300" },
-  };
+  const icon = TX_TYPE_ICONS[tx.type] || "📄";
 
   return (
     <div>
       <button
         type="button"
         onClick={handleClick}
-        className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left ${
-          isClickable ? "transition hover:bg-white/5 focus-visible:bg-white/10 focus-visible:outline-none cursor-pointer" : ""
-        }`}
-        aria-label={isClickable ? `View details for ${tx.reference}` : undefined}
+        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-white/5 focus-visible:bg-white/10 focus-visible:outline-none cursor-pointer"
       >
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
+            <span className="text-sm">{icon}</span>
             <p className="text-sm font-semibold capitalize text-white truncate">{tx.type.replace(/_/g, " ")}</p>
-            {isWithdrawal && (
+            {!isOrderLink && (
               <span className="text-[10px] text-white/30">{expanded ? "▼" : "▶"}</span>
             )}
           </div>
-          <p className={`text-[11px] truncate ${isClickable ? "text-brand-200" : "text-white/40"}`}>{tx.reference}</p>
+          <p className={`text-[11px] truncate ${isOrderLink ? "text-brand-200" : "text-white/40"}`}>{tx.reference}</p>
         </div>
         <div className="shrink-0 text-right">
           <p className={`text-sm font-semibold ${tx.amount >= 0 ? "text-emerald-300" : "text-red-300"}`}>
@@ -305,120 +311,136 @@ function TxRow({ tx, link, onNavigate }: { tx: WalletTransaction; link?: string 
         </div>
       </button>
 
-      {/* Withdrawal detail panel */}
-      {expanded && isWithdrawal && (
+      {expanded && !isOrderLink && (
         <div className="border-t border-white/5 bg-white/[0.02] px-4 py-3">
-          {loading ? (
+          {isWithdrawal && wdLoading ? (
             <div className="space-y-2">
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
             </div>
-          ) : detail ? (
-            <div className="space-y-2 text-sm">
-              {/* Status */}
-              <div className="flex items-center justify-between">
-                <span className="text-white/50">Status</span>
-                <span className={STATUS_LABELS[detail.status]?.color ?? "text-white/60"}>
-                  {STATUS_LABELS[detail.status]?.label ?? detail.status}
-                </span>
-              </div>
-
-              {/* Amounts */}
-              <div className="flex items-center justify-between">
-                <span className="text-white/50">Original amount</span>
-                <span className="text-white">{GBP.format(detail.amount)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-white/50">Fee (3%)</span>
-                <span className="text-red-300">-{GBP.format(detail.amount * 0.03)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-white/50">You receive</span>
-                <span className="font-semibold text-emerald-300">{GBP.format(detail.amount * 0.97)}</span>
-              </div>
-
-              {/* Method */}
-              <div className="flex items-center justify-between">
-                <span className="text-white/50">Method</span>
-                <span className="text-white">
-                  {detail.method === "uk_bank" ? "UK Bank Transfer" : detail.method === "usdt_wallet" ? "USDT Transfer" : detail.method}
-                </span>
-              </div>
-
-              {/* Bank details */}
-              {detail.bankFullName && (
-                <div className="flex items-center justify-between">
-                  <span className="text-white/50">Account name</span>
-                  <span className="text-white">{detail.bankFullName}</span>
-                </div>
-              )}
-              {detail.bankAccountNumber && (
-                <div className="flex items-center justify-between">
-                  <span className="text-white/50">Account number</span>
-                  <span className="font-mono text-white">{detail.bankAccountNumber}</span>
-                </div>
-              )}
-              {detail.bankSortCode && (
-                <div className="flex items-center justify-between">
-                  <span className="text-white/50">Sort code</span>
-                  <span className="font-mono text-white">{detail.bankSortCode}</span>
-                </div>
-              )}
-              {detail.bankReference && (
-                <div className="flex items-center justify-between">
-                  <span className="text-white/50">Reference</span>
-                  <span className="text-white">{detail.bankReference}</span>
-                </div>
-              )}
-
-              {/* USDT details */}
-              {detail.usdtNetwork && (
-                <div className="flex items-center justify-between">
-                  <span className="text-white/50">Network</span>
-                  <span className="text-white">{detail.usdtNetwork}</span>
-                </div>
-              )}
-              {detail.usdtAddress && (
-                <div className="flex items-center justify-between">
-                  <span className="text-white/50">Wallet address</span>
-                  <span className="font-mono text-xs text-white break-all">{detail.usdtAddress}</span>
-                </div>
-              )}
-
-              {/* Payment reference (from admin) */}
-              {detail.txHashOrBankRef && (
-                <div className="flex items-center justify-between">
-                  <span className="text-white/50">Payment ref</span>
-                  <span className="font-mono text-xs text-brand-200">{detail.txHashOrBankRef}</span>
-                </div>
-              )}
-
-              {/* Timestamps */}
-              <div className="mt-2 border-t border-white/5 pt-2 space-y-1">
-                {detail.createdAt && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-white/40">Submitted</span>
-                    <span className="text-[11px] text-white/50">{TIMESTAMP.format(new Date(detail.createdAt))}</span>
-                  </div>
-                )}
-                {detail.reviewedAt && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-white/40">Processed</span>
-                    <span className="text-[11px] text-white/50">{TIMESTAMP.format(new Date(detail.reviewedAt))}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Note */}
-              {detail.customerNote && (
-                <div className="mt-1 rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
-                  💬 {detail.customerNote}
-                </div>
-              )}
-            </div>
+          ) : isWithdrawal && wdDetail ? (
+            <WithdrawalDetailPanel detail={wdDetail} />
+          ) : !isWithdrawal ? (
+            <GenericTxDetail tx={tx} />
           ) : (
             <p className="text-xs text-white/40">Unable to load details</p>
           )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InfoRow({ label, value, valueClass, mono }: { label: string; value: string; valueClass?: string; mono?: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <span className="text-white/50 shrink-0">{label}</span>
+      <span className={`text-right ${valueClass || "text-white"} ${mono ? "font-mono text-xs" : ""} break-all`}>{value}</span>
+    </div>
+  );
+}
+
+function GenericTxDetail({ tx }: { tx: WalletTransaction }) {
+  const order = tx.relatedOrder;
+  return (
+    <div className="space-y-2 text-sm">
+      {tx.description && <InfoRow label="Description" value={tx.description} />}
+
+      {tx.balanceBefore != null && tx.balanceAfter != null && (
+        <>
+          <InfoRow label="Balance before" value={GBP.format(tx.balanceBefore)} valueClass="text-white/70" />
+          <InfoRow label="Balance after" value={GBP.format(tx.balanceAfter)} valueClass="font-semibold text-white" />
+        </>
+      )}
+
+      {(tx.type === "transfer_out" || tx.type === "transfer_in") && tx.description && (
+        <InfoRow
+          label={tx.type === "transfer_out" ? "Recipient" : "From"}
+          value={tx.description.replace(/^Transfer (to|from) /, "")}
+          valueClass="text-brand-200"
+        />
+      )}
+
+      {order && (
+        <div className="mt-2 border-t border-white/5 pt-2 space-y-1.5">
+          <InfoRow label="Order" value={order.reference} valueClass="text-brand-200 font-semibold" />
+          <InfoRow label="Order status" value={order.status} />
+          {order.items && order.items.length > 0 && (
+            <div className="space-y-0.5">
+              {order.items.map((item, i) => (
+                <p key={i} className="text-xs text-white/60">
+                  • {item.title || item.name} {item.weight ? `(${item.weight})` : ""} × {item.quantity || 1}
+                  {item.lineTotal ? ` — ${GBP.format(item.lineTotal)}` : ""}
+                </p>
+              ))}
+            </div>
+          )}
+          {order.trackingNumber && <InfoRow label="Tracking" value={`${order.carrier || "Yodel"}: ${order.trackingNumber}`} />}
+          {order.lockerAddress && <InfoRow label="Locker" value={order.lockerAddress} />}
+          {order.deliveredAt && <InfoRow label="Delivered" value={TIMESTAMP.format(new Date(order.deliveredAt))} />}
+        </div>
+      )}
+
+      <InfoRow label="Reference" value={tx.reference} mono />
+
+      <div className="mt-1 border-t border-white/5 pt-2">
+        {tx.createdAt && (
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-white/40">Date</span>
+            <span className="text-[11px] text-white/50">{TIMESTAMP.format(new Date(tx.createdAt))}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function WithdrawalDetailPanel({ detail }: { detail: WithdrawalDetail }) {
+  return (
+    <div className="space-y-2 text-sm">
+      <InfoRow
+        label="Status"
+        value={WD_STATUS[detail.status]?.label ?? detail.status}
+        valueClass={WD_STATUS[detail.status]?.color ?? "text-white/60"}
+      />
+
+      <InfoRow label="Original amount" value={GBP.format(detail.amount)} />
+      <InfoRow label="Fee (3%)" value={`-${GBP.format(detail.amount * 0.03)}`} valueClass="text-red-300" />
+      <InfoRow label="You receive" value={GBP.format(detail.amount * 0.97)} valueClass="font-semibold text-emerald-300" />
+
+      <InfoRow
+        label="Method"
+        value={detail.method === "uk_bank" ? "UK Bank Transfer" : detail.method === "usdt_wallet" ? "USDT Transfer" : detail.method}
+      />
+
+      {detail.bankFullName && <InfoRow label="Account name" value={detail.bankFullName} />}
+      {detail.bankAccountNumber && <InfoRow label="Account number" value={detail.bankAccountNumber} mono />}
+      {detail.bankSortCode && <InfoRow label="Sort code" value={detail.bankSortCode} mono />}
+      {detail.bankReference && <InfoRow label="Reference" value={detail.bankReference} />}
+
+      {detail.usdtNetwork && <InfoRow label="Network" value={detail.usdtNetwork} />}
+      {detail.usdtAddress && <InfoRow label="Wallet address" value={detail.usdtAddress} mono />}
+
+      {detail.txHashOrBankRef && <InfoRow label="Payment ref" value={detail.txHashOrBankRef} valueClass="text-brand-200" mono />}
+
+      <div className="mt-2 border-t border-white/5 pt-2 space-y-1">
+        {detail.createdAt && (
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-white/40">Submitted</span>
+            <span className="text-[11px] text-white/50">{TIMESTAMP.format(new Date(detail.createdAt))}</span>
+          </div>
+        )}
+        {detail.reviewedAt && (
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-white/40">Processed</span>
+            <span className="text-[11px] text-white/50">{TIMESTAMP.format(new Date(detail.reviewedAt))}</span>
+          </div>
+        )}
+      </div>
+
+      {detail.customerNote && (
+        <div className="mt-1 rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+          💬 {detail.customerNote}
         </div>
       )}
     </div>
