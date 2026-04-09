@@ -97,11 +97,11 @@ export default function WalletPage() {
           <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand-500/10 blur-3xl" />
 
           <p className="relative text-xs font-medium uppercase tracking-[0.3em] text-white/70">Available balance</p>
-          <p className="relative mt-3 text-[2.5rem] font-extrabold leading-none text-white drop-shadow-sm">{GBP.format(balanceData.balance)}</p>
-          <div className="relative mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-white/60">
-            <span>🎁 Bonus: <span className="font-semibold text-emerald-300">{GBP.format(balanceData.bonusBalance ?? 0)}</span></span>
-            <span>💸 Transferable: <span className="font-semibold text-white/80">{GBP.format(balanceData.transferableBalance ?? 0)}</span></span>
-          </div>
+          <p className="relative mt-3 text-[2.5rem] font-extrabold leading-none text-white drop-shadow-sm">{GBP.format(balanceData.transferableBalance ?? 0)}</p>
+          <p className="relative mt-3 text-sm text-white/60">
+            🎁 Bonus: <span className="font-semibold text-emerald-300">{GBP.format(balanceData.bonusBalance ?? 0)}</span>
+            <span className="ml-1 text-white/40">(can shop, cannot transfer/withdraw)</span>
+          </p>
 
           {/* User ID copyable badge */}
           <UserIdBadge
