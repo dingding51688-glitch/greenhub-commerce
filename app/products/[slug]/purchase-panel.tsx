@@ -76,7 +76,7 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
         <h2 className="text-2xl font-semibold text-white">Choose your weight</h2>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-2">
         {displayOptions.map((option) => {
           const isActive = selected?.id === option.id;
           const showMostChosen = option.highlight;
@@ -86,28 +86,26 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
               type="button"
               onClick={() => setSelectedId(option.id)}
               className={clsx(
-                "relative rounded-[32px] border border-[#1F242A] bg-[#0F1114] p-5 text-left text-[#F5F5F5] shadow-[0_18px_30px_rgba(0,0,0,0.45)] transition hover:-translate-y-0.5",
-                isActive && "border-emerald-400 bg-[#11171C] shadow-[0_25px_45px_rgba(16,185,129,0.25)]"
+                "relative rounded-2xl border border-[#1F242A] bg-[#0F1114] px-3 py-3 text-left text-[#F5F5F5] shadow-sm transition hover:-translate-y-0.5",
+                isActive && "border-emerald-400 bg-[#11171C] shadow-[0_8px_20px_rgba(16,185,129,0.2)]"
               )}
             >
               {showMostChosen && (
-                <span className="absolute left-5 top-5 rounded-full border border-emerald-400 bg-transparent px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.35em] text-emerald-300">
-                  MOST CHOSEN
+                <span className="absolute right-2 top-2 rounded-full border border-emerald-400 bg-transparent px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-emerald-300">
+                  Popular
                 </span>
               )}
               {isActive && (
-                <span className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-400 text-[#0B0F0D]">
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
-                    <path d="M20 6.5L9.5 17l-5.5-5.5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                <span className="absolute left-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400 text-[#0B0F0D]">
+                  <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden>
+                    <path d="M20 6.5L9.5 17l-5.5-5.5" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </span>
               )}
-              <div className="flex flex-col gap-4 pt-6">
-                <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#C9CFD4]">{option.label}</p>
-                  <p className="text-3xl font-semibold text-[#F5F5F5]">£{option.price.toFixed(2)}</p>
-                </div>
-                <p className="text-sm text-[#C9CFD4]">{option.displayUnitPrice}</p>
+              <div className="flex flex-col gap-1 pt-4">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#C9CFD4]">{option.label}</p>
+                <p className="text-xl font-semibold text-[#F5F5F5]">£{option.price.toFixed(0)}</p>
+                <p className="text-xs text-[#C9CFD4]">{option.displayUnitPrice}</p>
               </div>
             </button>
           );

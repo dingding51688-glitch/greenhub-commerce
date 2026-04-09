@@ -171,9 +171,11 @@ function CuratedPicks({ products }: { products: ProductRecord[] }) {
           <Link href="/products">View menu</Link>
         </Button>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory md:grid md:grid-cols-2 md:overflow-visible">
         {products.map((product) => (
-          <ProductCard key={product.documentId} product={product} />
+          <div key={product.documentId} className="w-[80vw] shrink-0 snap-start md:w-auto">
+            <ProductCard product={product} />
+          </div>
         ))}
       </div>
     </section>
