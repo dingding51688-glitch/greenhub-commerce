@@ -8,6 +8,13 @@ import type { ProductRecord } from "@/lib/types";
 import { getProductListingMeta } from "@/data/fixtures/products";
 import { FavoriteToggle } from "@/components/FavoriteToggle";
 
+const CMS_BASE = process.env.NEXT_PUBLIC_STRAPI_URL || "https://cms.greenhub420.co.uk";
+function strapiMedia(path?: string | null): string | undefined {
+  if (!path) return undefined;
+  if (path.startsWith("http")) return path;
+  return `${CMS_BASE}${path}`;
+}
+
 interface ProductCardProps {
   product: ProductRecord;
   variant?: "grid" | "list";
@@ -32,7 +39,8 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
   const reviews = product.reviews ?? meta.reviews ?? 0;
   const potency = product.potency ?? meta.potencyBadge ?? "Medium";
   const origin = meta.origin ?? "🇬🇧 Locker verified";
-  const imageUrl = meta.imageUrl ?? product.coverImage?.url;
+  const featImg = product.featuredImage;
+  const imageUrl = strapiMedia(featImg?.url) ?? meta.imageUrl ?? product.coverImage?.url;
   const imageAlt = meta.imageAlt ?? product.coverImage?.alternativeText ?? product.title;
   const priceRange = formatPriceRange(product);
 

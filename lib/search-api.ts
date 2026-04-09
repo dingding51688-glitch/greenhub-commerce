@@ -16,7 +16,9 @@ export async function searchProducts(params: ProductSearchParams = {}): Promise<
   }
 
   const url = new URL(`${AUTH_BASE}/api/products`);
-  url.searchParams.set("populate", "coverImage,weightOptions");
+  url.searchParams.set("populate[0]", "weightOptions");
+  url.searchParams.set("populate[1]", "featuredImage");
+  url.searchParams.set("populate[2]", "gallery");
   url.searchParams.set("pagination[pageSize]", "12");
 
   if (params.q) {

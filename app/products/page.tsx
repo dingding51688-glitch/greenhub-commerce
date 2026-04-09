@@ -28,7 +28,9 @@ export default function ProductsPage() {
   const requestParams = new URLSearchParams({
     "pagination[pageSize]": "12",
     "sort[0]": "createdAt:desc",
-    "populate[weightOptions]": "*"
+    "populate[0]": "weightOptions",
+    "populate[1]": "featuredImage",
+    "populate[2]": "gallery",
   });
   const categoryFilter = productCategoryContent[category].filter;
   if (categoryFilter) {
