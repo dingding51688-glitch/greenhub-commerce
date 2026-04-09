@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,10 +33,20 @@ export default function WalletTransferPage() {
     swrFetcher
   );
 
+  const searchParams = useSearchParams();
+
   const form = useForm<TransferFormValues>({
     resolver: zodResolver(transferSchema) as Resolver<TransferFormValues>,
-    defaultValues: { handle: "", amount: 0, memo: "" },
+    defaultValues: { handle: searchParams.get("to") || "", amount: 0, memo: "" },
   });
+
+  // Pre-fill from ?to= query param
+  useEffect(() => {
+    const to = searchParams.get("to");
+    if (to && !form.getValues("handle")) {
+      form.setValue("handle", to);
+    }
+  }, [searchParams, form]);
 
   if (!token) {
     return (

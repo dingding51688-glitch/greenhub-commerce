@@ -142,6 +142,7 @@ export type CommissionHubSummary = {
   totalConverted?: number;
   totalCommission?: number;
   thirtyDayCommission?: number;
+  commissionRate?: number;
 };
 
 export type CommissionHubTask = {

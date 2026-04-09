@@ -12,12 +12,11 @@ import {
   getCommissionHubSnapshot,
   ReferralApiError,
   type CommissionHubSnapshot,
-  type CommissionHubTask,
   type CommissionTransaction
 } from "@/lib/referral-api";
 import { consumeClickError, getLastTrackedClickTime } from "@/lib/referral-tracking";
 import dynamic from "next/dynamic";
-import { useRef, useCallback } from "react";
+import { useRef } from "react";
 
 const QRCode = dynamic(
   () => import("qrcode.react").then((mod) => mod.QRCodeCanvas ?? mod.default),
@@ -26,13 +25,13 @@ const QRCode = dynamic(
 
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
-/* ─── Tier system ─── */
+/* ─── Tier system (matches backend TIER_RATES) ─── */
 const TIERS = [
-  { name: "Starter", emoji: "🌱", min: 0, color: "text-white/60" },
-  { name: "Bronze", emoji: "🥉", min: 3, color: "text-amber-400" },
-  { name: "Silver", emoji: "🥈", min: 10, color: "text-gray-300" },
-  { name: "Gold", emoji: "🥇", min: 25, color: "text-yellow-300" },
-  { name: "Diamond", emoji: "💎", min: 50, color: "text-cyan-300" },
+  { name: "Starter", emoji: "🌱", min: 0,  rate: 10, color: "text-white/60" },
+  { name: "Bronze",  emoji: "🥉", min: 3,  rate: 10, color: "text-amber-400" },
+  { name: "Silver",  emoji: "🥈", min: 10, rate: 10, color: "text-gray-300" },
+  { name: "Gold",    emoji: "🥇", min: 25, rate: 12, color: "text-yellow-300" },
+  { name: "Diamond", emoji: "💎", min: 50, rate: 15, color: "text-cyan-300" },
 ];
 
 function getTier(conversions: number) {
@@ -82,7 +81,7 @@ export default function CommissionHubPage() {
   const notFound = error instanceof ReferralApiError && error.status === 404;
   const fatalError = error && !notFound;
   const summary = data?.summary;
-  const tasks = data?.tasks ?? [];
+
   const conversions = data?.conversions ?? [];
   const history = data?.history ?? [];
   const hasSnapshot = Boolean(summary) || conversions.length > 0 || history.length > 0;
@@ -138,6 +137,7 @@ export default function CommissionHubPage() {
   const shareUrl = summaryLink ? encodeURIComponent(summaryLink) : "";
   const telegramShare = summaryLink ? `https://t.me/share/url?url=${shareUrl}&text=${shareText}` : null;
   const whatsappShare = summaryLink ? `https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}` : null;
+  const currentRate = summary?.commissionRate ? Math.round(summary.commissionRate * 100) : 10;
   const tierInfo = getTier(totalFriends);
 
   const handleCopy = async () => {
@@ -166,7 +166,12 @@ export default function CommissionHubPage() {
         </p>
         <p className="relative mt-1 text-sm text-white/50">Total earnings</p>
 
-        <div className="relative mt-4 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+        <div className="relative mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs text-emerald-200">
+          💸 Commission earnings can be withdrawn to your bank account
+          <Link href="/wallet/withdraw" className="ml-1 underline underline-offset-2 hover:text-white">Withdraw</Link>
+        </div>
+
+        <div className="relative mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm">
           <span className="text-white/60">🔗 Clicks: <span className="font-semibold text-emerald-300">{GBP.format(clickCommission)}</span></span>
           <span className="text-white/60">🛒 Orders: <span className="font-semibold text-emerald-300">{GBP.format(orderCommission)}</span></span>
           {monthlyCommission > 0 && (
@@ -286,14 +291,19 @@ export default function CommissionHubPage() {
           <div className="flex items-center gap-2">
             <span className="text-xl">{tierInfo.tier.emoji}</span>
             <div>
-              <p className={`font-semibold ${tierInfo.tier.color}`}>{tierInfo.tier.name} Promoter</p>
+              <p className={`font-semibold ${tierInfo.tier.color}`}>{tierInfo.tier.name} Promoter · <span className="text-emerald-300">{currentRate}%</span></p>
               <p className="text-xs text-white/40">{totalFriends} friends referred</p>
             </div>
           </div>
           {tierInfo.nextTier && (
-            <p className="text-xs text-white/50">
-              {tierInfo.nextTier.min - totalFriends} more → {tierInfo.nextTier.emoji} {tierInfo.nextTier.name}
-            </p>
+            <div className="text-right">
+              <p className="text-xs text-white/50">
+                {tierInfo.nextTier.min - totalFriends} more → {tierInfo.nextTier.emoji} {tierInfo.nextTier.name}
+              </p>
+              {tierInfo.nextTier.rate > tierInfo.tier.rate && (
+                <p className="text-[10px] text-emerald-400">Unlocks {tierInfo.nextTier.rate}% commission</p>
+              )}
+            </div>
           )}
         </div>
         {tierInfo.nextTier && (
@@ -306,8 +316,7 @@ export default function CommissionHubPage() {
         )}
       </div>
 
-      {/* ── 5. Tasks ── */}
-      <TasksPanel tasks={tasks} />
+      {/* Tasks removed per request */}
 
       {/* ── 6. Activity: Conversions + Commission History ── */}
       <div className="grid gap-4 lg:grid-cols-2">
@@ -349,39 +358,7 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
   );
 }
 
-function TasksPanel({ tasks }: { tasks: CommissionHubTask[] }) {
-  if (!tasks.length) return null;
-  return (
-    <div className="rounded-3xl border border-white/10 bg-card p-4">
-      <p className="mb-3 text-xs font-medium uppercase tracking-[0.3em] text-white/50">🎯 Tasks</p>
-      <div className="space-y-2.5">
-        {tasks.map((task) => (
-          <article key={task.id} className="rounded-2xl border border-white/10 bg-white/[0.02] p-3">
-            <div className="flex items-center justify-between gap-2">
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-white truncate">{task.title}</p>
-                {task.description && <p className="text-xs text-white/50 truncate">{task.description}</p>}
-              </div>
-              {task.rewardLabel && (
-                <span className="shrink-0 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
-                  {task.rewardLabel}
-                </span>
-              )}
-            </div>
-            {typeof task.progress === "number" && (
-              <div className="mt-2 h-1.5 rounded-full bg-white/10">
-                <div
-                  className="h-full rounded-full bg-emerald-400 transition-all"
-                  style={{ width: `${Math.min(100, Math.max(0, task.progress * 100))}%` }}
-                />
-              </div>
-            )}
-          </article>
-        ))}
-      </div>
-    </div>
-  );
-}
+
 
 function ConversionsList({ conversions }: { conversions: { id: number | string; handle?: string; status?: string; createdAt?: string; orderValue?: number; commission?: number }[] }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -413,6 +390,14 @@ function ConversionsList({ conversions }: { conversions: { id: number | string; 
                 >
                   {copiedId === id ? "✓" : "📋"}
                 </button>
+              )}
+              {c.handle && (
+                <Link
+                  href={`/wallet/transfer?to=${encodeURIComponent(c.handle)}`}
+                  className="shrink-0 rounded-full border border-brand-500/40 bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium text-brand-200 hover:bg-brand-500/20"
+                >
+                  ⇒ Transfer
+                </Link>
               )}
             </div>
             <div className="flex items-center gap-3 shrink-0 text-xs">
@@ -512,11 +497,6 @@ function HowItWorks() {
           <p className="mt-2 text-sm font-semibold text-white">You Earn</p>
           <p className="mt-0.5 text-xs text-white/50">£0.30/click + 10% of orders</p>
         </div>
-      </div>
-      <div className="mt-4">
-        <Button asChild className="w-full min-h-[44px] sm:w-auto">
-          <a href="/contact">Contact support</a>
-        </Button>
       </div>
     </div>
   );
