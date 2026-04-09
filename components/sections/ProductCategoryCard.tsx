@@ -52,35 +52,33 @@ export function ProductCategoryCard({
   return (
     <Link
       href={href}
-      className="group relative flex min-h-[220px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#050505] text-white shadow-[0_25px_70px_rgba(0,0,0,0.35)] sm:min-h-[260px] sm:flex-row sm:rounded-[40px] card-hover"
+      className="group relative flex min-h-[140px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#050505] text-white shadow-lg sm:min-h-[220px] sm:flex-row sm:rounded-3xl card-hover"
       style={{ background }}
     >
-      <div className="relative z-10 flex w-full flex-col justify-between gap-4 px-4 py-5 sm:w-3/5 sm:gap-5 sm:px-6 sm:py-6">
+      <div className="relative z-10 flex w-full flex-col justify-between gap-2 px-3 py-3 sm:w-3/5 sm:gap-4 sm:px-5 sm:py-5">
         <div>
           {label && (
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/75">{label}</p>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-white/70 sm:text-[11px] sm:tracking-[0.3em]">{label}</p>
           )}
-          <h3 className="mt-2 text-xl font-semibold uppercase tracking-[0.18em] sm:mt-3 sm:text-2xl sm:tracking-[0.22em]">{title}</h3>
-          {subtitle && <p className="mt-2 text-sm leading-relaxed text-white/80 sm:mt-3">{subtitle}</p>}
+          <h3 className="mt-1 text-base font-semibold uppercase tracking-[0.15em] sm:mt-2 sm:text-xl sm:tracking-[0.18em]">{title}</h3>
+          {subtitle && <p className="mt-1 text-xs leading-relaxed text-white/75 sm:mt-2 sm:text-sm">{subtitle}</p>}
         </div>
-        <div className="flex items-center justify-between sm:justify-start">
-          <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white transition group-hover:translate-x-1 group-hover:-translate-y-1 sm:h-12 sm:w-12">
-            <ArrowIcon />
-          </span>
-        </div>
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition group-hover:translate-x-1 group-hover:-translate-y-1 sm:h-10 sm:w-10">
+          <ArrowIcon />
+        </span>
       </div>
-      <div className="relative z-10 flex flex-1 items-center justify-center px-4 pb-4 sm:items-end sm:justify-end sm:px-0 sm:pr-8">
+      <div className="relative z-10 flex flex-1 items-center justify-center px-3 pb-3 sm:items-end sm:justify-end sm:px-0 sm:pr-6">
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={imageAlt || title}
-            width={280}
-            height={280}
-            className="h-36 w-auto object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.55)] sm:h-44"
+            width={200}
+            height={200}
+            className="h-20 w-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)] sm:h-36"
             priority={false}
           />
         ) : (
-          <div className="flex h-28 w-28 items-center justify-center rounded-full border border-white/20 bg-white/5 text-4xl sm:h-32 sm:w-32">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/20 bg-white/5 text-2xl sm:h-24 sm:w-24 sm:text-4xl">
             <span role="img" aria-hidden="true">
               {imageEmojiFallback}
             </span>
@@ -91,12 +89,11 @@ export function ProductCategoryCard({
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
       >
-        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0)", backgroundSize: "28px 28px" }} />
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0)", backgroundSize: "24px 24px" }} />
         <div
-          className="absolute -bottom-12 -right-16 h-56 w-56 rounded-[50%] blur-[60px]"
+          className="absolute -bottom-8 -right-10 h-36 w-36 rounded-[50%] blur-[50px]"
           style={{ background: palette.overlay }}
         />
-        <div className="absolute bottom-0 right-0 h-32 w-32 rounded-tl-[90%] bg-white/5" />
       </div>
     </Link>
   );
