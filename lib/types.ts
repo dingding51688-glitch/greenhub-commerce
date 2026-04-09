@@ -193,6 +193,8 @@ export type ProductRecord = {
   rating?: number | null;
   reviews?: number | null;
   category?: string | null;
+  origin?: string | null;
+  originFlag?: string | null;
   coverImage?: ProductImage | null;
   featuredImage?: { url: string; alternativeText?: string | null; formats?: Record<string, { url: string }> } | null;
   gallery?: Array<{ url: string; alternativeText?: string | null; formats?: Record<string, { url: string }> }>;
