@@ -21,10 +21,10 @@ const payoutConfigs = {
     label: "Bank transfer (GBP)",
     description: "Payout to a UK Faster Payments account.",
     fields: [
-      { key: "accountName", label: "Account name", placeholder: "GreenHub Ops", required: true },
-      { key: "accountNumber", label: "Account number", placeholder: "00000000", required: true },
-      { key: "sortCode", label: "Sort code", placeholder: "00-00-00", required: true },
-      { key: "bankName", label: "Bank name", placeholder: "Starling", required: false }
+      { key: "accountName", label: "Account name", placeholder: "John Smith", required: true },
+      { key: "accountNumber", label: "Account number", placeholder: "12345678", required: true, maxLength: 8, pattern: "[0-9]{8}" },
+      { key: "sortCode", label: "Sort code", placeholder: "00-00-00", required: true, maxLength: 8, pattern: "[0-9]{2}-?[0-9]{2}-?[0-9]{2}" },
+      { key: "reference", label: "Reference", placeholder: "Payment reference", required: false }
     ]
   },
   crypto: {
@@ -35,14 +35,6 @@ const payoutConfigs = {
       { key: "address", label: "Wallet address", placeholder: "T...", required: true }
     ]
   },
-  wallet: {
-    label: "Internal transfer",
-    description: "Move balance to another member handle or internal account.",
-    fields: [
-      { key: "handle", label: "Recipient handle", placeholder: "@greenhub", required: true },
-      { key: "memo", label: "Memo", placeholder: "Transfer memo", required: false }
-    ]
-  }
 } as const;
 
 type MethodId = keyof typeof payoutConfigs;
@@ -53,9 +45,8 @@ export default function WalletWithdrawPage() {
   const [step, setStep] = useState(1);
   const [amountInput, setAmountInput] = useState("100");
   const [method, setMethod] = useState<MethodId>("bank");
-  const [bankDetails, setBankDetails] = useState({ accountName: "", accountNumber: "", sortCode: "", bankName: "" });
+  const [bankDetails, setBankDetails] = useState({ accountName: "", accountNumber: "", sortCode: "", reference: "" });
   const [cryptoDetails, setCryptoDetails] = useState({ network: "TRC20", address: "" });
-  const [walletDetails, setWalletDetails] = useState({ handle: "", memo: "" });
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -78,21 +69,17 @@ export default function WalletWithdrawPage() {
       case "bank":
         return bankDetails;
       case "crypto":
-        return cryptoDetails;
-      case "wallet":
       default:
-        return walletDetails;
+        return cryptoDetails;
     }
-  }, [method, bankDetails, cryptoDetails, walletDetails]);
+  }, [method, bankDetails, cryptoDetails]);
   const detailsRecord = detailsState as Record<string, string>;
 
   const handleFieldChange = (key: string, value: string) => {
     if (method === "bank") {
       setBankDetails((prev) => ({ ...prev, [key]: value }));
-    } else if (method === "crypto") {
-      setCryptoDetails((prev) => ({ ...prev, [key]: value }));
     } else {
-      setWalletDetails((prev) => ({ ...prev, [key]: value }));
+      setCryptoDetails((prev) => ({ ...prev, [key]: value }));
     }
   };
 
@@ -107,6 +94,18 @@ export default function WalletWithdrawPage() {
       if (missing.length) {
         setError(`Fill ${missing.map((f) => f.label).join(", ")}`);
         return;
+      }
+      if (method === "bank") {
+        const acNum = detailsRecord.accountNumber?.replace(/\s/g, "") || "";
+        if (!/^\d{8}$/.test(acNum)) {
+          setError("Account number must be exactly 8 digits");
+          return;
+        }
+        const sc = detailsRecord.sortCode?.replace(/[-\s]/g, "") || "";
+        if (!/^\d{6}$/.test(sc)) {
+          setError("Sort code must be exactly 6 digits (e.g. 12-34-56)");
+          return;
+        }
       }
     }
     setError(null);
@@ -341,6 +340,7 @@ function MethodStep({
               className="mt-1"
               value={details[field.key]?.toString() || ""}
               placeholder={field.placeholder}
+              maxLength={(field as any).maxLength}
               onChange={(event) => onDetailChange(field.key, event.target.value)}
             />
           </label>
