@@ -6,6 +6,13 @@ import { ProductCard } from "@/components/ProductCard";
 import { ProductImageZoom } from "@/components/ProductImageZoom";
 import type { ProductRecord, ProductsResponse } from "@/lib/types";
 import { serverFetch } from "@/lib/server-api";
+
+const CMS_BASE = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
+function strapiMedia(path?: string | null): string | undefined {
+  if (!path) return undefined;
+  if (path.startsWith("http")) return path;
+  return `${CMS_BASE}${path}`;
+}
 import { ProductDetailPurchase } from "./purchase-panel";
 import { getProductListingMeta } from "@/data/fixtures/products";
 import { FavoriteToggle } from "@/components/FavoriteToggle";
@@ -23,7 +30,9 @@ export async function generateStaticParams() {
 async function getProduct(slug: string) {
   const query = new URLSearchParams({
     "filters[slug][$eq]": slug,
-    "populate[weightOptions]": "*"
+    "populate[0]": "weightOptions",
+    "populate[1]": "featuredImage",
+    "populate[2]": "gallery",
   });
   try {
     const data = await serverFetch<ProductsResponse>(`/api/products?${query.toString()}`);
@@ -39,7 +48,9 @@ async function getRelatedProducts(slug: string) {
     "filters[slug][$ne]": slug,
     "pagination[pageSize]": "4",
     "sort[0]": "createdAt:desc",
-    "populate[weightOptions]": "*"
+    "populate[0]": "weightOptions",
+    "populate[1]": "featuredImage",
+    "populate[2]": "gallery",
   });
   try {
     const data = await serverFetch<ProductsResponse>(`/api/products?${query.toString()}`);
@@ -89,8 +100,10 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
 function ProductHero({ product }: { product: ProductRecord }) {
   const meta = getProductListingMeta(product.slug);
-  const imageUrl = product.coverImage?.url ?? meta?.imageUrl;
-  const imageAlt = product.coverImage?.alternativeText ?? meta?.imageAlt ?? product.title;
+  const featImg = product.featuredImage;
+  const imageUrl = strapiMedia(featImg?.url) ?? product.coverImage?.url ?? meta?.imageUrl;
+  const imageAlt = featImg?.alternativeText ?? product.coverImage?.alternativeText ?? meta?.imageAlt ?? product.title;
+  const galleryImages = product.gallery?.map(g => ({ url: strapiMedia(g.url)!, alt: g.alternativeText || product.title })) ?? [];
   const rating = product.rating ?? meta?.rating ?? 4.9;
   const reviews = product.reviews ?? meta?.reviews ?? 0;
   const origin = meta?.origin ?? "🇬🇧 Store verified";

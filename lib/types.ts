@@ -194,6 +194,8 @@ export type ProductRecord = {
   reviews?: number | null;
   category?: string | null;
   coverImage?: ProductImage | null;
+  featuredImage?: { url: string; alternativeText?: string | null; formats?: Record<string, { url: string }> } | null;
+  gallery?: Array<{ url: string; alternativeText?: string | null; formats?: Record<string, { url: string }> }>;
   weightOptions?: WeightOption[];
 };
 
