@@ -381,6 +381,11 @@ export default function CommissionHubPage() {
       <div className="rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-3 text-xs leading-relaxed text-white/40">
         <p>💡 Every unique click pays <span className="text-white/60">£0.30</span> (24h dedup per visitor). Every friend&apos;s order earns you <span className="text-white/60">10% commission</span>. Referral earnings never expire and are credited to your wallet instantly.</p>
       </div>
+
+      {/* ── 9. Anti-fraud warning ── */}
+      <div className="rounded-2xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-xs leading-relaxed text-red-200/70">
+        <p>⚠️ <span className="font-semibold text-red-200">Fair use policy:</span> Our system monitors all click activity in real time. Fraudulent behaviour such as self-clicking, bot traffic, or any form of fake clicks will result in <span className="font-semibold text-red-200">immediate account suspension</span> and forfeiture of all referral earnings. Play fair — we reward genuine referrals.</p>
+      </div>
     </section>
   );
 }
