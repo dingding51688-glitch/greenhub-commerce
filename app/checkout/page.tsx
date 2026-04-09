@@ -54,7 +54,13 @@ export default function CheckoutPage() {
     { refreshInterval: 60_000 }
   );
   const walletBalance = walletData?.balance ?? 0;
+  const bonusBalance = walletData?.bonusBalance ?? 0;
+  const availableBalance = walletData?.transferableBalance ?? 0;
   const insufficientBalance = subtotal > walletBalance;
+
+  // Payment breakdown: bonus used first, then available balance
+  const bonusUsed = Math.min(bonusBalance, subtotal);
+  const availableUsed = Math.min(availableBalance, Math.max(0, subtotal - bonusUsed));
 
   const { data: profileData } = useSWR<CustomerProfileResponse>(
     token ? "/api/account/profile" : null,
@@ -187,7 +193,7 @@ export default function CheckoutPage() {
                 <h2 className="text-lg font-semibold text-white sm:text-xl">Wallet payment</h2>
               </header>
 
-              <div className="rounded-2xl border border-emerald-400/40 bg-emerald-400/5 p-4">
+              <div className="rounded-2xl border border-emerald-400/40 bg-emerald-400/5 p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-semibold text-white">Wallet balance</p>
@@ -197,8 +203,32 @@ export default function CheckoutPage() {
                     Wallet
                   </span>
                 </div>
-                <p className="mt-2 text-sm leading-relaxed text-white/60">
-                  Payment will be deducted from your wallet balance instantly.
+                <div className="flex gap-4 text-sm text-white/60">
+                  <span>💰 Available: <span className="font-semibold text-white/80">{currency.format(availableBalance)}</span></span>
+                  <span>🎁 Bonus: <span className="font-semibold text-emerald-300">{currency.format(bonusBalance)}</span></span>
+                </div>
+
+                {/* Payment breakdown */}
+                {!insufficientBalance && subtotal > 0 && (
+                  <div className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-1.5">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-white/50">Payment breakdown</p>
+                    {bonusUsed > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-emerald-300">🎁 Bonus</span>
+                        <span className="font-semibold text-emerald-300">−{currency.format(bonusUsed)}</span>
+                      </div>
+                    )}
+                    {availableUsed > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-white/70">💰 Available balance</span>
+                        <span className="font-semibold text-white/80">−{currency.format(availableUsed)}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <p className="text-xs text-white/40">
+                  Bonus is used first. Remaining amount is paid from your available balance.
                 </p>
               </div>
 
