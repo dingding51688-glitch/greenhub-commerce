@@ -165,11 +165,6 @@ export default function CommissionHubPage() {
         </p>
         <p className="relative mt-1 text-sm text-white/50">Total earnings</p>
 
-        <div className="relative mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs text-emerald-200">
-          💸 Commission earnings can be withdrawn to your bank account
-          <Link href="/wallet/withdraw" className="ml-1 underline underline-offset-2 hover:text-white">Withdraw</Link>
-        </div>
-
         <div className="relative mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm">
           <span className="text-white/60">🔗 Clicks: <span className="font-semibold text-emerald-300">{GBP.format(clickCommission)}</span></span>
           <span className="text-white/60">🛒 Orders: <span className="font-semibold text-emerald-300">{GBP.format(orderCommission)}</span></span>
@@ -274,7 +269,7 @@ export default function CommissionHubPage() {
       {/* ── 3. Stats Grid ── */}
       <div className="grid grid-cols-3 gap-2.5">
         <StatCard label="Clicks" value={validClicks.toString()} sub={GBP.format(clickCommission)} />
-        <StatCard label="Friends" value={totalFriends.toString()} sub={conversionRate ? `${(conversionRate * 100).toFixed(0)}% convert` : `${topups} topped up`} />
+        <StatCard label="Friends" value={totalFriends.toString()} sub={`${qualifiedFriends} qualified · ${totalFriends - qualifiedFriends} not yet`} />
         <StatCard label="Orders" value={orderCount.toString()} sub="10% commission" />
       </div>
 
