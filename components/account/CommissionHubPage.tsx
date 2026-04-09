@@ -16,6 +16,12 @@ import {
   type CommissionTransaction
 } from "@/lib/referral-api";
 import { consumeClickError, getLastTrackedClickTime } from "@/lib/referral-tracking";
+import dynamic from "next/dynamic";
+
+const QRCode = dynamic(
+  () => import("qrcode.react").then((mod) => mod.QRCodeCanvas ?? mod.default),
+  { ssr: false }
+);
 
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
@@ -114,6 +120,7 @@ export default function CommissionHubPage() {
   );
 
   const clicks = summary?.clicks ?? 0;
+  const totalFriends = summary?.totalInvites ?? conversions.length;
   const registrations = summary?.registrations ?? 0;
   const topups = summary?.topups ?? 0;
   const conversionRate = summary?.conversionRate ?? 0;
@@ -127,7 +134,7 @@ export default function CommissionHubPage() {
   const shareUrl = summaryLink ? encodeURIComponent(summaryLink) : "";
   const telegramShare = summaryLink ? `https://t.me/share/url?url=${shareUrl}&text=${shareText}` : null;
   const whatsappShare = summaryLink ? `https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}` : null;
-  const tierInfo = getTier(registrations);
+  const tierInfo = getTier(totalFriends);
 
   const handleCopy = async () => {
     if (!summaryLink) return;
@@ -178,39 +185,45 @@ export default function CommissionHubPage() {
         </div>
       )}
 
-      {/* ── 2. Share Section ── */}
+      {/* ── 2. Share Section with QR ── */}
       <div className="rounded-3xl border border-white/10 bg-card p-5">
         <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/50">📤 Your Invite Link</p>
-        <p className="mt-2 break-all rounded-xl bg-white/5 px-3 py-2.5 font-mono text-sm text-white">
-          {summaryLink || "Link pending…"}
-        </p>
-        <p className="mt-1.5 text-xs text-white/40">Referral code: <span className="font-mono text-white/60">{referralCode}</span></p>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Button size="sm" onClick={handleCopy} disabled={!summaryLink} className="min-h-[44px]">
-            {copyToast || "📋 Copy link"}
-          </Button>
-          {whatsappShare && (
-            <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
-              <a href={whatsappShare} target="_blank" rel="noreferrer">📱 WhatsApp</a>
-            </Button>
+        <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start">
+          {/* QR Code */}
+          {summaryLink && (
+            <div className="shrink-0 self-center rounded-xl bg-white p-2 sm:self-start">
+              <QRCode value={summaryLink} size={120} />
+            </div>
           )}
-          {telegramShare && (
-            <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
-              <a href={telegramShare} target="_blank" rel="noreferrer">✈️ Telegram</a>
-            </Button>
-          )}
-          <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
-            <Link href="/referral/poster">📷 Poster</Link>
-          </Button>
+          <div className="flex-1 min-w-0">
+            <p className="break-all rounded-xl bg-white/5 px-3 py-2.5 font-mono text-sm text-white">
+              {summaryLink || "Link pending…"}
+            </p>
+            <p className="mt-1.5 text-xs text-white/40">Referral code: <span className="font-mono text-white/60">{referralCode}</span></p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button size="sm" onClick={handleCopy} disabled={!summaryLink} className="min-h-[44px]">
+                {copyToast || "📋 Copy link"}
+              </Button>
+              {whatsappShare && (
+                <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
+                  <a href={whatsappShare} target="_blank" rel="noreferrer">📱 WhatsApp</a>
+                </Button>
+              )}
+              {telegramShare && (
+                <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
+                  <a href={telegramShare} target="_blank" rel="noreferrer">✈️ Telegram</a>
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* ── 3. Stats Grid ── */}
       <div className="grid grid-cols-3 gap-2.5">
         <StatCard label="Clicks" value={clicks.toString()} sub={`${GBP.format(0.30)} each`} />
-        <StatCard label="Friends" value={registrations.toString()} sub={conversionRate ? `${(conversionRate * 100).toFixed(0)}% convert` : `${topups} topped up`} />
-        <StatCard label="Orders" value={(summary?.totalConverted ?? conversions.filter(c => c.orderValue).length).toString()} sub="10% commission" />
+        <StatCard label="Friends" value={totalFriends.toString()} sub={conversionRate ? `${(conversionRate * 100).toFixed(0)}% convert` : `${topups} topped up`} />
+        <StatCard label="Orders" value={(summary?.totalConverted ?? conversions.filter(c => (c.orderValue ?? c.commission ?? 0) > 0).length).toString()} sub="10% commission" />
       </div>
 
       {lastClickTime && (
@@ -226,12 +239,12 @@ export default function CommissionHubPage() {
             <span className="text-xl">{tierInfo.tier.emoji}</span>
             <div>
               <p className={`font-semibold ${tierInfo.tier.color}`}>{tierInfo.tier.name} Promoter</p>
-              <p className="text-xs text-white/40">{registrations} friends referred</p>
+              <p className="text-xs text-white/40">{totalFriends} friends referred</p>
             </div>
           </div>
           {tierInfo.nextTier && (
             <p className="text-xs text-white/50">
-              {tierInfo.nextTier.min - registrations} more → {tierInfo.nextTier.emoji} {tierInfo.nextTier.name}
+              {tierInfo.nextTier.min - totalFriends} more → {tierInfo.nextTier.emoji} {tierInfo.nextTier.name}
             </p>
           )}
         </div>
