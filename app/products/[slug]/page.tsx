@@ -112,7 +112,7 @@ function ProductHero({ product }: { product: ProductRecord }) {
   return (
     <div className="space-y-6 rounded-[40px] border border-white/10 bg-night-950/80 p-6 shadow-card">
       <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr]">
-        <ProductImageZoom imageUrl={imageUrl} imageAlt={imageAlt} badge={product.heroBadge} />
+        <ProductImageZoom imageUrl={imageUrl} imageAlt={imageAlt} badge={product.heroBadge} gallery={galleryImages} />
         <div className="space-y-4">
           <div className="flex items-start justify-between">
             <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-ink-500">{product.strain} strain</p>
