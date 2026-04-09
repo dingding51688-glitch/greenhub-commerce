@@ -169,7 +169,7 @@ export default function AccountPage() {
         </Link>
         <Link href="/account/commission" className="group rounded-3xl border border-white/10 bg-card p-6 shadow-card transition hover:border-white/20">
           <p className="text-xs uppercase tracking-[0.3em] text-white/50">Referrals</p>
-          <p className="mt-2 text-xl font-semibold text-white">Commission hub</p>
+          <p className="mt-2 text-xl font-semibold text-white">Earn Hub</p>
           <p className="mt-1 text-sm text-white/60">Invite friends, track earnings, and view your referral stats.</p>
           <span className="mt-3 inline-block text-sm text-emerald-300 group-hover:underline">View commissions →</span>
         </Link>
