@@ -13,8 +13,8 @@ import { swrFetcher } from "@/lib/api";
 import { createWithdrawalRequest } from "@/lib/withdrawal-api";
 
 
-const MIN_WITHDRAWAL = 20;
-const FEE_PERCENT = 0.02; // 2% handling fee (update if ops changes)
+const MIN_WITHDRAWAL = 100;
+const FEE_PERCENT = 0.03; // 3% handling fee
 
 const payoutConfigs = {
   bank: {
@@ -319,8 +319,8 @@ function AmountStep({
         placeholder="20"
       />
       <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
-        <p>Minimum transfer is £{MIN_WITHDRAWAL}. Handling fee {Math.round(FEE_PERCENT * 100)}%.</p>
-        <p className="mt-1 text-xs text-white/50">Fee estimate £{fee.toFixed(2)} · You receive £{receiveAmount.toFixed(2)}</p>
+        <p>Withdrawal fee: {Math.round(FEE_PERCENT * 100)}%. Minimum withdrawal: £{MIN_WITHDRAWAL}.</p>
+        <p className="mt-1 text-xs text-white/50">Fee: £{fee.toFixed(2)} · You receive: £{receiveAmount.toFixed(2)} · Arrives within 24 hours</p>
       </div>
     </section>
   );
@@ -415,9 +415,9 @@ function ReviewStep({
       <div className="rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-white/80">
         <p className="text-base font-semibold text-white">£{amount.toFixed(2)} → {payoutConfigs[method].label}</p>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-white/60">
-          <li>Fee £{fee.toFixed(2)}</li>
-          <li>You receive £{receiveAmount.toFixed(2)}</li>
-          <li>Status: pending review (ETA 12h)</li>
+          <li>Fee (3%): £{fee.toFixed(2)}</li>
+          <li>You receive: £{receiveAmount.toFixed(2)}</li>
+          <li>Arrives within 24 hours</li>
         </ul>
       </div>
       {entries.length > 0 && (
@@ -447,7 +447,7 @@ function SuccessCard({ request }: { request: WithdrawalRequest }) {
       <p className="text-sm uppercase tracking-[0.3em] text-emerald-200">Request submitted</p>
       <h2 className="text-3xl font-semibold">Reference {request.reference}</h2>
       <p className="text-sm text-white/70">
-        Our team will process your payout within 12 hours. You&apos;ll receive an email once the transfer is complete.
+        Our team will process your payout within 24 hours. You&apos;ll receive an email once the transfer is complete.
       </p>
       <dl className="grid gap-2 text-sm text-white/80 sm:grid-cols-2">
         <div>
