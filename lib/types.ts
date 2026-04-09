@@ -28,14 +28,27 @@ export type WalletTransactionsResponse = {
 
 export type WithdrawalRequest = {
   id: number;
-  reference: string;
+  documentId?: string;
+  reference?: string;
   amount: number;
   currency: string;
-  payoutMethod: string;
+  method?: string;
+  payoutMethod?: string;
   payoutDetails?: Record<string, unknown> | null;
   status: string;
   fee?: number | null;
   notes?: string | null;
+  bankFullName?: string;
+  bankAccountNumber?: string;
+  bankSortCode?: string;
+  bankReference?: string;
+  customerNote?: string;
+  usdtNetwork?: string;
+  usdtAddress?: string;
+  txHashOrBankRef?: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  reviewNotes?: string;
   createdAt?: string;
   updatedAt?: string;
 };

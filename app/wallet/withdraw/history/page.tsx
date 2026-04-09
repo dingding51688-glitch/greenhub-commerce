@@ -182,36 +182,99 @@ function WithdrawalList({
 }
 
 function WithdrawalCard({ request }: { request: WithdrawalRequest }) {
+  const [expanded, setExpanded] = useState(false);
   const statusMeta = STATUS_MAP[request.status] ?? { label: request.status, className: "bg-white/10 text-white" };
-  const detailEntries = Object.entries(request.payoutDetails || {})
-    .filter(([, value]) => value)
-    .slice(0, 3);
+  const method = request.method || request.payoutMethod || "";
+  const methodLabel = method === "uk_bank" ? "UK Bank Transfer" : method === "usdt_wallet" ? "USDT Transfer" : method;
+  const netAmount = request.amount * 0.97;
+  const fee = request.amount * 0.03;
 
   return (
-    <article className="space-y-3 rounded-3xl border border-white/10 bg-card p-4 shadow-card sm:p-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <article className="overflow-hidden rounded-3xl border border-white/10 bg-card shadow-card">
+      {/* Header - always visible, clickable */}
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="flex w-full flex-col gap-3 p-4 text-left transition hover:bg-white/[0.03] sm:flex-row sm:items-center sm:justify-between sm:p-5"
+      >
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-white/60">{request.reference || `#${request.id}`}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-xs uppercase tracking-[0.3em] text-white/60">{request.reference || `#${request.id}`}</p>
+            <span className="text-[10px] text-white/30">{expanded ? "▼" : "▶"}</span>
+          </div>
           <h3 className="text-2xl font-semibold text-white">{GBP.format(request.amount)}</h3>
-          <p className="text-xs text-white/50">Method: {request.payoutMethod}</p>
+          <p className="text-xs text-white/50">{methodLabel}</p>
         </div>
         <div className="flex items-center gap-3 text-sm text-white/60">
           {request.createdAt && <span>{DATE_FMT.format(new Date(request.createdAt))}</span>}
           <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusMeta.className}`}>{statusMeta.label}</span>
         </div>
-      </div>
-      {detailEntries.length > 0 && (
-        <div className="grid grid-cols-2 gap-2 text-xs text-white/70 sm:grid-cols-3">
-          {detailEntries.map(([key, value]) => (
-            <div key={key} className="min-w-0">
-              <p className="uppercase tracking-[0.25em] text-white/40">{key}</p>
-              <p className="truncate text-white">{String(value)}</p>
+      </button>
+
+      {/* Expandable detail */}
+      {expanded && (
+        <div className="border-t border-white/5 px-4 py-4 sm:px-5 space-y-2.5 text-sm">
+          {/* Amounts */}
+          <DetailRow label="Original amount" value={GBP.format(request.amount)} />
+          <DetailRow label="Fee (3%)" value={`-${GBP.format(fee)}`} valueClass="text-red-300" />
+          <DetailRow label="You receive" value={GBP.format(netAmount)} valueClass="font-semibold text-emerald-300" />
+
+          {/* Bank details */}
+          {request.bankFullName && <DetailRow label="Account name" value={request.bankFullName} />}
+          {request.bankAccountNumber && <DetailRow label="Account number" value={request.bankAccountNumber} mono />}
+          {request.bankSortCode && <DetailRow label="Sort code" value={request.bankSortCode} mono />}
+          {request.bankReference && <DetailRow label="Reference" value={request.bankReference} />}
+
+          {/* USDT details */}
+          {request.usdtNetwork && <DetailRow label="Network" value={request.usdtNetwork} />}
+          {request.usdtAddress && <DetailRow label="Wallet address" value={request.usdtAddress} mono small />}
+
+          {/* Payment reference from admin */}
+          {request.txHashOrBankRef && (
+            <DetailRow label="Payment ref" value={request.txHashOrBankRef} valueClass="text-brand-200" mono small />
+          )}
+
+          {/* Timestamps */}
+          <div className="mt-2 border-t border-white/5 pt-2 space-y-1">
+            {request.createdAt && (
+              <DetailRow label="Submitted" value={DATE_FMT.format(new Date(request.createdAt))} small />
+            )}
+            {request.reviewedAt && (
+              <DetailRow label="Processed" value={DATE_FMT.format(new Date(request.reviewedAt))} small />
+            )}
+          </div>
+
+          {/* Notes */}
+          {request.customerNote && (
+            <div className="mt-1 rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+              💬 {request.customerNote}
             </div>
-          ))}
+          )}
+          {request.reviewNotes && (
+            <div className="mt-1 rounded-lg bg-white/5 px-3 py-2 text-xs text-white/50">
+              📝 Admin: {request.reviewNotes}
+            </div>
+          )}
         </div>
       )}
-      {request.notes && <p className="text-xs text-amber-200">Note: {request.notes}</p>}
     </article>
+  );
+}
+
+function DetailRow({ label, value, valueClass, mono, small }: {
+  label: string;
+  value: string;
+  valueClass?: string;
+  mono?: boolean;
+  small?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <span className={`text-white/50 ${small ? "text-[11px]" : ""}`}>{label}</span>
+      <span className={`${valueClass || "text-white"} ${mono ? "font-mono" : ""} ${small ? "text-[11px]" : ""} text-right break-all`}>
+        {value}
+      </span>
+    </div>
   );
 }
 
