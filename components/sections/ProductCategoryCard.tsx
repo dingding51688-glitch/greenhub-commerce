@@ -20,6 +20,18 @@ const toneMap = {
     bottom: "#20170f",
     accent: "#f5d6a1",
     overlay: "rgba(245,214,161,0.15)"
+  },
+  purple: {
+    top: "#1a0f2e",
+    bottom: "#2d1b4e",
+    accent: "#a855f7",
+    overlay: "rgba(168,85,247,0.18)"
+  },
+  blue: {
+    top: "#0c1929",
+    bottom: "#132d4a",
+    accent: "#38bdf8",
+    overlay: "rgba(56,189,248,0.18)"
   }
 };
 
@@ -74,11 +86,11 @@ export function ProductCategoryCard({
             alt={imageAlt || title}
             width={200}
             height={200}
-            className="h-20 w-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)] sm:h-36"
+            className="h-28 w-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)] sm:h-40"
             priority={false}
           />
         ) : (
-          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/20 bg-white/5 text-2xl sm:h-24 sm:w-24 sm:text-4xl">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/20 bg-white/5 text-3xl sm:h-28 sm:w-28 sm:text-4xl">
             <span role="img" aria-hidden="true">
               {imageEmojiFallback}
             </span>
