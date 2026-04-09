@@ -7,6 +7,7 @@ import useSWR from "swr";
 import Button from "@/components/ui/button";
 import { StateMessage } from "@/components/StateMessage";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useNotifications } from "@/components/providers/NotificationProvider";
 import type { NotificationRecord } from "@/lib/types";
 
 const dateFmt = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" });
@@ -77,6 +78,7 @@ const notificationsFetcher = async (): Promise<NotificationResponse> => {
 export default function NotificationCenterPage() {
   const { token } = useAuth();
   const router = useRouter();
+  const { refreshUnreadCount } = useNotifications();
   const { data, error, isLoading, mutate } = useSWR<NotificationResponse>(token ? "/api/account/notifications" : null, notificationsFetcher, {
     keepPreviousData: true,
     revalidateOnFocus: false,
@@ -100,6 +102,7 @@ export default function NotificationCenterPage() {
       }
       setActionNotice({ type: "success", message: "All notifications marked as read" });
       await mutate();
+      refreshUnreadCount();
     } catch (markError: any) {
       setActionNotice({ type: "error", message: markError?.message || "Failed to update notifications" });
     }
@@ -118,6 +121,7 @@ export default function NotificationCenterPage() {
         throw new Error(payload?.error?.message || "Unable to mark notification as read");
       }
       await mutate();
+      refreshUnreadCount();
     } catch (markError: any) {
       setActionNotice({ type: "error", message: markError?.message || "Failed to update notifications" });
     }

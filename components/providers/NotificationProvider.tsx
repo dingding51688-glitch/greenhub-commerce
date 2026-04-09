@@ -19,6 +19,7 @@ interface NotificationContextValue {
   refreshNotifications: () => Promise<void>;
   markRead: (ids: number[]) => Promise<void>;
   markAllRead: () => Promise<void>;
+  refreshUnreadCount: () => void;
 }
 
 const NotificationContext = createContext<NotificationContextValue | undefined>(undefined);
@@ -76,8 +77,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   }, [mutateUnread, token]);
 
   const value = useMemo(
-    () => ({ notifications, unreadCount, loading, error, refreshNotifications, markRead, markAllRead }),
-    [notifications, unreadCount, loading, error, refreshNotifications, markRead, markAllRead]
+    () => ({ notifications, unreadCount, loading, error, refreshNotifications, markRead, markAllRead, refreshUnreadCount: () => mutateUnread() }),
+    [notifications, unreadCount, loading, error, refreshNotifications, markRead, markAllRead, mutateUnread]
   );
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
