@@ -22,8 +22,8 @@ const payoutConfigs = {
     description: "Payout to a UK Faster Payments account.",
     fields: [
       { key: "accountName", label: "Account name", placeholder: "John Smith", required: true },
-      { key: "accountNumber", label: "Account number", placeholder: "12345678", required: true, maxLength: 8, pattern: "[0-9]{8}" },
-      { key: "sortCode", label: "Sort code", placeholder: "00-00-00", required: true, maxLength: 8, pattern: "[0-9]{2}-?[0-9]{2}-?[0-9]{2}" },
+      { key: "accountNumber", label: "Account number", placeholder: "12345678", required: true, maxLength: 8, inputMode: "numeric" as const },
+      { key: "sortCode", label: "Sort code", placeholder: "00-00-00", required: true, maxLength: 8, inputMode: "numeric" as const },
       { key: "reference", label: "Reference", placeholder: "Payment reference", required: false }
     ]
   },
@@ -31,8 +31,8 @@ const payoutConfigs = {
     label: "USDT transfer",
     description: "Send to your USDT wallet (TRC20 / ERC20).",
     fields: [
-      { key: "network", label: "Network", placeholder: "TRC20", required: true },
-      { key: "address", label: "Wallet address", placeholder: "T...", required: true }
+      { key: "network", label: "Network", placeholder: "", required: true, type: "select" as const, options: ["TRC20", "ERC20"] },
+      { key: "address", label: "Wallet address", placeholder: "T... or 0x...", required: true }
     ]
   },
 } as const;
@@ -77,7 +77,17 @@ export default function WalletWithdrawPage() {
 
   const handleFieldChange = (key: string, value: string) => {
     if (method === "bank") {
-      setBankDetails((prev) => ({ ...prev, [key]: value }));
+      let sanitized = value;
+      if (key === "accountNumber") {
+        sanitized = value.replace(/[^0-9]/g, "").slice(0, 8);
+      } else if (key === "sortCode") {
+        // Allow digits and dashes only, auto-format as XX-XX-XX
+        const digits = value.replace(/[^0-9]/g, "").slice(0, 6);
+        if (digits.length > 4) sanitized = `${digits.slice(0, 2)}-${digits.slice(2, 4)}-${digits.slice(4)}`;
+        else if (digits.length > 2) sanitized = `${digits.slice(0, 2)}-${digits.slice(2)}`;
+        else sanitized = digits;
+      }
+      setBankDetails((prev) => ({ ...prev, [key]: sanitized }));
     } else {
       setCryptoDetails((prev) => ({ ...prev, [key]: value }));
     }
@@ -105,6 +115,21 @@ export default function WalletWithdrawPage() {
         if (!/^\d{6}$/.test(sc)) {
           setError("Sort code must be exactly 6 digits (e.g. 12-34-56)");
           return;
+        }
+      }
+      if (method === "crypto") {
+        const network = detailsRecord.network || "";
+        const addr = detailsRecord.address?.trim() || "";
+        if (network === "TRC20") {
+          if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(addr)) {
+            setError("Invalid TRC20 address. It should start with T and be 34 characters long");
+            return;
+          }
+        } else if (network === "ERC20") {
+          if (!/^0x[0-9a-fA-F]{40}$/.test(addr)) {
+            setError("Invalid ERC20 address. It should start with 0x and be 42 characters long");
+            return;
+          }
         }
       }
     }
@@ -330,21 +355,37 @@ function MethodStep({
         ))}
       </div>
       <div className="space-y-3">
-        {payoutConfigs[method].fields.map((field) => (
-          <label key={field.key} className="text-sm text-white">
-            <span className="font-medium">
-              {field.label}
-              {field.required && <span className="text-amber-300"> *</span>}
-            </span>
-            <Input
-              className="mt-1"
-              value={details[field.key]?.toString() || ""}
-              placeholder={field.placeholder}
-              maxLength={(field as any).maxLength}
-              onChange={(event) => onDetailChange(field.key, event.target.value)}
-            />
-          </label>
-        ))}
+        {payoutConfigs[method].fields.map((field) => {
+          const f = field as any;
+          return (
+            <label key={field.key} className="text-sm text-white">
+              <span className="font-medium">
+                {field.label}
+                {field.required && <span className="text-amber-300"> *</span>}
+              </span>
+              {f.type === "select" && f.options ? (
+                <select
+                  className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-white/30"
+                  value={details[field.key]?.toString() || f.options[0]}
+                  onChange={(event) => onDetailChange(field.key, event.target.value)}
+                >
+                  {f.options.map((opt: string) => (
+                    <option key={opt} value={opt} className="bg-neutral-900 text-white">{opt}</option>
+                  ))}
+                </select>
+              ) : (
+                <Input
+                  className="mt-1"
+                  value={details[field.key]?.toString() || ""}
+                  placeholder={field.placeholder}
+                  maxLength={f.maxLength}
+                  inputMode={f.inputMode}
+                  onChange={(event) => onDetailChange(field.key, event.target.value)}
+                />
+              )}
+            </label>
+          );
+        })}
       </div>
     </section>
   );
@@ -406,7 +447,7 @@ function SuccessCard({ request }: { request: WithdrawalRequest }) {
       <p className="text-sm uppercase tracking-[0.3em] text-emerald-200">Request submitted</p>
       <h2 className="text-3xl font-semibold">Reference {request.reference}</h2>
       <p className="text-sm text-white/70">
-        Our team will verify and update the status to <strong>approved</strong> once the payout is queued. Expect a message or email if more information is required.
+        Our team will process your payout within 12 hours. You&apos;ll receive an email once the transfer is complete.
       </p>
       <dl className="grid gap-2 text-sm text-white/80 sm:grid-cols-2">
         <div>
