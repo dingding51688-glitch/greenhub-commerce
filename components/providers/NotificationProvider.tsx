@@ -61,8 +61,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       if (!ids.length || !token) return;
       await apiMarkRead(ids);
       setNotifications((prev) => prev.map((notification) => (ids.includes(notification.id) ? { ...notification, read: true } : notification)));
-      // Force immediate revalidation of unread count
-      await mutateUnread(undefined, { revalidate: true });
+      // Optimistically decrement count, then revalidate in background
+      mutateUnread((prev: number | undefined) => Math.max(0, (prev ?? 0) - ids.length), { revalidate: true });
     },
     [mutateUnread, token]
   );
