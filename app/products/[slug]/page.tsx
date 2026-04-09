@@ -106,7 +106,7 @@ function ProductHero({ product }: { product: ProductRecord }) {
   const galleryImages = product.gallery?.map(g => ({ url: strapiMedia(g.url)!, alt: g.alternativeText || product.title })) ?? [];
   const rating = product.rating ?? meta?.rating ?? 4.9;
   const reviews = product.reviews ?? meta?.reviews ?? 0;
-  const origin = meta?.origin ?? "🇬🇧 Store verified";
+  const origin = product.origin ?? meta?.origin ?? "🇬🇧 Store verified";
   const priceRange = formatPriceRange(product);
 
   return (
