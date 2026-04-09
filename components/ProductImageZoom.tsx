@@ -246,12 +246,7 @@ export function ProductImageZoom({ imageUrl, imageAlt, badge, gallery = [] }: Pr
         </div>
       )}
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-ink-400">Tap image to enlarge</p>
-        <Button type="button" variant="secondary" className="w-full sm:w-auto" onClick={handleOpen} disabled={!currentImage.url}>
-          View full image
-        </Button>
-      </div>
+
       {modal}
     </div>
   );
