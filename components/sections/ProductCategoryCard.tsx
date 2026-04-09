@@ -64,46 +64,38 @@ export function ProductCategoryCard({
   return (
     <Link
       href={href}
-      className="group relative flex min-h-[140px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#050505] text-white shadow-lg sm:min-h-[220px] sm:flex-row sm:rounded-3xl card-hover"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#050505] text-white shadow-lg card-hover"
       style={{ background }}
     >
-      <div className="relative z-10 flex w-full flex-col justify-between gap-2 px-3 py-3 sm:w-3/5 sm:gap-4 sm:px-5 sm:py-5">
-        <div>
-          {label && (
-            <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-white/70 sm:text-[11px] sm:tracking-[0.3em]">{label}</p>
-          )}
-          <h3 className="mt-1 text-base font-semibold uppercase tracking-[0.15em] sm:mt-2 sm:text-xl sm:tracking-[0.18em]">{title}</h3>
-          {subtitle && <p className="mt-1 text-xs leading-relaxed text-white/75 sm:mt-2 sm:text-sm">{subtitle}</p>}
-        </div>
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition group-hover:translate-x-1 group-hover:-translate-y-1 sm:h-10 sm:w-10">
-          <ArrowIcon />
-        </span>
-      </div>
-      <div className="relative z-10 flex flex-1 items-center justify-center px-3 pb-3 sm:items-end sm:justify-end sm:px-0 sm:pr-6">
+      {/* Image area */}
+      <div className="relative z-10 flex aspect-square items-center justify-center p-4">
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={imageAlt || title}
             width={200}
             height={200}
-            className="h-28 w-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)] sm:h-40"
+            className="h-full w-full object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.5)]"
             priority={false}
           />
         ) : (
-          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/20 bg-white/5 text-3xl sm:h-28 sm:w-28 sm:text-4xl">
-            <span role="img" aria-hidden="true">
-              {imageEmojiFallback}
-            </span>
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/20 bg-white/5 text-3xl">
+            <span role="img" aria-hidden="true">{imageEmojiFallback}</span>
           </div>
         )}
       </div>
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-      >
-        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0)", backgroundSize: "24px 24px" }} />
+      {/* Text area */}
+      <div className="relative z-10 px-3 pb-3">
+        {label && (
+          <p className="text-[8px] font-semibold uppercase tracking-[0.2em] text-white/60">{label}</p>
+        )}
+        <h3 className="mt-0.5 text-sm font-bold uppercase tracking-[0.1em]">{title}</h3>
+        {subtitle && <p className="mt-0.5 text-[10px] leading-snug text-white/60 line-clamp-2">{subtitle}</p>}
+      </div>
+      {/* Decorative overlay */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div
-          className="absolute -bottom-8 -right-10 h-36 w-36 rounded-[50%] blur-[50px]"
+          className="absolute -bottom-6 -right-6 h-28 w-28 rounded-[50%] blur-[40px]"
           style={{ background: palette.overlay }}
         />
       </div>

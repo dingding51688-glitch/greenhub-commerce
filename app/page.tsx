@@ -99,9 +99,9 @@ async function FeaturedCollections() {
   }
 
   return (
-    <section className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-3 animate-stagger">
+    <section className="flex gap-2.5 overflow-x-auto pb-2 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:overflow-visible lg:grid-cols-5 animate-stagger">
       {collections.map((collection) => (
-        <div key={collection.title} className="w-[70vw] shrink-0 snap-start sm:w-auto">
+        <div key={collection.title} className="w-[42vw] shrink-0 snap-start sm:w-auto">
           <ProductCategoryCard {...collection} tone={collection.tone as any} />
         </div>
       ))}
