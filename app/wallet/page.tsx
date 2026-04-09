@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
@@ -8,8 +8,28 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { StateMessage } from "@/components/StateMessage";
 import { Skeleton } from "@/components/Skeleton";
 import { Button } from "@/components/ui";
-import { swrFetcher } from "@/lib/api";
+import { swrFetcher, apiFetch } from "@/lib/api";
 import type { WalletBalanceResponse, WalletTransaction, WalletTransactionsResponse } from "@/lib/types";
+
+type WithdrawalDetail = {
+  id: number;
+  amount: number;
+  currency: string;
+  method: string;
+  status: string;
+  bankFullName?: string;
+  bankAccountNumber?: string;
+  bankSortCode?: string;
+  bankReference?: string;
+  customerNote?: string;
+  usdtNetwork?: string;
+  usdtAddress?: string;
+  txHashOrBankRef?: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
 
 type CustomerProfileResponse = {
   data?: {
@@ -218,32 +238,189 @@ function UserIdBadge({
 }
 
 function TxRow({ tx, link, onNavigate }: { tx: WalletTransaction; link?: string | null; onNavigate?: (href: string) => void }) {
-  const Wrapper = link ? "button" : "div";
-  const handleClick = () => {
-    if (link && onNavigate) onNavigate(link);
+  const isWithdrawal = tx.type === "withdrawal" && tx.reference?.startsWith("withdrawal-");
+  const [expanded, setExpanded] = useState(false);
+  const [detail, setDetail] = useState<WithdrawalDetail | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const withdrawalId = isWithdrawal ? tx.reference.replace("withdrawal-", "") : null;
+
+  const handleClick = useCallback(async () => {
+    if (link && onNavigate) {
+      onNavigate(link);
+      return;
+    }
+    if (isWithdrawal && withdrawalId) {
+      if (expanded) {
+        setExpanded(false);
+        return;
+      }
+      setExpanded(true);
+      if (!detail) {
+        setLoading(true);
+        try {
+          const res = await apiFetch<{ success: boolean; data: WithdrawalDetail }>(`/api/account/withdrawals/${withdrawalId}`);
+          if (res?.data) setDetail(res.data);
+        } catch { /* ignore */ }
+        setLoading(false);
+      }
+    }
+  }, [link, onNavigate, isWithdrawal, withdrawalId, expanded, detail]);
+
+  const isClickable = !!link || isWithdrawal;
+
+  const STATUS_LABELS: Record<string, { label: string; color: string }> = {
+    pending: { label: "⏳ Pending", color: "text-amber-300" },
+    approved: { label: "✅ Approved", color: "text-emerald-300" },
+    paid: { label: "💸 Paid", color: "text-brand-200" },
+    rejected: { label: "❌ Rejected", color: "text-red-300" },
   };
 
   return (
-    <Wrapper
-      type={link ? "button" : undefined}
-      onClick={link ? handleClick : undefined}
-      className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left ${
-        link ? "transition hover:bg-white/5 focus-visible:bg-white/10 focus-visible:outline-none" : ""
-      }`}
-      aria-label={link ? `View details for ${tx.reference}` : undefined}
-    >
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold capitalize text-white truncate">{tx.type.replace(/_/g, " ")}</p>
-        <p className={`text-[11px] truncate ${link ? "text-brand-200" : "text-white/40"}`}>{tx.reference}</p>
-      </div>
-      <div className="shrink-0 text-right">
-        <p className={`text-sm font-semibold ${tx.amount >= 0 ? "text-emerald-300" : "text-red-300"}`}>
-          {tx.amount >= 0 ? "+" : ""}{GBP.format(tx.amount)}
-        </p>
-        <p className="text-[11px] text-white/40">
-          {tx.createdAt ? TIMESTAMP.format(new Date(tx.createdAt)) : ""}
-        </p>
-      </div>
-    </Wrapper>
+    <div>
+      <button
+        type="button"
+        onClick={handleClick}
+        className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left ${
+          isClickable ? "transition hover:bg-white/5 focus-visible:bg-white/10 focus-visible:outline-none cursor-pointer" : ""
+        }`}
+        aria-label={isClickable ? `View details for ${tx.reference}` : undefined}
+      >
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <p className="text-sm font-semibold capitalize text-white truncate">{tx.type.replace(/_/g, " ")}</p>
+            {isWithdrawal && (
+              <span className="text-[10px] text-white/30">{expanded ? "▼" : "▶"}</span>
+            )}
+          </div>
+          <p className={`text-[11px] truncate ${isClickable ? "text-brand-200" : "text-white/40"}`}>{tx.reference}</p>
+        </div>
+        <div className="shrink-0 text-right">
+          <p className={`text-sm font-semibold ${tx.amount >= 0 ? "text-emerald-300" : "text-red-300"}`}>
+            {tx.amount >= 0 ? "+" : ""}{GBP.format(tx.amount)}
+          </p>
+          <p className="text-[11px] text-white/40">
+            {tx.createdAt ? TIMESTAMP.format(new Date(tx.createdAt)) : ""}
+          </p>
+        </div>
+      </button>
+
+      {/* Withdrawal detail panel */}
+      {expanded && isWithdrawal && (
+        <div className="border-t border-white/5 bg-white/[0.02] px-4 py-3">
+          {loading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+          ) : detail ? (
+            <div className="space-y-2 text-sm">
+              {/* Status */}
+              <div className="flex items-center justify-between">
+                <span className="text-white/50">Status</span>
+                <span className={STATUS_LABELS[detail.status]?.color ?? "text-white/60"}>
+                  {STATUS_LABELS[detail.status]?.label ?? detail.status}
+                </span>
+              </div>
+
+              {/* Amounts */}
+              <div className="flex items-center justify-between">
+                <span className="text-white/50">Original amount</span>
+                <span className="text-white">{GBP.format(detail.amount)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white/50">Fee (3%)</span>
+                <span className="text-red-300">-{GBP.format(detail.amount * 0.03)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white/50">You receive</span>
+                <span className="font-semibold text-emerald-300">{GBP.format(detail.amount * 0.97)}</span>
+              </div>
+
+              {/* Method */}
+              <div className="flex items-center justify-between">
+                <span className="text-white/50">Method</span>
+                <span className="text-white">
+                  {detail.method === "uk_bank" ? "UK Bank Transfer" : detail.method === "usdt_wallet" ? "USDT Transfer" : detail.method}
+                </span>
+              </div>
+
+              {/* Bank details */}
+              {detail.bankFullName && (
+                <div className="flex items-center justify-between">
+                  <span className="text-white/50">Account name</span>
+                  <span className="text-white">{detail.bankFullName}</span>
+                </div>
+              )}
+              {detail.bankAccountNumber && (
+                <div className="flex items-center justify-between">
+                  <span className="text-white/50">Account number</span>
+                  <span className="font-mono text-white">{detail.bankAccountNumber}</span>
+                </div>
+              )}
+              {detail.bankSortCode && (
+                <div className="flex items-center justify-between">
+                  <span className="text-white/50">Sort code</span>
+                  <span className="font-mono text-white">{detail.bankSortCode}</span>
+                </div>
+              )}
+              {detail.bankReference && (
+                <div className="flex items-center justify-between">
+                  <span className="text-white/50">Reference</span>
+                  <span className="text-white">{detail.bankReference}</span>
+                </div>
+              )}
+
+              {/* USDT details */}
+              {detail.usdtNetwork && (
+                <div className="flex items-center justify-between">
+                  <span className="text-white/50">Network</span>
+                  <span className="text-white">{detail.usdtNetwork}</span>
+                </div>
+              )}
+              {detail.usdtAddress && (
+                <div className="flex items-center justify-between">
+                  <span className="text-white/50">Wallet address</span>
+                  <span className="font-mono text-xs text-white break-all">{detail.usdtAddress}</span>
+                </div>
+              )}
+
+              {/* Payment reference (from admin) */}
+              {detail.txHashOrBankRef && (
+                <div className="flex items-center justify-between">
+                  <span className="text-white/50">Payment ref</span>
+                  <span className="font-mono text-xs text-brand-200">{detail.txHashOrBankRef}</span>
+                </div>
+              )}
+
+              {/* Timestamps */}
+              <div className="mt-2 border-t border-white/5 pt-2 space-y-1">
+                {detail.createdAt && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-white/40">Submitted</span>
+                    <span className="text-[11px] text-white/50">{TIMESTAMP.format(new Date(detail.createdAt))}</span>
+                  </div>
+                )}
+                {detail.reviewedAt && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-white/40">Processed</span>
+                    <span className="text-[11px] text-white/50">{TIMESTAMP.format(new Date(detail.reviewedAt))}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Note */}
+              {detail.customerNote && (
+                <div className="mt-1 rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+                  💬 {detail.customerNote}
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-xs text-white/40">Unable to load details</p>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
