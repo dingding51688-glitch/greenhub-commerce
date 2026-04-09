@@ -1,6 +1,8 @@
 export type WalletBalanceResponse = {
   success: boolean;
   balance: number;
+  bonusBalance: number;
+  transferableBalance: number;
   lifetimeTopUp: number;
   bonusAwarded: number;
 };

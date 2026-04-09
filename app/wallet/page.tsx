@@ -98,10 +98,10 @@ export default function WalletPage() {
 
           <p className="relative text-xs font-medium uppercase tracking-[0.3em] text-white/70">Available balance</p>
           <p className="relative mt-3 text-[2.5rem] font-extrabold leading-none text-white drop-shadow-sm">{GBP.format(balanceData.balance)}</p>
-          <p className="relative mt-3 text-sm text-white/60">
-            Lifetime top-up <span className="font-semibold text-white/80">{GBP.format(balanceData.lifetimeTopUp)}</span>{" "}
-            · Bonus <span className="font-semibold text-white/80">{GBP.format(balanceData.bonusAwarded)}</span>
-          </p>
+          <div className="relative mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-white/60">
+            <span>🎁 Bonus: <span className="font-semibold text-emerald-300">{GBP.format(balanceData.bonusBalance ?? 0)}</span></span>
+            <span>💸 Transferable: <span className="font-semibold text-white/80">{GBP.format(balanceData.transferableBalance ?? 0)}</span></span>
+          </div>
 
           {/* User ID copyable badge */}
           <UserIdBadge

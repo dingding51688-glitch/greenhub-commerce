@@ -85,7 +85,11 @@ export default function WalletTransferPage() {
         <Link href="/wallet" className="text-xs text-white/40 hover:text-white/60">← Back to wallet</Link>
         <h1 className="mt-2 text-2xl font-semibold text-white">Transfer</h1>
         {balanceData && (
-          <p className="mt-1 text-sm text-white/50">Available balance: {GBP.format(balanceData.balance)}</p>
+          <div className="mt-2 space-y-1">
+            <p className="text-sm text-white/50">Total balance: {GBP.format(balanceData.balance)}</p>
+            <p className="text-sm text-emerald-300/70">🎁 Bonus (non-transferable): {GBP.format(balanceData.bonusBalance ?? 0)}</p>
+            <p className="text-sm font-semibold text-white/70">💸 Transferable: {GBP.format(balanceData.transferableBalance ?? 0)}</p>
+          </div>
         )}
       </header>
 
