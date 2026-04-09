@@ -136,7 +136,8 @@ export default function CommissionHubPage() {
   const telegramShare = summaryLink ? `https://t.me/share/url?url=${shareUrl}&text=${shareText}` : null;
   const whatsappShare = summaryLink ? `https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}` : null;
   const currentRate = summary?.commissionRate ? Math.round(summary.commissionRate * 100) : 10;
-  const tierInfo = getTier(totalFriends);
+  const qualifiedFriends = summary?.topups ?? conversions.filter(c => (c as any).totalCommissionEarned > 0 || c.status === "topped_up" || c.status === "purchased").length;
+  const tierInfo = getTier(qualifiedFriends);
 
   const handleCopy = async () => {
     if (!summaryLink) return;
@@ -291,13 +292,13 @@ export default function CommissionHubPage() {
             <span className="text-xl">{tierInfo.tier.emoji}</span>
             <div>
               <p className={`font-semibold ${tierInfo.tier.color}`}>{tierInfo.tier.name} Promoter · <span className="text-emerald-300">{currentRate}%</span></p>
-              <p className="text-xs text-white/40">{totalFriends} friends referred</p>
+              <p className="text-xs text-white/40">{qualifiedFriends} qualified / {totalFriends} total friends</p>
             </div>
           </div>
           {tierInfo.nextTier && (
             <div className="text-right">
               <p className="text-xs text-white/50">
-                {tierInfo.nextTier.min - totalFriends} more → {tierInfo.nextTier.emoji} {tierInfo.nextTier.name}
+                {tierInfo.nextTier.min - qualifiedFriends} more → {tierInfo.nextTier.emoji} {tierInfo.nextTier.name}
               </p>
               {tierInfo.nextTier.rate > tierInfo.tier.rate && (
                 <p className="text-[10px] text-emerald-400">Unlocks {tierInfo.nextTier.rate}% commission</p>
@@ -343,8 +344,8 @@ export default function CommissionHubPage() {
                       />
                     </div>
                   )}
-                  {!isLast && isReached && totalFriends < nextMin && (
-                    <p className="mt-1 text-[10px] text-white/40 text-right">{totalFriends} / {nextMin} friends</p>
+                  {!isLast && isReached && qualifiedFriends < nextMin && (
+                    <p className="mt-1 text-[10px] text-white/40 text-right">{qualifiedFriends} / {nextMin} friends</p>
                   )}
                   {isLast && isReached && (
                     <div className="mt-1.5 h-1.5 w-full rounded-full bg-gradient-to-r from-emerald-500 to-brand-400" />
@@ -353,6 +354,9 @@ export default function CommissionHubPage() {
               );
             })}
           </div>
+          <p className="mt-3 text-[11px] text-white/40 leading-relaxed">
+            ℹ️ Only friends who have placed an order count towards tier progress. Friends who registered but haven&apos;t ordered yet are marked as &quot;not qualified&quot;.
+          </p>
         </div>
       </div>
 
@@ -400,7 +404,7 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
 
 
 
-function ConversionsList({ conversions }: { conversions: { id: number | string; handle?: string; status?: string; createdAt?: string; orderValue?: number; commission?: number }[] }) {
+function ConversionsList({ conversions }: { conversions: { id: number | string; handle?: string; status?: string; createdAt?: string; orderValue?: number; commission?: number; totalCommissionEarned?: number }[] }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   if (!conversions.length) {
@@ -441,9 +445,13 @@ function ConversionsList({ conversions }: { conversions: { id: number | string; 
               )}
             </div>
             <div className="flex items-center gap-3 shrink-0 text-xs">
-              <StatusPill status={c.status} />
-              {(c.orderValue ?? c.commission) != null && (
-                <span className="text-emerald-300 font-semibold">{GBP.format(c.orderValue ?? c.commission ?? 0)}</span>
+              {(c.status === "topped_up" || c.status === "purchased" || (c as any).totalCommissionEarned > 0) ? (
+                <span className="rounded-full border border-emerald-400/40 bg-emerald-400/10 px-2 py-0.5 text-[10px] uppercase text-emerald-300">Qualified</span>
+              ) : (
+                <span className="rounded-full border border-yellow-400/30 bg-yellow-400/10 px-2 py-0.5 text-[10px] uppercase text-yellow-300">Not qualified</span>
+              )}
+              {((c as any).totalCommissionEarned ?? c.orderValue ?? c.commission ?? 0) > 0 && (
+                <span className="text-emerald-300 font-semibold">{GBP.format((c as any).totalCommissionEarned ?? c.orderValue ?? c.commission ?? 0)}</span>
               )}
               <span className="text-white/30">
                 {c.createdAt ? new Date(c.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "—"}
