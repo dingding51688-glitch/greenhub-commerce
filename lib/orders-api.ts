@@ -44,6 +44,10 @@ export type CreateOrderPayload = {
   dropoffPostcode?: string;
   paymentOption?: string;
   referralCode?: string;
+  deliveryMethod?: string;
+  pickupLocationName?: string;
+  pickupLocationAddress?: string;
+  pickupLocationId?: string;
 };
 
 export type OrderItem = {

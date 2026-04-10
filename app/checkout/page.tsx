@@ -13,6 +13,8 @@ import { useCart, type CartItem } from "@/components/providers/CartProvider";
 import { swrFetcher } from "@/lib/api";
 import { createOrder } from "@/lib/orders-api";
 import { getStoredReferralCode } from "@/lib/referral-tracking";
+import { isNorthernIreland, NI_DELIVERY_FEE, type DeliveryLocation } from "@/lib/delivery-api";
+import LocationPicker from "@/components/checkout/LocationPicker";
 import type { WalletBalanceResponse } from "@/lib/types";
 
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
@@ -34,6 +36,7 @@ export default function CheckoutPage() {
   const [alert, setAlert] = useState<{ ok: boolean; msg: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState<{ reference: string; total: number } | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<DeliveryLocation | null>(null);
 
   const { data: walletData } = useSWR<WalletBalanceResponse>(
     token ? "/api/wallet/balance" : null, swrFetcher, { refreshInterval: 60_000 }
@@ -41,10 +44,6 @@ export default function CheckoutPage() {
   const balance = walletData?.balance ?? 0;
   const bonus = walletData?.bonusBalance ?? 0;
   const available = walletData?.transferableBalance ?? 0;
-  const shortfall = subtotal > balance;
-
-  const bonusUsed = Math.min(bonus, subtotal);
-  const availableUsed = Math.min(available, Math.max(0, subtotal - bonusUsed));
 
   const { data: profileData } = useSWR<ProfileRes>(token ? "/api/account/profile" : null, swrFetcher);
 
@@ -52,6 +51,15 @@ export default function CheckoutPage() {
     resolver: zodResolver(schema),
     defaultValues: { email: "", postcode: "" },
   });
+
+  const watchedPostcode = form.watch("postcode");
+  const isNI = isNorthernIreland(watchedPostcode || "");
+  const deliveryFee = isNI ? NI_DELIVERY_FEE : 0;
+  const grandTotal = subtotal + deliveryFee;
+  const shortfall = grandTotal > balance;
+
+  const bonusUsed = Math.min(bonus, grandTotal);
+  const availableUsed = Math.min(available, Math.max(0, grandTotal - bonusUsed));
 
   useEffect(() => {
     const a = profileData?.data?.attributes;
@@ -61,6 +69,11 @@ export default function CheckoutPage() {
     if (!c.email && e) form.setValue("email", e);
     if (!c.postcode && p) form.setValue("postcode", p);
   }, [profileData, userEmail, form]);
+
+  // Clear selected location when postcode changes significantly
+  useEffect(() => {
+    setSelectedLocation(null);
+  }, [isNI]);
 
   // Success screen
   if (orderSuccess) {
@@ -135,6 +148,10 @@ export default function CheckoutPage() {
 
   const onSubmit = async (v: Form) => {
     if (shortfall) return;
+    if (!selectedLocation) {
+      setAlert({ ok: false, msg: "Please select a pickup location" });
+      return;
+    }
     setSubmitting(true);
     setAlert(null);
     try {
@@ -147,9 +164,13 @@ export default function CheckoutPage() {
         dropoffPostcode: pc,
         paymentOption: "wallet",
         referralCode: ref || undefined,
+        deliveryMethod: selectedLocation.type,
+        pickupLocationName: selectedLocation.name,
+        pickupLocationAddress: `${selectedLocation.address}, ${selectedLocation.postcode}`,
+        pickupLocationId: selectedLocation.id,
       });
       clearCart();
-      setOrderSuccess({ reference: res.order.reference, total: subtotal });
+      setOrderSuccess({ reference: res.order.reference, total: grandTotal });
     } catch (e: any) {
       setAlert({ ok: false, msg: e?.message || "Unable to place order" });
     } finally {
@@ -185,7 +206,11 @@ export default function CheckoutPage() {
               <Field label="Postcode" error={form.formState.errors.postcode?.message}>
                 <input type="text" {...form.register("postcode")} className={inputCls} placeholder="BT1 1AA" />
               </Field>
-              <p className="text-[9px] text-white/20">We&apos;ll assign the nearest InPost locker</p>
+              <LocationPicker
+                postcode={watchedPostcode || ""}
+                onSelect={setSelectedLocation}
+                selected={selectedLocation}
+              />
             </div>
           </div>
 
@@ -209,7 +234,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Breakdown */}
-            {!shortfall && subtotal > 0 && (
+            {!shortfall && grandTotal > 0 && (
               <div className="mt-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 space-y-1">
                 <p className="text-[8px] uppercase tracking-wider text-white/25">Breakdown</p>
                 {bonusUsed > 0 && (
@@ -232,7 +257,7 @@ export default function CheckoutPage() {
               <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/5 p-3">
                 <p className="text-xs font-bold text-amber-200">Insufficient balance</p>
                 <p className="mt-0.5 text-[10px] text-amber-200/60">
-                  Need {GBP.format(subtotal)}, have {GBP.format(balance)} — short {GBP.format(subtotal - balance)}
+                  Need {GBP.format(grandTotal)}, have {GBP.format(balance)} — short {GBP.format(grandTotal - balance)}
                 </p>
                 <button
                   type="button"
@@ -251,7 +276,7 @@ export default function CheckoutPage() {
             disabled={submitting || shortfall}
             className="flex w-full min-h-[52px] items-center justify-center rounded-xl cta-gradient text-base font-bold text-white disabled:opacity-40"
           >
-            {submitting ? "Placing order…" : shortfall ? "Top up first" : `Pay ${GBP.format(subtotal)}`}
+            {submitting ? "Placing order…" : shortfall ? "Top up first" : `Pay ${GBP.format(grandTotal)}`}
           </button>
         </form>
 
@@ -276,11 +301,18 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-white/40">Delivery</span>
-                <span className="text-emerald-300">Free</span>
+                {deliveryFee > 0 ? (
+                  <span className="text-amber-200">{GBP.format(deliveryFee)}</span>
+                ) : (
+                  <span className="text-emerald-300">Free</span>
+                )}
               </div>
+              {deliveryFee > 0 && (
+                <p className="text-[9px] text-white/20">🚢 Northern Ireland surcharge</p>
+              )}
               <div className="flex justify-between border-t border-white/5 pt-2">
                 <span className="text-sm font-bold text-white">Total</span>
-                <span className="text-lg font-bold text-white">{GBP.format(subtotal)}</span>
+                <span className="text-lg font-bold text-white">{GBP.format(grandTotal)}</span>
               </div>
             </div>
           </div>
