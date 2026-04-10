@@ -10,350 +10,272 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useCart, type CartItem } from "@/components/providers/CartProvider";
-import { StateMessage } from "@/components/StateMessage";
-import Button from "@/components/ui/button";
 import { swrFetcher } from "@/lib/api";
 import { createOrder } from "@/lib/orders-api";
 import { getStoredReferralCode } from "@/lib/referral-tracking";
 import type { WalletBalanceResponse } from "@/lib/types";
 
-const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
-/* ── schema (wallet-only, no paymentOption field) ── */
-
-const formSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
-  postcode: z.string().min(4, "Please enter your postcode"),
+const schema = z.object({
+  email: z.string().email("Enter a valid email"),
+  postcode: z.string().min(4, "Enter your postcode"),
 });
-type CheckoutFormValues = z.infer<typeof formSchema>;
+type Form = z.infer<typeof schema>;
 
-/* ── types ── */
+const inputCls = "w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-3 text-sm text-white outline-none placeholder:text-white/20 focus:border-white/25";
 
-type CustomerProfileResponse = {
-  data?: {
-    id: number;
-    attributes: {
-      email?: string;
-      preferredLocker?: string | null;
-    };
-  };
-};
-
-/* ── page ── */
+type ProfileRes = { data?: { id: number; attributes: { email?: string; preferredLocker?: string | null } } };
 
 export default function CheckoutPage() {
   const { token, userEmail } = useAuth();
   const router = useRouter();
   const { items, subtotal, totalItems, clearCart } = useCart();
-  const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [alert, setAlert] = useState<{ ok: boolean; msg: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const { data: walletData } = useSWR<WalletBalanceResponse>(
-    token ? "/api/wallet/balance" : null,
-    swrFetcher,
-    { refreshInterval: 60_000 }
+    token ? "/api/wallet/balance" : null, swrFetcher, { refreshInterval: 60_000 }
   );
-  const walletBalance = walletData?.balance ?? 0;
-  const bonusBalance = walletData?.bonusBalance ?? 0;
-  const availableBalance = walletData?.transferableBalance ?? 0;
-  const insufficientBalance = subtotal > walletBalance;
+  const balance = walletData?.balance ?? 0;
+  const bonus = walletData?.bonusBalance ?? 0;
+  const available = walletData?.transferableBalance ?? 0;
+  const shortfall = subtotal > balance;
 
-  // Payment breakdown: bonus used first, then available balance
-  const bonusUsed = Math.min(bonusBalance, subtotal);
-  const availableUsed = Math.min(availableBalance, Math.max(0, subtotal - bonusUsed));
+  const bonusUsed = Math.min(bonus, subtotal);
+  const availableUsed = Math.min(available, Math.max(0, subtotal - bonusUsed));
 
-  const { data: profileData } = useSWR<CustomerProfileResponse>(
-    token ? "/api/account/profile" : null,
-    swrFetcher
-  );
+  const { data: profileData } = useSWR<ProfileRes>(token ? "/api/account/profile" : null, swrFetcher);
 
-  const form = useForm<CheckoutFormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<Form>({
+    resolver: zodResolver(schema),
     defaultValues: { email: "", postcode: "" },
   });
 
   useEffect(() => {
-    const attrs = profileData?.data?.attributes;
-    const profileEmail = attrs?.email || userEmail || "";
-    const profilePostcode = attrs?.preferredLocker || "";
-    const current = form.getValues();
-    if (!current.email && profileEmail) form.setValue("email", profileEmail);
-    if (!current.postcode && profilePostcode) form.setValue("postcode", profilePostcode);
+    const a = profileData?.data?.attributes;
+    const e = a?.email || userEmail || "";
+    const p = a?.preferredLocker || "";
+    const c = form.getValues();
+    if (!c.email && e) form.setValue("email", e);
+    if (!c.postcode && p) form.setValue("postcode", p);
   }, [profileData, userEmail, form]);
 
-  /* ── guards ── */
-
+  // Guards
   if (!token) {
     return (
-      <section className="px-4 py-10">
-        <StateMessage
-          title="Please sign in"
-          body="Sign in to complete your order."
-          actionLabel="Go to login"
-          onAction={() => router.push("/login")}
-        />
-      </section>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="space-y-3 text-center">
+          <p className="text-4xl">🔐</p>
+          <p className="text-sm font-bold text-white">Sign in to checkout</p>
+          <Link href="/login" className="inline-flex min-h-[40px] items-center rounded-xl cta-gradient px-5 text-sm font-bold text-white">Log in</Link>
+        </div>
+      </div>
     );
   }
 
   if (items.length === 0) {
     return (
-      <section className="px-4 py-10">
-        <StateMessage
-          variant="empty"
-          title="Your cart is empty"
-          body="Browse our products to get started."
-          actionLabel="Browse products"
-          onAction={() => router.push("/products")}
-        />
-      </section>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="space-y-3 text-center">
+          <p className="text-4xl">🛒</p>
+          <p className="text-sm font-bold text-white">Cart is empty</p>
+          <Link href="/products" className="inline-flex min-h-[40px] items-center rounded-xl cta-gradient px-5 text-sm font-bold text-white">Browse Products</Link>
+        </div>
+      </div>
     );
   }
 
-  /* ── submit (always wallet) ── */
-
-  const onSubmit = async (values: CheckoutFormValues) => {
-    if (insufficientBalance) return;
+  const onSubmit = async (v: Form) => {
+    if (shortfall) return;
     setSubmitting(true);
     setAlert(null);
     try {
-      const normalizedPostcode = values.postcode.trim().toUpperCase();
-      const referralCode = getStoredReferralCode();
-      const response = await createOrder({
-        items: items.map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          weight: item.weight,
-        })),
-        contactEmail: values.email,
-        deliveryPostcode: normalizedPostcode,
-        dropoffPostcode: normalizedPostcode,
+      const pc = v.postcode.trim().toUpperCase();
+      const ref = getStoredReferralCode();
+      const res = await createOrder({
+        items: items.map((i) => ({ productId: i.productId, quantity: i.quantity, unitPrice: i.unitPrice, weight: i.weight })),
+        contactEmail: v.email,
+        deliveryPostcode: pc,
+        dropoffPostcode: pc,
         paymentOption: "wallet",
-        referralCode: referralCode || undefined,
+        referralCode: ref || undefined,
       });
       clearCart();
-      setAlert({ type: "success", message: `Order ${response.order.reference} created!` });
-      router.push(`/orders/${response.order.reference}`);
-    } catch (error: any) {
-      setAlert({ type: "error", message: error?.message || "Unable to create order" });
+      setAlert({ ok: true, msg: `Order ${res.order.reference} placed!` });
+      router.push(`/orders/${res.order.reference}`);
+    } catch (e: any) {
+      setAlert({ ok: false, msg: e?.message || "Unable to place order" });
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <section className="space-y-5 px-4 py-8">
+    <div className="space-y-4 pb-24 sm:space-y-6 sm:pb-20">
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <Link href="/cart" className="text-white/30 hover:text-white/50">← Cart</Link>
+        <span className="text-white/15">/</span>
+        <span className="text-xs text-white/50">Checkout</span>
+      </div>
+
       {alert && (
-        <div
-          className={`rounded-2xl border px-4 py-3 text-sm ${
-            alert.type === "success"
-              ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-100"
-              : "border-red-400/40 bg-red-400/10 text-red-100"
-          }`}
-        >
-          {alert.message}
+        <div className={`rounded-xl border px-3 py-2 text-xs ${alert.ok ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200" : "border-red-400/30 bg-red-400/10 text-red-200"}`}>
+          {alert.msg}
         </div>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[2fr,1fr]">
-        {/* ── Left: Contact + Payment ── */}
-        <div className="space-y-5">
-          <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
+      <div className="grid gap-4 lg:grid-cols-[1fr,320px]">
+        {/* Left: form */}
+        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)} noValidate>
+          {/* Delivery */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-3">📍 Delivery</p>
+            <div className="space-y-3">
+              <Field label="Email" error={form.formState.errors.email?.message}>
+                <input type="email" {...form.register("email")} className={inputCls} placeholder="you@example.com" />
+              </Field>
+              <Field label="Postcode" error={form.formState.errors.postcode?.message}>
+                <input type="text" {...form.register("postcode")} className={inputCls} placeholder="BT1 1AA" />
+              </Field>
+              <p className="text-[9px] text-white/20">We&apos;ll assign the nearest InPost locker</p>
+            </div>
+          </div>
 
-            {/* Delivery details */}
-            <div className="space-y-4 rounded-3xl border border-white/10 bg-night-950/70 p-4 sm:p-6">
-              <header className="space-y-1">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/50">Contact</p>
-                <h2 className="text-lg font-semibold text-white sm:text-xl">Delivery details</h2>
-              </header>
-              <FormField label="Email" error={form.formState.errors.email?.message}>
-                <input
-                  type="email"
-                  className={inputClass}
-                  placeholder="you@example.com"
-                  {...form.register("email")}
-                />
-              </FormField>
-              <FormField label="Postcode" error={form.formState.errors.postcode?.message}>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="SW1A 1AA"
-                  {...form.register("postcode")}
-                />
-              </FormField>
-              <p className="text-xs text-white/50">We&apos;ll assign the nearest locker to your postcode</p>
+          {/* Wallet payment */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-3">💳 Payment</p>
+
+            {/* Balance card */}
+            <div className="rounded-xl border border-emerald-400/15 bg-emerald-400/[0.03] p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[9px] text-white/30">Wallet Balance</p>
+                  <p className="text-xl font-bold text-white">{GBP.format(balance)}</p>
+                </div>
+                <span className="rounded-full bg-emerald-400/10 px-2 py-0.5 text-[9px] font-bold text-emerald-300">Wallet</span>
+              </div>
+              <div className="mt-2 flex gap-3 text-[10px]">
+                <span className="text-white/40">💰 {GBP.format(available)}</span>
+                <span className="text-emerald-300/60">🎁 {GBP.format(bonus)}</span>
+              </div>
             </div>
 
-            {/* Wallet payment */}
-            <div className="space-y-4 rounded-3xl border border-white/10 bg-night-950/70 p-4 sm:p-6">
-              <header className="space-y-1">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/50">Payment</p>
-                <h2 className="text-lg font-semibold text-white sm:text-xl">Wallet payment</h2>
-              </header>
-
-              <div className="rounded-2xl border border-emerald-400/40 bg-emerald-400/5 p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-white">Wallet balance</p>
-                    <p className="mt-0.5 text-2xl font-bold text-white">{currency.format(walletBalance)}</p>
-                  </div>
-                  <span className="rounded-full border border-emerald-400/50 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-200">
-                    Wallet
-                  </span>
-                </div>
-                <div className="flex gap-4 text-sm text-white/60">
-                  <span>💰 Available: <span className="font-semibold text-white/80">{currency.format(availableBalance)}</span></span>
-                  <span>🎁 Bonus: <span className="font-semibold text-emerald-300">{currency.format(bonusBalance)}</span></span>
-                </div>
-
-                {/* Payment breakdown */}
-                {!insufficientBalance && subtotal > 0 && (
-                  <div className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-1.5">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-white/50">Payment breakdown</p>
-                    {bonusUsed > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-emerald-300">🎁 Bonus</span>
-                        <span className="font-semibold text-emerald-300">−{currency.format(bonusUsed)}</span>
-                      </div>
-                    )}
-                    {availableUsed > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-white/70">💰 Available balance</span>
-                        <span className="font-semibold text-white/80">−{currency.format(availableUsed)}</span>
-                      </div>
-                    )}
+            {/* Breakdown */}
+            {!shortfall && subtotal > 0 && (
+              <div className="mt-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 space-y-1">
+                <p className="text-[8px] uppercase tracking-wider text-white/25">Breakdown</p>
+                {bonusUsed > 0 && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-emerald-300">🎁 Bonus</span>
+                    <span className="text-emerald-300">−{GBP.format(bonusUsed)}</span>
                   </div>
                 )}
-
-                <p className="text-xs text-white/40">
-                  Bonus is used first. Remaining amount is paid from your available balance.
-                </p>
+                {availableUsed > 0 && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-white/50">💰 Balance</span>
+                    <span className="text-white/70">−{GBP.format(availableUsed)}</span>
+                  </div>
+                )}
               </div>
-
-              {/* Insufficient balance notice */}
-              {insufficientBalance && (
-                <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
-                  <p className="font-semibold text-amber-200">Insufficient balance</p>
-                  <p className="mt-1 leading-relaxed text-amber-200/70">
-                    Required: {currency.format(subtotal)}, current balance {currency.format(walletBalance)},
-                    shortfall {currency.format(subtotal - walletBalance)}.
-                  </p>
-                  <Button
-                    variant="secondary"
-                    type="button"
-                    className="mt-3 w-full min-h-[48px] text-base sm:w-auto"
-                    onClick={() => router.push("/wallet/topup")}
-                  >
-                    Top up
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            {/* Submit */}
-            <Button
-              type="submit"
-              disabled={submitting || insufficientBalance}
-              className="w-full min-h-[52px] text-base font-semibold"
-            >
-              {submitting
-                ? "Placing order…"
-                : insufficientBalance
-                  ? "Top up your wallet first"
-                  : `Pay ${currency.format(subtotal)}`}
-            </Button>
-
-            {insufficientBalance && (
-              <p className="text-center text-xs text-white/40">
-                You need sufficient balance to place an order.
-                <Link href="/wallet/topup" className="text-emerald-300 underline"> Top up</Link>.
-              </p>
             )}
-          </form>
-        </div>
 
-        {/* ── Right: Order summary ── */}
-        <aside className="space-y-4">
-          <div className="space-y-4 rounded-3xl border border-white/10 bg-night-950/60 p-4 sm:p-5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs uppercase tracking-[0.3em] text-white/50">Order summary</h3>
-              <Link href="/cart" className="text-xs text-white/40 hover:text-white/60">Edit cart</Link>
-            </div>
-            <ul className="space-y-3">
-              {items.map((item) => (
-                <CartLineItem key={`${item.productId}::${item.weight}`} item={item} />
-              ))}
-            </ul>
-            <div className="space-y-2 border-t border-white/10 pt-3">
-              <div className="flex justify-between text-sm text-white/70">
-                <span>Subtotal ({totalItems} items)</span>
-                <span className="text-white">{currency.format(subtotal)}</span>
+            {/* Insufficient */}
+            {shortfall && (
+              <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/5 p-3">
+                <p className="text-xs font-bold text-amber-200">Insufficient balance</p>
+                <p className="mt-0.5 text-[10px] text-amber-200/60">
+                  Need {GBP.format(subtotal)}, have {GBP.format(balance)} — short {GBP.format(subtotal - balance)}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => router.push("/wallet/topup")}
+                  className="mt-2 flex w-full min-h-[36px] items-center justify-center rounded-lg border border-amber-400/30 text-xs font-bold text-amber-200"
+                >
+                  Top Up Wallet
+                </button>
               </div>
-              <div className="flex justify-between text-sm text-white/70">
-                <span>Delivery</span>
+            )}
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={submitting || shortfall}
+            className="flex w-full min-h-[52px] items-center justify-center rounded-xl cta-gradient text-base font-bold text-white disabled:opacity-40"
+          >
+            {submitting ? "Placing order…" : shortfall ? "Top up first" : `Pay ${GBP.format(subtotal)}`}
+          </button>
+        </form>
+
+        {/* Right: summary */}
+        <div className="space-y-3">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[10px] uppercase tracking-wider text-white/40">Items · {totalItems}</p>
+              <Link href="/cart" className="text-[9px] text-white/25 hover:text-white/40">Edit</Link>
+            </div>
+
+            <div className="space-y-2">
+              {items.map((item) => (
+                <LineItem key={`${item.productId}::${item.weight}`} item={item} />
+              ))}
+            </div>
+
+            <div className="mt-3 space-y-1.5 border-t border-white/5 pt-3">
+              <div className="flex justify-between text-xs">
+                <span className="text-white/40">Subtotal</span>
+                <span className="text-white">{GBP.format(subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-white/40">Delivery</span>
                 <span className="text-emerald-300">Free</span>
               </div>
-              <div className="flex justify-between pt-1 text-base font-semibold text-white">
-                <span>Total</span>
-                <span>{currency.format(subtotal)}</span>
+              <div className="flex justify-between border-t border-white/5 pt-2">
+                <span className="text-sm font-bold text-white">Total</span>
+                <span className="text-lg font-bold text-white">{GBP.format(subtotal)}</span>
               </div>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-night-950/60 p-4 text-sm leading-relaxed text-white/60 sm:p-5">
-            <p className="font-semibold text-white/80">Need help?</p>
-            <p className="mt-1">
-              Visit our <Link href="/support" className="underline">support centre</Link> for payment or order queries.
+          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+            <p className="text-xs font-bold text-white mb-1">Need help?</p>
+            <p className="text-[10px] text-white/30">
+              Visit <Link href="/support" className="text-emerald-400 underline">support</Link> for payment or order questions
             </p>
           </div>
-        </aside>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-/* ── FormField ── */
-
-function FormField({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
-    <label className="block text-xs font-medium uppercase tracking-[0.3em] text-white/50">
-      {label}
-      <div className="mt-1.5">{children}</div>
-      {error && <p className="mt-1 text-xs text-red-300">{error}</p>}
+    <label className="block">
+      <span className="text-[10px] uppercase tracking-wider text-white/40">{label}</span>
+      <div className="mt-1">{children}</div>
+      {error && <p className="mt-1 text-[10px] text-red-300">{error}</p>}
     </label>
   );
 }
 
-const inputClass =
-  "w-full rounded-2xl border border-white/15 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none";
-
-/* ── CartLineItem ── */
-
-function CartLineItem({ item }: { item: CartItem }) {
+function LineItem({ item }: { item: CartItem }) {
   return (
-    <li className="flex gap-3">
+    <div className="flex items-center gap-2.5">
       <div className="shrink-0">
         {item.image ? (
-          <Image
-            src={item.image}
-            alt={item.title}
-            width={48}
-            height={48}
-            className="rounded-xl object-cover"
-          />
+          <Image src={item.image} alt={item.title} width={40} height={40} className="rounded-lg object-cover" />
         ) : (
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 text-lg">📦</div>
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-sm">📦</div>
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm text-white">{item.title}</p>
-        <p className="text-xs text-white/40">{item.weight} × {item.quantity}</p>
+        <p className="truncate text-xs font-medium text-white">{item.title}</p>
+        <p className="text-[9px] text-white/25">{item.weight} × {item.quantity}</p>
       </div>
-      <p className="shrink-0 text-sm font-semibold text-white">
-        {currency.format(item.unitPrice * item.quantity)}
-      </p>
-    </li>
+      <p className="shrink-0 text-xs font-bold text-white">{GBP.format(item.unitPrice * item.quantity)}</p>
+    </div>
   );
 }
