@@ -461,38 +461,32 @@ function CommissionList({ rows }: { rows: CommissionTransaction[] }) {
     return <StateMessage variant="empty" title="No commissions yet" body="Share your referral link to start earning." />;
   }
 
-  const isClick = (type?: string) => type === "click_bonus" || type === "referral_click_bonus" || type === "点击奖励";
-
   return (
     <div className="space-y-2">
-      {rows.map((row) => (
-        <div key={row.id} className="rounded-xl bg-white/[0.03] px-3 py-2.5">
-          <div className="flex items-center justify-between gap-2">
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm">{isClick(row.type) ? "🔗" : "🛒"}</span>
-                <p className="text-sm font-medium text-white truncate">
-                  {isClick(row.type)
-                    ? "Click reward"
-                    : row.sourceInvitee ? `Order commission` : "Commission"}
-                </p>
+      {rows.map((row) => {
+        const label = row.sourceInvitee
+          ? `Friend's order · ${row.sourceInvitee}`
+          : row.description || "Commission earned";
+
+        return (
+          <div key={row.id} className="rounded-xl bg-white/[0.03] px-3 py-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm">🛒</span>
+                  <p className="text-sm font-medium text-white truncate">{label}</p>
+                </div>
               </div>
+              <span className="text-sm font-semibold text-emerald-300 shrink-0">+{GBP.format(row.amount ?? 0)}</span>
             </div>
-            <span className="text-sm font-semibold text-emerald-300 shrink-0">+{GBP.format(row.amount ?? 0)}</span>
+            <div className="mt-1 flex items-center gap-2 text-[11px] text-white/40">
+              <span className="ml-auto shrink-0">
+                {row.createdAt ? new Date(row.createdAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}
+              </span>
+            </div>
           </div>
-          {/* Detail line */}
-          <div className="mt-1 flex items-center gap-2 text-[11px] text-white/40">
-            {row.sourceInvitee && !isClick(row.type) && (
-              <span>From <span className="font-mono text-white/60">{row.sourceInvitee}</span></span>
-            )}
-            {isClick(row.type) && <span>£0.30 per valid click</span>}
-            {row.reference && <span className="font-mono truncate">{row.reference}</span>}
-            <span className="ml-auto shrink-0">
-              {row.createdAt ? new Date(row.createdAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}
-            </span>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -535,7 +529,7 @@ function HowItWorks() {
         <div>
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 text-2xl">💰</div>
           <p className="mt-2 text-sm font-semibold text-white">You Earn</p>
-          <p className="mt-0.5 text-xs text-white/50">£0.30/click + 10% of orders</p>
+          <p className="mt-0.5 text-xs text-white/50">Earn 15-25% of every order</p>
         </div>
       </div>
     </div>

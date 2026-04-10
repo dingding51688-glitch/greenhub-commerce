@@ -97,6 +97,7 @@ export type CommissionTransaction = {
   reference?: string;
   createdAt: string;
   type?: string;
+  description?: string;
   sourceInvitee?: string;
 };
 
