@@ -1,30 +1,29 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { StateMessage } from "@/components/StateMessage";
-import Button from "@/components/ui/button";
 import { findOrderSummary, getOrderTracking } from "@/lib/orders-api";
 import type { OrderRecord } from "@/lib/types";
 
-function CopyButton({ value, label }: { value: string; label: string }) {
-  const [copied, setCopied] = useState(false);
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch { /* fallback */ }
+const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+const DATE_FMT = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" });
+
+const STATUS_STEP: Record<string, number> = {
+  pending: 0, paid: 1, processing: 1, awaiting_confirmations: 1,
+  dispatched: 2, delivered: 3, completed: 3,
+  canceled: -1, rejected: -1, refunded: -1,
+};
+const STEPS = ["Placed", "Processing", "Dispatched", "Delivered"];
+
+function CopyBtn({ value }: { value: string }) {
+  const [ok, setOk] = useState(false);
+  const copy = useCallback(async () => {
+    try { await navigator.clipboard.writeText(value); setOk(true); setTimeout(() => setOk(false), 1500); } catch {}
   }, [value]);
   return (
-    <button
-      onClick={handleCopy}
-      className="ml-2 inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-white/70 transition hover:bg-white/10 hover:text-white active:scale-95"
-      aria-label={`Copy ${label}`}
-    >
-      {copied ? "✓ Copied" : "Copy"}
-    </button>
+    <button onClick={copy} className="ml-1.5 text-[9px] text-white/30 hover:text-white/50">{ok ? "✓" : "📋"}</button>
   );
 }
 
@@ -40,14 +39,11 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
     setLoading(true);
     Promise.all([
       getOrderTracking(params.reference),
-      findOrderSummary(params.reference).catch(() => null)
+      findOrderSummary(params.reference).catch(() => null),
     ])
-      .then(([trackingResponse, orderSummary]) => {
-        const trackingOrder = trackingResponse.order ?? null;
-        const merged = orderSummary
-          ? { ...orderSummary, status: trackingOrder?.status ?? orderSummary.status }
-          : trackingOrder;
-        setOrder(merged);
+      .then(([tracking, summary]) => {
+        const t = tracking.order ?? null;
+        setOrder(summary ? { ...summary, status: t?.status ?? summary.status } : t);
       })
       .catch((err) => setError(err?.message || "Unable to load order"))
       .finally(() => setLoading(false));
@@ -55,130 +51,188 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
 
   if (!token) {
     return (
-      <StateMessage
-        title="Sign in to view orders"
-        body="Login first, then revisit this link."
-        actionLabel="Login"
-        onAction={() => router.push("/login")}
-      />
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="space-y-3 text-center">
+          <p className="text-4xl">🔐</p>
+          <p className="text-sm font-bold text-white">Sign in to view this order</p>
+          <Link href="/login" className="inline-flex min-h-[40px] items-center rounded-xl cta-gradient px-5 text-sm font-bold text-white">Log in</Link>
+        </div>
+      </div>
     );
   }
 
   if (loading) {
-    return <StateMessage variant="info" title="Fetching order" body="Hold tight while we fetch locker details." />;
+    return (
+      <div className="space-y-3 pb-24">
+        <div className="h-24 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-16 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-40 animate-pulse rounded-2xl bg-white/5" />
+      </div>
+    );
   }
 
   if (error || !order) {
     return (
-      <StateMessage
-        variant="error"
-        title="Order not found"
-        body={error || "We can't locate this reference. Double-check the link or contact support."}
-        actionLabel="Back to account"
-        onAction={() => router.push("/account")}
-      />
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="space-y-3 text-center">
+          <p className="text-4xl">❌</p>
+          <p className="text-sm font-bold text-white">Order not found</p>
+          <p className="text-xs text-white/40">{error || "Check the reference or contact support"}</p>
+          <Link href="/orders" className="inline-flex min-h-[36px] items-center rounded-xl border border-white/15 px-4 text-xs font-medium text-white">Back to orders</Link>
+        </div>
+      </div>
     );
   }
 
   const items = order.items ?? [];
-  const lockerAddressDisplay = order.lockerNotes || order.lockerAddress;
+  const step = STATUS_STEP[order.status] ?? 0;
+  const isCanceled = step === -1;
+  const lockerDisplay = order.lockerNotes || order.lockerAddress;
 
   return (
-    <section className="space-y-6">
-      <div className="rounded-[40px] border border-white/10 bg-night-950/80 p-6 shadow-card">
-        <p className="text-xs uppercase tracking-[0.35em] text-white/40">Order reference</p>
-        <h1 className="text-3xl font-semibold text-white">{order.reference}</h1>
-        <p className="mt-2 text-sm text-white/60">
-          Status: <span className="text-white">{order.status}</span> · Total {currency.format(order.totalAmount)}
-        </p>
+    <div className="space-y-4 pb-24 sm:space-y-6 sm:pb-20">
+      {/* Back + Reference */}
+      <div className="flex items-center gap-2">
+        <Link href="/orders" className="text-white/30 hover:text-white/50">← Orders</Link>
+        <span className="text-white/15">/</span>
+        <span className="text-xs font-mono text-white/50">{order.reference}</span>
       </div>
 
-      <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Items</p>
-        {items.length === 0 ? (
-          <p className="mt-3 text-sm text-white/60">No line items available for this order.</p>
-        ) : (
-          <ul className="mt-3 space-y-3">
-            {items.map((item) => (
-            <li key={`${item.productId}-${item.weight}`} className="rounded-2xl border border-white/10 px-4 py-3">
-              <div className="flex items-center justify-between text-sm text-white/80">
-                <span>{item.title || `Product ${item.productId}`}</span>
-                <span>x{item.quantity}</span>
-              </div>
-              <div className="flex items-center justify-between text-xs text-white/50">
-                <span>{item.weight || "Locker-ready"}</span>
-                <span>{currency.format(item.unitPrice)}</span>
-              </div>
-            </li>
-            ))}
-          </ul>
+      {/* Status header */}
+      <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-emerald-900/15 to-transparent p-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-white/40">Order Total</p>
+            <p className="text-2xl font-bold text-white">{GBP.format(order.totalAmount)}</p>
+          </div>
+          <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold capitalize ${
+            isCanceled ? "bg-red-400/10 text-red-300" : step >= 3 ? "bg-emerald-400/10 text-emerald-300" : "bg-amber-400/10 text-amber-300"
+          }`}>
+            {order.status.replace(/_/g, " ")}
+          </span>
+        </div>
+        {order.createdAt && (
+          <p className="mt-1 text-[10px] text-white/25">{DATE_FMT.format(new Date(order.createdAt))}</p>
         )}
       </div>
 
-      {(order.contactEmail || order.dropoffPostcode) && (
-        <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/40">Delivery info</p>
-          <div className="mt-3 space-y-2">
-            {order.contactEmail && (
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Email</p>
-                <p className="text-base text-white">{order.contactEmail}</p>
-              </div>
-            )}
-            {order.dropoffPostcode && (
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Postcode</p>
-                <p className="text-base text-white">{order.dropoffPostcode}</p>
-              </div>
-            )}
-          </div>
+      {/* Progress stepper */}
+      {!isCanceled && (
+        <div className="flex items-center gap-1 px-1">
+          {STEPS.map((label, i) => (
+            <div key={label} className="flex flex-1 flex-col items-center gap-1">
+              <div className={`h-1.5 w-full rounded-full ${i <= step ? "bg-emerald-400" : "bg-white/8"}`} />
+              <span className={`text-[8px] ${i <= step ? "text-emerald-300" : "text-white/20"}`}>{label}</span>
+            </div>
+          ))}
         </div>
       )}
 
-      <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Locker details</p>
-        <div className="mt-3 space-y-2">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Address</p>
-            <div className="flex items-center">
-              <p className="text-base text-white">{lockerAddressDisplay || "Pending"}</p>
-              {lockerAddressDisplay && <CopyButton value={lockerAddressDisplay} label="address" />}
+      {/* Items */}
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+        <p className="text-[10px] uppercase tracking-wider text-white/40 mb-2">Items · {items.length}</p>
+        {items.length === 0 ? (
+          <p className="text-xs text-white/30">No items data</p>
+        ) : (
+          <div className="space-y-1.5">
+            {items.map((item, i) => (
+              <div key={`${item.productId}-${item.weight}-${i}`}
+                className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2.5">
+                <div>
+                  <p className="text-xs font-semibold text-white">{item.title || `Product #${item.productId}`}</p>
+                  <p className="text-[9px] text-white/30">
+                    {item.weight || "—"} × {item.quantity}
+                    {item.unitPrice ? ` · ${GBP.format(item.unitPrice)} each` : ""}
+                  </p>
+                </div>
+                <p className="text-sm font-bold text-white">{GBP.format(item.lineTotal)}</p>
+              </div>
+            ))}
+            {/* Total row */}
+            <div className="flex items-center justify-between border-t border-white/5 pt-2 mt-1">
+              <span className="text-[10px] text-white/40">Total</span>
+              <span className="text-sm font-bold text-emerald-300">{GBP.format(order.totalAmount)}</span>
             </div>
           </div>
+        )}
+      </div>
+
+      {/* Delivery info */}
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+        <p className="text-[10px] uppercase tracking-wider text-white/40 mb-3">Delivery</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <InfoField label="Postcode" value={order.dropoffPostcode || "Pending"} />
+          <InfoField label="Payment" value={order.paymentOption || "Wallet"} />
+          {order.contactEmail && <InfoField label="Email" value={order.contactEmail} />}
+        </div>
+      </div>
+
+      {/* Locker details */}
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+        <p className="text-[10px] uppercase tracking-wider text-white/40 mb-3">📦 Locker Details</p>
+        <div className="space-y-3">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Yodel tracking number</p>
+            <p className="text-[9px] uppercase tracking-wider text-white/30">Address</p>
             <div className="flex items-center">
-              <p className="font-mono text-lg text-white">{order.trackingNumber || "Pending"}</p>
-              {order.trackingNumber && <CopyButton value={order.trackingNumber} label="tracking number" />}
+              <p className="text-sm text-white">{lockerDisplay || "Pending assignment"}</p>
+              {lockerDisplay && <CopyBtn value={lockerDisplay} />}
             </div>
           </div>
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Access code</p>
-            <div className="flex items-center">
-              <p className="font-mono text-lg text-white">{order.lockerAccessCode || "Pending"}</p>
-              {order.lockerAccessCode && <CopyButton value={order.lockerAccessCode} label="access code" />}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-[9px] uppercase tracking-wider text-white/30">Tracking</p>
+              <div className="flex items-center">
+                <p className="font-mono text-sm font-bold text-white">{order.trackingNumber || "—"}</p>
+                {order.trackingNumber && <CopyBtn value={order.trackingNumber} />}
+              </div>
+              {order.trackingUrl && (
+                <a href={order.trackingUrl} target="_blank" rel="noreferrer" className="text-[9px] text-emerald-400 underline">
+                  Track parcel →
+                </a>
+              )}
+            </div>
+            <div>
+              <p className="text-[9px] uppercase tracking-wider text-white/30">Access Code</p>
+              <div className="flex items-center">
+                <p className="font-mono text-lg font-bold text-emerald-300">{order.lockerAccessCode || "—"}</p>
+                {order.lockerAccessCode && <CopyBtn value={order.lockerAccessCode} />}
+              </div>
             </div>
           </div>
+          {order.carrier && (
+            <div>
+              <p className="text-[9px] uppercase tracking-wider text-white/30">Carrier</p>
+              <p className="text-sm text-white">{order.carrier}</p>
+            </div>
+          )}
           {order.lockerEta && (
-            <p className="text-white/60">ETA: {order.lockerEta}</p>
+            <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/5 px-3 py-2">
+              <p className="text-xs text-emerald-200">⏱ ETA: {order.lockerEta}</p>
+            </div>
           )}
         </div>
       </div>
 
-      <div className="rounded-[32px] border border-white/10 bg-night-950/60 p-5 text-sm text-white/70">
-        <p className="font-semibold text-white">Need to change locker or payment?</p>
-        <p className="mt-1">Contact support if you need to change the locker or payment method.</p>
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-          <Button asChild className="w-full sm:w-auto">
-            <a href="/support">Contact support</a>
-          </Button>
-          <Button asChild variant="ghost" className="w-full sm:w-auto">
-            <a href="/orders">View all orders</a>
-          </Button>
-        </div>
+      {/* Actions */}
+      <div className="flex gap-2">
+        <Link href="/support"
+          className="flex flex-1 min-h-[44px] items-center justify-center rounded-xl cta-gradient text-sm font-bold text-white">
+          Need Help?
+        </Link>
+        <Link href="/orders"
+          className="flex flex-1 min-h-[44px] items-center justify-center rounded-xl border border-white/15 text-sm font-medium text-white">
+          All Orders
+        </Link>
       </div>
-    </section>
+    </div>
   );
 }
 
-const currency = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+function InfoField({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[9px] uppercase tracking-wider text-white/30">{label}</p>
+      <p className="text-sm text-white">{value}</p>
+    </div>
+  );
+}
