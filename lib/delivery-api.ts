@@ -68,18 +68,26 @@ export async function searchInPostLockers(
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
-  return (data.items || []).map((p: any) => ({
-    id: p.name,
-    name: p.address?.line1 || p.name,
-    address: p.address?.line1 || "",
-    postcode: p.address_details?.post_code || "",
-    city: p.address_details?.city || "",
-    lat: p.location?.latitude || 0,
-    lng: p.location?.longitude || 0,
-    distance: p.distance ?? null,
-    type: "inpost_locker" as const,
-    opening: parseInPostHours(p.opening_hours),
-  }));
+  return (data.items || []).map((p: any) => {
+    const street = p.address_details?.street || "";
+    const buildNum = p.address_details?.building_number || "";
+    const city = p.address_details?.city || "";
+    const pc = p.address_details?.post_code || "";
+    // Build a readable address: "Sharrow Lane, Sheffield S11 8AN"
+    const addrParts = [street, city, pc].filter(Boolean);
+    return {
+      id: p.name,
+      name: p.address?.line1 || p.name,
+      address: addrParts.join(", ") || p.address?.line2 || "",
+      postcode: pc,
+      city,
+      lat: p.location?.latitude || 0,
+      lng: p.location?.longitude || 0,
+      distance: p.distance ?? null,
+      type: "inpost_locker" as const,
+      opening: parseInPostHours(p.opening_hours),
+    };
+  });
 }
 
 // ─── OOHPod (Stockist) ─────────────────────────────────

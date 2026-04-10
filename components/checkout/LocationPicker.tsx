@@ -162,9 +162,10 @@ export default function LocationPicker({ postcode, onSelect, selected }: Props) 
                     <p className={`text-[11px] font-bold truncate ${isSel ? "text-emerald-300" : "text-white"}`}>
                       {isSel && "✓ "}{loc.name}
                     </p>
+                    {loc.address && (
+                      <p className="text-[10px] text-white/40 mt-0.5 truncate">{loc.address}</p>
+                    )}
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <span className="text-[9px] text-white/25">{loc.postcode}</span>
-                      <span className="text-[9px] text-white/15">·</span>
                       <span className="text-[9px] text-emerald-300/50">{loc.opening}</span>
                     </div>
                   </div>
