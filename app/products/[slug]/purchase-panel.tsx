@@ -2,55 +2,38 @@
 
 import clsx from "clsx";
 import { useState } from "react";
-import Button from "@/components/ui/button";
-import type { ProductRecord, WeightOption } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/providers/CartProvider";
+import type { ProductRecord, WeightOption } from "@/lib/types";
 
 const MIN_QTY = 1;
 const MAX_QTY = 5;
 
-const FALLBACK_WEIGHT_OPTIONS: WeightOption[] = [
+const FALLBACK: WeightOption[] = [
   { id: 1001, label: "3.5g", price: 35, unitPrice: "£10/g" },
   { id: 1002, label: "7g", price: 60, unitPrice: "£8.57/g" },
   { id: 1003, label: "14g", price: 110, unitPrice: "£7.85/g" },
-  { id: 1004, label: "28g", price: 180, unitPrice: "£6.42/g", featured: true }
+  { id: 1004, label: "28g", price: 180, unitPrice: "£6.42/g", featured: true },
 ];
 
-function formatUnitPrice(option: WeightOption) {
-  if (option.unitPrice) return option.unitPrice;
-  const match = option.label.match(/([\d.]+)\s*g/i);
-  if (match) {
-    const grams = parseFloat(match[1]);
-    if (!Number.isNaN(grams) && grams > 0) {
-      return `£${(option.price / grams).toFixed(2)}/g`;
-    }
-  }
-  return "Locker ready";
+function unitPrice(o: WeightOption) {
+  if (o.unitPrice) return o.unitPrice;
+  const m = o.label.match(/([\d.]+)\s*g/i);
+  if (m) { const g = parseFloat(m[1]); if (g > 0) return `£${(o.price / g).toFixed(2)}/g`; }
+  return "";
 }
 
 export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
   const router = useRouter();
   const { addItem } = useCart();
-  const rawOptions = product.weightOptions ?? [];
-  const normalizedOptions = rawOptions.length > 0 ? rawOptions : FALLBACK_WEIGHT_OPTIONS;
-  const limitedOptions = normalizedOptions.slice(0, 4);
-  const [selectedId, setSelectedId] = useState<number | null>(limitedOptions[0]?.id ?? null);
-  const [quantity, setQuantity] = useState(1);
+  const options = (product.weightOptions?.length ? product.weightOptions : FALLBACK).slice(0, 4);
+  const [selectedId, setSelectedId] = useState(options[0]?.id ?? null);
+  const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
-  const displayOptions = limitedOptions.map((option) => {
-    const highlight = option.featured || option.label.toLowerCase().includes("28");
-    return {
-      ...option,
-      displayUnitPrice: formatUnitPrice(option),
-      highlight
-    };
-  });
+  const selected = options.find((o) => o.id === selectedId) ?? options[0];
 
-  const selected = displayOptions.find((option) => option.id === selectedId) ?? displayOptions[0] ?? null;
-
-  const handleAddToCart = () => {
+  const handleAdd = () => {
     if (!selected) return;
     addItem({
       productId: product.id,
@@ -59,104 +42,87 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
       image: product.coverImage?.url ?? null,
       weight: selected.label,
       unitPrice: selected.price,
-      quantity,
+      quantity: qty,
     });
     setAdded(true);
     setTimeout(() => router.push("/cart"), 600);
   };
 
-  const adjustQuantity = (delta: number) => {
-    setQuantity((prev) => Math.min(MAX_QTY, Math.max(MIN_QTY, prev + delta)));
-  };
-
   return (
-    <div className="flex flex-col gap-6 rounded-[40px] border border-white/10 bg-[#050708] p-6 text-white shadow-card">
-      <div className="space-y-1">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/50">Weight</p>
-        <h2 className="text-2xl font-semibold text-white">Choose your weight</h2>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2">
-        {displayOptions.map((option) => {
-          const isActive = selected?.id === option.id;
-          const showMostChosen = option.highlight;
+    <div className="space-y-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+      {/* Weight selector */}
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Select Weight</p>
+      <div className="grid grid-cols-2 gap-1.5">
+        {options.map((o) => {
+          const active = selected?.id === o.id;
+          const popular = o.featured || o.label.toLowerCase().includes("28");
           return (
             <button
-              key={option.id}
-              type="button"
-              onClick={() => setSelectedId(option.id)}
+              key={o.id}
+              onClick={() => setSelectedId(o.id)}
               className={clsx(
-                "relative rounded-2xl border border-[#1F242A] bg-[#0F1114] px-3 py-3 text-left text-[#F5F5F5] shadow-sm transition hover:-translate-y-0.5",
-                isActive && "border-emerald-400 bg-[#11171C] shadow-[0_8px_20px_rgba(16,185,129,0.2)]"
+                "relative rounded-xl border px-3 py-2.5 text-left transition",
+                active
+                  ? "border-emerald-400/40 bg-emerald-400/10"
+                  : "border-white/8 bg-white/[0.02] hover:border-white/15"
               )}
             >
-              {showMostChosen && (
-                <span className="absolute right-2 top-2 rounded-full border border-emerald-400 bg-transparent px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-emerald-300">
+              {popular && (
+                <span className="absolute right-1.5 top-1.5 rounded-full bg-emerald-400/20 px-1.5 py-0.5 text-[7px] font-bold uppercase text-emerald-300">
                   Popular
                 </span>
               )}
-              {isActive && (
-                <span className="absolute left-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400 text-[#0B0F0D]">
-                  <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden>
-                    <path d="M20 6.5L9.5 17l-5.5-5.5" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-              )}
-              <div className="flex flex-col gap-1 pt-4">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#C9CFD4]">{option.label}</p>
-                <p className="text-xl font-semibold text-[#F5F5F5]">£{option.price.toFixed(0)}</p>
-                <p className="text-xs text-[#C9CFD4]">{option.displayUnitPrice}</p>
-              </div>
+              <p className="text-[10px] text-white/40">{o.label}</p>
+              <p className="text-base font-bold text-white">£{o.price.toFixed(0)}</p>
+              {unitPrice(o) && <p className="text-[9px] text-white/25">{unitPrice(o)}</p>}
             </button>
           );
         })}
       </div>
 
-      <div className="flex items-center justify-between rounded-[32px] border border-white/15 bg-[#0F1215] px-5 py-4 text-[#F5F5F5]">
+      {/* Quantity */}
+      <div className="flex items-center justify-between rounded-xl border border-white/8 bg-white/[0.03] px-4 py-2.5">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[#F5F5F5]/70">Quantity</p>
-          <p className="text-3xl font-semibold text-[#F5F5F5]">{quantity}</p>
+          <p className="text-[9px] uppercase tracking-wider text-white/30">Qty</p>
+          <p className="text-xl font-bold text-white">{qty}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex gap-2">
           <button
-            type="button"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-transparent text-2xl font-semibold text-white disabled:opacity-30"
-            onClick={() => adjustQuantity(-1)}
-            disabled={quantity === MIN_QTY}
-            aria-label="Decrease quantity"
-          >
-            –
-          </button>
+            onClick={() => setQty((q) => Math.max(MIN_QTY, q - 1))}
+            disabled={qty === MIN_QTY}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-lg text-white disabled:opacity-20"
+          >–</button>
           <button
-            type="button"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-transparent text-2xl font-semibold text-white disabled:opacity-30"
-            onClick={() => adjustQuantity(1)}
-            disabled={quantity === MAX_QTY}
-            aria-label="Increase quantity"
-          >
-            +
-          </button>
+            onClick={() => setQty((q) => Math.min(MAX_QTY, q + 1))}
+            disabled={qty === MAX_QTY}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-lg text-white disabled:opacity-20"
+          >+</button>
         </div>
       </div>
 
-      <Button
-        onClick={handleAddToCart}
-        disabled={!selected || added}
-        className="w-full rounded-[30px] border-2 border-[#0B0F0D] bg-[#23A26D] text-[#0B0F0D] font-semibold tracking-wide hover:bg-[#1F8B5D]"
-      >
-        {added ? "✓ ADDED — GOING TO CART" : "ADD TO CART"}
-      </Button>
+      {/* Total + Add to cart */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1">
+          <p className="text-[9px] text-white/30">Total</p>
+          <p className="text-xl font-bold text-white">£{((selected?.price ?? 0) * qty).toFixed(0)}</p>
+        </div>
+        <button
+          onClick={handleAdd}
+          disabled={!selected || added}
+          className={clsx(
+            "flex min-h-[48px] flex-1 items-center justify-center rounded-xl text-sm font-bold uppercase tracking-wider transition",
+            added ? "bg-emerald-400/20 text-emerald-300" : "cta-gradient text-white"
+          )}
+        >
+          {added ? "✓ Added" : "Add to Cart"}
+        </button>
+      </div>
 
-      <div className="rounded-[32px] border border-white/15 bg-[#0A0C0E] p-5 text-sm text-[#EDEDED]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/60">Where we ship</p>
-        <p className="mt-1 text-base font-semibold text-white">We ship across the United Kingdom.</p>
-        <ul className="mt-3 list-disc space-y-1 pl-5 text-[#EDEDED]">
-          <li>England</li>
-          <li>Scotland</li>
-          <li>Wales</li>
-        </ul>
-        <p className="mt-3 text-sm text-[#EDEDED]/80">We do NOT ship to Northern Ireland.</p>
-        <p className="text-sm text-[#EDEDED]/80">Orders are vacuum-sealed and discreetly packaged. Tracking number will be provided within 24 hours.</p>
+      {/* Shipping info */}
+      <div className="rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2 text-[10px] text-white/25 space-y-0.5">
+        <p>🚚 Ships across England, Scotland & Wales</p>
+        <p>📦 Vacuum-sealed, discreet packaging</p>
+        <p>⚠️ We do NOT ship to Northern Ireland</p>
       </div>
     </div>
   );
