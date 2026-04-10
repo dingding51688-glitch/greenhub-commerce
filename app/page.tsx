@@ -14,9 +14,6 @@ function strapiMedia(path?: string | null): string | undefined {
 export default function HomePage() {
   return (
     <div className="space-y-5 pb-20 sm:space-y-10">
-      {/* ── 0. User status bar (mobile only, logged in) ── */}
-      <UserStatusBar />
-
       {/* ── 1. Hero: Compact, action-oriented ── */}
       <section className="relative isolate overflow-hidden rounded-2xl border border-white/10 px-5 py-8 sm:rounded-[40px] sm:px-12 sm:py-14">
         <div className="absolute inset-0 bg-hero-gradient" aria-hidden="true" />
