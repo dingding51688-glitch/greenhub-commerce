@@ -83,7 +83,7 @@ const faqs = [
   },
   {
     q: "What areas do you cover?",
-    a: "All of the UK via the InPost locker network — over 14,000 locations nationwide. Northern Ireland customers need to provide a real delivery address.",
+    a: "All of the UK via the InPost locker network — over 14,000 pickup points nationwide. Northern Ireland customers need to provide a real delivery address or a collection point.",
   },
   {
     q: "Can I get a refund?",
