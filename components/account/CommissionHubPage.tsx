@@ -135,7 +135,7 @@ export default function CommissionHubPage() {
   const shareUrl = summaryLink ? encodeURIComponent(summaryLink) : "";
   const telegramShare = summaryLink ? `https://t.me/share/url?url=${shareUrl}&text=${shareText}` : null;
   const whatsappShare = summaryLink ? `https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}` : null;
-  const currentRate = summary?.commissionRate ? Math.round(summary.commissionRate * 100) : 10;
+  const currentRate = summary?.commissionRate ? Math.round(summary.commissionRate * 100) : 15;
   const qualifiedFriends = summary?.topups ?? conversions.filter(c => (c as any).totalCommissionEarned > 0 || c.status === "topped_up" || c.status === "purchased").length;
   const tierInfo = getTier(qualifiedFriends);
 
