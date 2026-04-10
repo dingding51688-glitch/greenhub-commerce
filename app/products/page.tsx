@@ -8,10 +8,19 @@ import { ProductCard } from "@/components/ProductCard";
 import Button from "@/components/ui/button";
 import { Skeleton } from "@/components/Skeleton";
 import { swrFetcher } from "@/lib/api";
-import type { ProductRecord, ProductsResponse } from "@/lib/types";
+import type { ProductsResponse } from "@/lib/types";
 import { productCategoryContent, type ProductCategoryKey } from "@/data/fixtures/products";
 
 const CATEGORY_TABS: ProductCategoryKey[] = ["shop-all", "flowers", "pre-rolls", "vapes", "edibles", "concentrates"];
+
+const tabEmojis: Record<string, string> = {
+  "shop-all": "🛍️",
+  flowers: "🌿",
+  "pre-rolls": "🚬",
+  vapes: "💨",
+  edibles: "🍬",
+  concentrates: "🧊",
+};
 
 function resolveCategory(value: string | null): ProductCategoryKey {
   if (value && CATEGORY_TABS.includes(value as ProductCategoryKey)) {
@@ -26,7 +35,7 @@ export default function ProductsPage() {
   const category = resolveCategory(searchParams.get("category"));
 
   const requestParams = new URLSearchParams({
-    "pagination[pageSize]": "12",
+    "pagination[pageSize]": "20",
     "sort[0]": "createdAt:desc",
     "populate[0]": "weightOptions",
     "populate[1]": "featuredImage",
@@ -40,7 +49,6 @@ export default function ProductsPage() {
   const key = `/api/products?${requestParams.toString()}`;
   const { data, isLoading } = useSWR<ProductsResponse>(key, swrFetcher);
   const products = useMemo(() => data?.data ?? [], [data]);
-  const displayProducts = products;
 
   const handleCategoryChange = (value: ProductCategoryKey) => {
     const next = new URLSearchParams(searchParams.toString());
@@ -53,65 +61,74 @@ export default function ProductsPage() {
     router.replace(query ? `/products?${query}` : "/products", { scroll: false });
   };
 
-
   const hero = productCategoryContent[category];
 
   return (
-    <div className="space-y-6 pb-20">
-      <div className="overflow-x-auto px-6 py-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/80 whitespace-nowrap">
-          {hero.breadcrumb}
-        </p>
+    <div className="space-y-4 pb-24 sm:space-y-6 sm:pb-20">
+      {/* Category tabs - horizontal scroll on mobile */}
+      <div className="flex gap-2 overflow-x-auto pb-1 snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
+        {CATEGORY_TABS.map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            className={clsx(
+              "flex shrink-0 snap-start items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition whitespace-nowrap",
+              category === tab
+                ? "bg-emerald-400/15 text-emerald-300 border border-emerald-400/30"
+                : "bg-white/[0.04] text-white/50 border border-white/8 hover:text-white/80"
+            )}
+            onClick={() => handleCategoryChange(tab)}
+          >
+            <span>{tabEmojis[tab]}</span>
+            <span>{tab === "shop-all" ? "All" : tab.charAt(0).toUpperCase() + tab.slice(1).replace("-", " ")}</span>
+          </button>
+        ))}
       </div>
 
-      <div className="rounded-3xl border border-white/10 bg-night-950/60 p-4">
-        <div className="flex flex-wrap gap-2">
-          {CATEGORY_TABS.map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              className={clsx(
-                "rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition",
-                category === tab ? "bg-night-900 text-white" : "bg-night-50 text-night-600 hover:text-night-900"
-              )}
-              onClick={() => handleCategoryChange(tab)}
-            >
-              {tab === "shop-all" ? "Shop All" : tab.replace("-", " ")}
-            </button>
-          ))}
-        </div>
+      {/* Category header */}
+      <div>
+        <h1 className="text-lg font-bold text-white sm:text-2xl">{hero.title}</h1>
+        <p className="mt-1 text-xs text-white/40 sm:text-sm">{hero.description}</p>
       </div>
 
+      {/* Product count */}
+      {!isLoading && products.length > 0 && (
+        <p className="text-[10px] uppercase tracking-wider text-white/30">{products.length} products</p>
+      )}
+
+      {/* Loading */}
       {isLoading && (
-        <div className="space-y-2">
-          <p className="text-sm text-ink-500">Loading store inventory...</p>
-          <div className="grid gap-4 md:grid-cols-2">
-            {Array.from({ length: 6 }).map((_, idx) => (
-              <Skeleton key={idx} className="h-64" />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {!isLoading && displayProducts.length === 0 && (
-        <div className="rounded-3xl border border-white/10 bg-night-950/60 p-6 text-center text-sm text-ink-400">
-          No products available for this category. Try another filter or check back later.
-        </div>
-      )}
-
-      {!isLoading && displayProducts.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2">
-          {displayProducts.map((product) => (
-            <ProductCard key={product.documentId} product={product} />
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <Skeleton key={idx} className="aspect-[3/4] rounded-2xl" />
           ))}
         </div>
       )}
 
-      <div className="rounded-3xl border border-white/10 bg-night-900/50 p-5 text-sm text-ink-500">
-        <p className="font-semibold text-white">Need curated help?</p>
-        <p>Message our support team on Telegram or email and we&apos;ll recommend a bundle that suits your taste.</p>
-        <Button asChild variant="ghost" className="mt-3 w-full sm:w-auto">
-          <a href="mailto:support@greenhub420.co.uk">Contact support</a>
+      {/* Empty */}
+      {!isLoading && products.length === 0 && (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8 text-center">
+          <p className="text-2xl">🔍</p>
+          <p className="mt-2 text-sm font-medium text-white/60">No products in this category yet</p>
+          <p className="mt-1 text-xs text-white/30">Check back soon or browse another category</p>
+        </div>
+      )}
+
+      {/* Product Grid - 2 columns on mobile */}
+      {!isLoading && products.length > 0 && (
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+          {products.map((product) => (
+            <ProductCard key={product.documentId} product={product} variant="compact" />
+          ))}
+        </div>
+      )}
+
+      {/* Support CTA */}
+      <div className="rounded-2xl border border-white/8 bg-white/[0.02] px-4 py-4 sm:px-6">
+        <p className="text-sm font-semibold text-white">Need help choosing?</p>
+        <p className="mt-1 text-xs text-white/40">Message our team and we&apos;ll recommend the best products for you.</p>
+        <Button asChild variant="ghost" size="sm" className="mt-2">
+          <a href="/support">Contact support</a>
         </Button>
       </div>
     </div>
