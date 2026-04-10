@@ -33,6 +33,7 @@ export default function CheckoutPage() {
   const { items, subtotal, totalItems, clearCart } = useCart();
   const [alert, setAlert] = useState<{ ok: boolean; msg: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState<{ reference: string; total: number } | null>(null);
 
   const { data: walletData } = useSWR<WalletBalanceResponse>(
     token ? "/api/wallet/balance" : null, swrFetcher, { refreshInterval: 60_000 }
@@ -60,6 +61,52 @@ export default function CheckoutPage() {
     if (!c.email && e) form.setValue("email", e);
     if (!c.postcode && p) form.setValue("postcode", p);
   }, [profileData, userEmail, form]);
+
+  // Success screen
+  if (orderSuccess) {
+    return (
+      <div className="flex min-h-[70vh] items-center justify-center">
+        <div className="w-full max-w-sm space-y-5 text-center">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-400/10">
+            <span className="text-4xl">✅</span>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white">Order Placed!</h2>
+            <p className="mt-1 text-sm text-white/50">Your order has been confirmed</p>
+          </div>
+          <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-4 space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-white/50">Order</span>
+              <span className="font-mono font-bold text-white">{orderSuccess.reference}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-white/50">Total</span>
+              <span className="font-bold text-emerald-300">{GBP.format(orderSuccess.total)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-white/50">Payment</span>
+              <span className="text-white">Wallet ✓</span>
+            </div>
+          </div>
+          <p className="text-xs text-white/30">We&apos;ll notify you when your order is dispatched</p>
+          <div className="flex gap-2">
+            <Link
+              href={`/orders/${orderSuccess.reference}`}
+              className="flex flex-1 min-h-[44px] items-center justify-center rounded-xl cta-gradient text-sm font-bold text-white"
+            >
+              View Order
+            </Link>
+            <Link
+              href="/products"
+              className="flex flex-1 min-h-[44px] items-center justify-center rounded-xl border border-white/15 text-sm font-medium text-white"
+            >
+              Continue Shopping
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Guards
   if (!token) {
@@ -102,8 +149,7 @@ export default function CheckoutPage() {
         referralCode: ref || undefined,
       });
       clearCart();
-      setAlert({ ok: true, msg: `Order ${res.order.reference} placed!` });
-      router.push(`/orders/${res.order.reference}`);
+      setOrderSuccess({ reference: res.order.reference, total: subtotal });
     } catch (e: any) {
       setAlert({ ok: false, msg: e?.message || "Unable to place order" });
     } finally {

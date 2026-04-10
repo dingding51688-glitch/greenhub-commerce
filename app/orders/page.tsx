@@ -18,18 +18,18 @@ const FILTERS = [
   { id: "canceled", label: "Canceled", statuses: new Set(["canceled", "rejected", "refunded"]) },
 ] as const;
 
-const STATUS_DOT: Record<string, string> = {
-  pending: "bg-amber-400",
-  paid: "bg-blue-400",
-  processing: "bg-blue-400",
-  awaiting_confirmations: "bg-orange-400",
-  dispatched: "bg-emerald-400",
-  delivered: "bg-emerald-400",
-  completed: "bg-emerald-400",
-  canceled: "bg-red-400",
-  rejected: "bg-red-400",
-  refunded: "bg-red-400",
+const STATUS_BADGE: Record<string, { bg: string; text: string; label: string; icon: string }> = {
+  pending:   { bg: "bg-amber-400/10 border-amber-400/20", text: "text-amber-300", label: "Pending", icon: "⏳" },
+  paid:      { bg: "bg-blue-400/10 border-blue-400/20", text: "text-blue-300", label: "Paid", icon: "💳" },
+  processing:{ bg: "bg-blue-400/10 border-blue-400/20", text: "text-blue-300", label: "Processing", icon: "⚙️" },
+  dispatched:{ bg: "bg-purple-400/10 border-purple-400/20", text: "text-purple-300", label: "Dispatched", icon: "🚚" },
+  delivered: { bg: "bg-emerald-400/10 border-emerald-400/20", text: "text-emerald-300", label: "Delivered", icon: "✅" },
+  completed: { bg: "bg-emerald-400/10 border-emerald-400/20", text: "text-emerald-300", label: "Completed", icon: "✅" },
+  canceled:  { bg: "bg-red-400/10 border-red-400/20", text: "text-red-300", label: "Cancelled", icon: "❌" },
+  rejected:  { bg: "bg-red-400/10 border-red-400/20", text: "text-red-300", label: "Rejected", icon: "❌" },
+  refunded:  { bg: "bg-red-400/10 border-red-400/20", text: "text-red-300", label: "Refunded", icon: "🔄" },
 };
+const DEFAULT_BADGE = { bg: "bg-white/5 border-white/10", text: "text-white/40", label: "Unknown", icon: "❓" };
 
 function relativeDate(iso?: string) {
   if (!iso) return "";
@@ -150,7 +150,7 @@ export default function OrdersPage() {
 }
 
 function OrderRow({ order }: { order: OrderRecord }) {
-  const dot = STATUS_DOT[order.status] || "bg-white/30";
+  const badge = STATUS_BADGE[order.status] || DEFAULT_BADGE;
   const items = order.items || [];
   const firstItem = items[0];
   const extraCount = Math.max(0, items.length - 1);
@@ -158,17 +158,15 @@ function OrderRow({ order }: { order: OrderRecord }) {
   return (
     <Link
       href={`/orders/${order.reference}`}
-      className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.02] px-3 py-3 transition hover:bg-white/[0.04]"
+      className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.02] px-3 py-3 transition hover:bg-white/[0.04] active:bg-white/[0.06]"
     >
-      {/* Status dot */}
-      <div className={`h-2 w-2 shrink-0 rounded-full ${dot}`} />
-
       {/* Info */}
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-white">#{order.reference}</span>
-          <span className="rounded-full bg-white/5 px-1.5 py-0.5 text-[8px] capitalize text-white/40">
-            {order.status.replace(/_/g, " ")}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-semibold text-white">{order.reference}</span>
+          <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${badge.bg} ${badge.text}`}>
+            <span>{badge.icon}</span>
+            <span>{badge.label}</span>
           </span>
         </div>
         <p className="mt-0.5 truncate text-[10px] text-white/30">
