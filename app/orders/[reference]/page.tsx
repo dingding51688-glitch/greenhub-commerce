@@ -176,7 +176,7 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
               order.deliveryMethod
             } />
           )}
-          {order.deliveryFee > 0 && <InfoField label="Delivery Fee" value={`£${order.deliveryFee.toFixed(2)}`} />}
+          {(order.deliveryFee ?? 0) > 0 && <InfoField label="Delivery Fee" value={`£${(order.deliveryFee ?? 0).toFixed(2)}`} />}
         </div>
         {/* Pickup location */}
         {order.pickupLocationName && (
