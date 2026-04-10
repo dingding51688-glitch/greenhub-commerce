@@ -2,9 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import useSWR from "swr";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Button, Input } from "@/components/ui";
+import { swrFetcher } from "@/lib/api";
 import { StateMessage } from "@/components/StateMessage";
 import { createTopupIntent, pollTopupStatus } from "@/lib/wallet-api";
 import type { TopupIntentMeta, TopupRecord } from "@/lib/types";
@@ -25,9 +27,11 @@ export default function WalletTopupPage() {
   const amount = parseFloat(amountInput) || 0;
   const amountInvalid = amount < MIN_TRANSFER_GBP;
 
-  // Build deep link for Telegram bot
+  // Build deep link for Telegram bot — use transferHandle (the real GH-xxx shown to user)
+  const { data: cpData } = useSWR(token ? "/api/account/profile" : null, swrFetcher);
+  const transferHandle = (cpData as any)?.data?.attributes?.transferHandle;
   const rawId = profile?.customer?.documentId || profile?.documentId;
-  const ghId = rawId ? `GH-${rawId.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(-8).padStart(8, "0")}` : "";
+  const ghId = transferHandle || (rawId ? `GH-${rawId.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(-8).padStart(8, "0")}` : "");
   const botDeepLink = `https://t.me/greenhubTopup_bot?start=topup_${Math.round(amount)}_${ghId}`;
 
   const handleStart = async () => {
