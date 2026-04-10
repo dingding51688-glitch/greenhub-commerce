@@ -1,4 +1,4 @@
-export type ProductCategoryKey = "shop-all" | "flowers" | "pre-rolls" | "vapes" | "edibles" | "hash";
+export type ProductCategoryKey = "shop-all" | "flowers" | "pre-rolls" | "vapes" | "edibles" | "concentrates";
 
 export type ProductCategoryContent = {
   breadcrumb: string;
@@ -39,11 +39,11 @@ export const productCategoryContent: Record<ProductCategoryKey, ProductCategoryC
     description: "Lab-tested edibles with precise dosing. From fruity gummies to rich chocolates — discreet and delicious.",
     filter: { param: "filters[collection][slug][$eqi]", value: "edibles" }
   },
-  hash: {
-    breadcrumb: "HOME / SHOP ALL / HASH",
-    title: "Premium pressed hash",
-    description: "Traditional and modern hash varieties. Hand-pressed, dry-sift, and bubble hash from top cultivars.",
-    filter: { param: "filters[collection][slug][$eqi]", value: "hash" }
+  concentrates: {
+    breadcrumb: "HOME / SHOP ALL / CONCENTRATES",
+    title: "Wax, shatter & live resin",
+    description: "Solvent and solventless concentrates for dab rigs and pens. Lab-tested potency with full terpene profiles.",
+    filter: { param: "filters[collection][slug][$eqi]", value: "concentrates" }
   }
 };
 
