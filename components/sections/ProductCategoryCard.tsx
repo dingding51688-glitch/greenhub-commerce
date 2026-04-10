@@ -68,14 +68,14 @@ export function ProductCategoryCard({
       style={{ background }}
     >
       {/* Image area */}
-      <div className="relative z-10 flex aspect-square items-center justify-center p-4">
+      <div className="relative z-10 flex aspect-square items-center justify-center p-5">
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={imageAlt || title}
             width={200}
             height={200}
-            className="h-full w-full object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.5)]"
+            className="mx-auto h-[75%] w-[75%] object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.5)]"
             priority={false}
           />
         ) : (
