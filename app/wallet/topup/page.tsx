@@ -14,7 +14,7 @@ const doneStatuses = new Set(["confirmed", "failed", "expired", "refunded"]);
 
 export default function WalletTopupPage() {
   const router = useRouter();
-  const { token } = useAuth();
+  const { token, profile } = useAuth();
   const [amountInput, setAmountInput] = useState("100");
   const [chain, setChain] = useState<"TRC20" | "ERC20">("TRC20");
   const [intent, setIntent] = useState<TopupIntentMeta | null>(null);
@@ -24,6 +24,11 @@ export default function WalletTopupPage() {
 
   const amount = parseFloat(amountInput) || 0;
   const amountInvalid = amount < MIN_TRANSFER_GBP;
+
+  // Build deep link for Telegram bot
+  const rawId = profile?.customer?.documentId || profile?.documentId;
+  const ghId = rawId ? `GH-${rawId.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(-8).padStart(8, "0")}` : "";
+  const botDeepLink = `https://t.me/greenhubTopup_bot?start=topup_${Math.round(amount)}_${ghId}`;
 
   const handleStart = async () => {
     if (!token) { router.push("/login"); return; }
@@ -96,28 +101,28 @@ export default function WalletTopupPage() {
         </div>
         {/* Bank - links to Telegram */}
         <a
-          href="https://t.me/chineseinbelfast1"
+          href={botDeepLink}
           target="_blank"
           rel="noopener noreferrer"
           className="rounded-2xl border border-blue-400/20 bg-blue-400/5 px-4 py-3 text-center transition hover:bg-blue-400/10"
         >
           <span className="text-2xl">🏦</span>
           <p className="mt-1 text-xs font-bold text-blue-300">Bank Transfer</p>
-          <p className="text-[9px] text-blue-300/60">Contact support →</p>
+          <p className="text-[9px] text-blue-300/60">Open Telegram Bot →</p>
         </a>
       </div>
 
       {/* ── Bank Transfer Notice ── */}
       <a
-        href="https://t.me/chineseinbelfast1"
+        href={botDeepLink}
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-3 rounded-2xl border border-blue-400/15 bg-blue-400/5 px-4 py-3 transition hover:bg-blue-400/10"
       >
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-400/15 text-xl">💬</span>
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-400/15 text-xl">🤖</span>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-blue-200">Bank transfer top-up?</p>
-          <p className="text-[11px] text-blue-300/60">Contact our Telegram support for bank transfer details</p>
+          <p className="text-[11px] text-blue-300/60">Open our Telegram bot — it will guide you step by step</p>
         </div>
         <span className="shrink-0 text-white/30">→</span>
       </a>
