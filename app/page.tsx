@@ -1,5 +1,6 @@
-import { HeroClassic, ProductCategoryCard } from "@/components/sections";
-import { featuredCollectionsContent, homeHeroContent } from "@/data/fixtures/marketing";
+import Link from "next/link";
+import { ProductCategoryCard } from "@/components/sections";
+import { featuredCollectionsContent } from "@/data/fixtures/marketing";
 import { serverFetch } from "@/lib/server-api";
 
 const CMS_BASE = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
@@ -9,69 +10,143 @@ function strapiMedia(path?: string | null): string | undefined {
   return `${CMS_BASE}${path}`;
 }
 
-const orderGuideSteps = [
-  {
-    step: 1,
-    title: "Browse & checkout",
-    description: "Pick your products, enter your postcode at checkout, and confirm payment via your wallet balance. We handle the rest.",
-  },
-  {
-    step: 2,
-    title: "Locker dispatch notification",
-    description: "When the parcel arrives at the InPost locker, you receive an email + SMS with the pickup code.",
-  },
-  {
-    step: 3,
-    title: "Head to the assigned locker",
-    description: "Visit the selected InPost terminal at any time that suits you within the 72h holding window.",
-  },
-  {
-    step: 4,
-    title: "Scan or enter the code",
-    description: "Enter the pickup digits or scan the QR code at the kiosk. The door pops open and your parcel is inside.",
-  },
-];
-
 export default function HomePage() {
   return (
-    <div className="space-y-6 pb-20 sm:space-y-10">
-      <HeroClassic {...homeHeroContent} />
-
-      <FeaturedCollections />
-
-      {/* ── Order Guide ── */}
-      <section id="store-journey" className="rounded-2xl border border-white/10 bg-[linear-gradient(135deg,#080808,#050505)] px-4 py-6 shadow-card sm:rounded-[40px] sm:px-12 sm:py-10">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-amber-400/80">ORDER GUIDE</p>
-        <h2 className="mt-2 text-xl font-semibold text-white sm:text-3xl">How your order arrives</h2>
-
-        <div className="relative mt-8 flex flex-col gap-5 animate-stagger">
-          {orderGuideSteps.map((step, i) => (
-            <div key={step.step} className="relative flex gap-5">
-              {/* Timeline connector */}
-              <div className="flex flex-col items-center">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-400 text-sm font-bold text-black">
-                  {step.step}
-                </div>
-                {i < orderGuideSteps.length - 1 && (
-                  <div className="mt-1 w-px flex-1 bg-gradient-to-b from-amber-400/40 to-transparent" />
-                )}
+    <div className="space-y-5 pb-20 sm:space-y-10">
+      {/* ── 1. Hero: Compact, action-oriented ── */}
+      <section className="relative isolate overflow-hidden rounded-2xl border border-white/10 px-5 py-8 sm:rounded-[40px] sm:px-12 sm:py-14">
+        <div className="absolute inset-0 bg-hero-gradient" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(circle at 20% -10%, rgba(19,168,107,0.45), transparent 55%)" }} aria-hidden="true" />
+        <div className="relative z-10">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-emerald-400/80">
+            UK Delivery · InPost Lockers · Anonymous
+          </p>
+          <h1 className="mt-3 text-[22px] font-bold leading-tight text-white sm:text-[42px]">
+            Order online.<br />
+            Pick up anonymously.
+          </h1>
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-white/60">
+            Premium cannabis delivered to your nearest InPost locker. No name, no ID — just your pickup code.
+          </p>
+          <div className="mt-5 flex gap-2.5">
+            <Link
+              href="/products"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full cta-gradient px-6 text-sm font-semibold uppercase tracking-wider text-white shadow-cta"
+            >
+              Shop Now
+            </Link>
+            <Link
+              href="/how-it-works"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/25 px-6 text-sm font-semibold uppercase tracking-wider text-white/80"
+            >
+              How It Works
+            </Link>
+          </div>
+          {/* Quick stats row */}
+          <div className="mt-6 flex gap-4 overflow-x-auto text-center sm:gap-8">
+            {[
+              { val: "14,000+", label: "Pickup Points" },
+              { val: "Same Day", label: "Dispatch" },
+              { val: "100%", label: "Anonymous" },
+            ].map((s) => (
+              <div key={s.label} className="shrink-0">
+                <p className="text-lg font-bold text-white sm:text-xl">{s.val}</p>
+                <p className="text-[9px] uppercase tracking-wider text-white/40">{s.label}</p>
               </div>
-              {/* Card */}
-              <div className="flex-1 rounded-2xl border border-white/8 bg-white/[0.02] p-5 card-hover">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-amber-400/70">Step {step.step}</p>
-                <h3 className="mt-1.5 text-base font-semibold text-white">{step.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/65">{step.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-6 rounded-2xl border border-emerald-400/30 bg-emerald-400/5 px-4 py-3 text-sm text-emerald-200">
-          🛡️ Secure &amp; Anonymous — No name required, no ID checks. Just your code.
+            ))}
+          </div>
         </div>
       </section>
 
-      <SupportCta />
+      {/* ── 2. Category Cards ── */}
+      <FeaturedCollections />
+
+      {/* ── 3. Quick Order Flow (3 steps, horizontal on mobile) ── */}
+      <section className="flex gap-2.5 overflow-x-auto pb-1 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:overflow-visible">
+        {[
+          { icon: "🛒", title: "Order", desc: "Browse menu & pay with wallet balance", color: "emerald" },
+          { icon: "📦", title: "We Ship", desc: "Dispatched same day to your nearest InPost locker", color: "amber" },
+          { icon: "🔓", title: "Collect", desc: "Enter your code, grab your parcel — done in 30 seconds", color: "purple" },
+        ].map((step) => (
+          <div key={step.title} className="w-[65vw] shrink-0 snap-start rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:w-auto">
+            <span className="text-2xl">{step.icon}</span>
+            <h3 className="mt-2 text-sm font-bold text-white">{step.title}</h3>
+            <p className="mt-1 text-xs leading-relaxed text-white/50">{step.desc}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* ── 4. Trust Bar ── */}
+      <div className="grid grid-cols-4 gap-2">
+        {[
+          { icon: "🔒", text: "Encrypted" },
+          { icon: "📍", text: "14,000+" },
+          { icon: "⚡", text: "Same Day" },
+          { icon: "🎯", text: "No ID" },
+        ].map((t) => (
+          <div key={t.text} className="rounded-xl border border-white/8 bg-white/[0.02] py-2.5 text-center">
+            <span className="text-lg">{t.icon}</span>
+            <p className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-white/50">{t.text}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* ── 5. Earn Hub Promo ── */}
+      <section className="rounded-2xl border border-purple-400/20 bg-gradient-to-br from-purple-500/10 to-transparent px-5 py-5 sm:rounded-3xl sm:px-8 sm:py-8">
+        <div className="flex items-start gap-4">
+          <span className="text-3xl">💰</span>
+          <div className="flex-1">
+            <h2 className="text-base font-bold text-white sm:text-xl">Earn 15–25% commission</h2>
+            <p className="mt-1 text-xs leading-relaxed text-white/55 sm:text-sm">
+              Share your referral link. Every time a friend orders, you earn commission — paid instantly to your wallet.
+            </p>
+            <Link
+              href="/account/commission"
+              className="mt-3 inline-flex min-h-[36px] items-center justify-center rounded-full bg-purple-500 px-5 text-xs font-semibold text-white transition hover:bg-purple-400"
+            >
+              Open Earn Hub →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 6. Payment Methods (compact) ── */}
+      <section className="rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-4 sm:rounded-3xl sm:px-8 sm:py-6">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">We accept</p>
+        <div className="mt-3 flex gap-3">
+          {[
+            { icon: "🏦", name: "Bank Transfer", tag: "5 min" },
+            { icon: "💳", name: "Wallet", tag: "Instant" },
+            { icon: "₮", name: "USDT", tag: "Crypto" },
+          ].map((m) => (
+            <div key={m.name} className="flex-1 rounded-xl border border-white/8 bg-white/[0.02] px-3 py-2.5 text-center">
+              <span className="text-lg">{m.icon}</span>
+              <p className="mt-1 text-[10px] font-semibold text-white/70">{m.name}</p>
+              <p className="text-[9px] text-emerald-400/70">{m.tag}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── 7. Support CTA ── */}
+      <section className="rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-5 sm:rounded-3xl sm:px-8 sm:py-8 sm:text-center">
+        <h2 className="text-base font-bold text-white sm:text-xl">Need help ordering?</h2>
+        <p className="mt-1 text-xs text-white/50 sm:text-sm">Support available daily 09:00–21:00 GMT</p>
+        <div className="mt-4 flex gap-2.5 sm:justify-center">
+          <Link
+            href="/how-it-works"
+            className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded-full border border-white/20 text-xs font-semibold uppercase tracking-wider text-white/70 sm:flex-none sm:px-6"
+          >
+            Ordering Guide
+          </Link>
+          <Link
+            href="/support"
+            className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded-full cta-gradient text-xs font-semibold uppercase tracking-wider text-white sm:flex-none sm:px-6"
+          >
+            Contact Support
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
@@ -105,32 +180,6 @@ async function FeaturedCollections() {
           <ProductCategoryCard {...collection} tone={collection.tone as any} />
         </div>
       ))}
-    </section>
-  );
-}
-
-function SupportCta() {
-  return (
-    <section className="rounded-3xl border border-white/10 bg-[linear-gradient(135deg,#080808,#050505)] px-5 py-8 text-left shadow-card sm:rounded-[40px] sm:px-12 sm:py-10 sm:text-center">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/60">Need help?</p>
-      <h2 className="mt-2 text-xl font-semibold text-white sm:text-3xl">Questions about ordering?</h2>
-      <p className="mt-3 text-sm leading-relaxed text-white/70 sm:mx-auto sm:max-w-md">
-        Our support team is available 09:00–21:00 GMT daily. Check the ordering guide or reach out directly.
-      </p>
-      <div className="mt-5 flex flex-col gap-2.5 sm:mt-6 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3">
-        <a
-          href="/how-it-works"
-          className="inline-flex min-h-[48px] items-center justify-center rounded-pill border border-white/30 px-6 text-sm font-semibold uppercase tracking-[0.1em] text-white/85 transition hover:border-white/60 hover:text-white"
-        >
-          Ordering guide
-        </a>
-        <a
-          href="/support"
-          className="inline-flex min-h-[48px] items-center justify-center rounded-pill cta-gradient border border-transparent px-6 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-cta transition hover:opacity-95"
-        >
-          Contact support
-        </a>
-      </div>
     </section>
   );
 }
