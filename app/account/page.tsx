@@ -3,31 +3,26 @@
 import { type ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm, type Resolver } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/components/providers/AuthProvider";
 import useSWR from "swr";
-import Button from "@/components/ui/button";
-import { StateMessage } from "@/components/StateMessage";
-import { Skeleton } from "@/components/Skeleton";
 import { swrFetcher, apiMutate } from "@/lib/api";
-
-
-/* ─── constants ─── */
+import type { WalletBalanceResponse } from "@/lib/types";
 
 const phoneRegex = /^\+?[0-9]{7,15}$/;
 const postcodeRegex = /^[A-Za-z0-9\s]{4,9}$/;
-const inputCls = "w-full rounded-2xl border border-white/15 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none";
+const inputCls =
+  "w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/20 focus:border-white/25";
 
-/* ─── profile schema ─── */
 const profileSchema = z.object({
   fullName: z.string().nonempty(),
   email: z.string().email(),
-  phone: z.string().optional().or(z.literal("")).refine((v) => !v || phoneRegex.test(v), { message: "Enter a valid phone number" }),
-  postcode: z.string().optional().or(z.literal("")).refine((v) => !v || postcodeRegex.test(v), { message: "Enter a valid UK postcode" }),
+  phone: z.string().optional().or(z.literal("")).refine((v) => !v || phoneRegex.test(v), { message: "Invalid phone" }),
+  postcode: z.string().optional().or(z.literal("")).refine((v) => !v || postcodeRegex.test(v), { message: "Invalid postcode" }),
 });
-type ProfileFormValues = z.infer<typeof profileSchema>;
+type ProfileForm = z.infer<typeof profileSchema>;
 
 type CustomerProfileResponse = {
   data?: {
@@ -44,113 +39,141 @@ type CustomerProfileResponse = {
   };
 };
 
-/* ── SWR config: don't retry on 401/403 ── */
 const noRetryOnAuth = {
-  shouldRetryOnError: (error: Error & { status?: number }) => {
-    if (error?.status === 401 || error?.status === 403) return false;
-    return true;
-  },
+  shouldRetryOnError: (error: Error & { status?: number }) => error?.status !== 401 && error?.status !== 403,
 };
 
-/* ━━━━━━━━━━━━━━━━━━━━━ Main page ━━━━━━━━━━━━━━━━━━━━━ */
 export default function AccountPage() {
   const { isReady, token, userEmail, profile, refreshProfile, logout } = useAuth();
   const router = useRouter();
   const [redirecting, setRedirecting] = useState(false);
 
-  const handleSignOut = () => { logout(); router.push("/login"); };
-
-  /* Auto-redirect to login — only after auth hydration is complete */
   useEffect(() => {
     if (!isReady || token || redirecting) return;
-    const timer = setTimeout(() => { setRedirecting(true); router.push("/login"); }, 3000);
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => { setRedirecting(true); router.push("/login"); }, 2500);
+    return () => clearTimeout(t);
   }, [isReady, token, redirecting, router]);
 
-  /* ── data fetching ── */
-  const { data: customerProfile, error: customerError, isLoading: customerLoading, mutate: refreshCustomer } =
+  const { data: customer, error: customerError, isLoading: customerLoading, mutate: refreshCustomer } =
     useSWR<CustomerProfileResponse>(token ? "/api/account/profile" : null, swrFetcher, noRetryOnAuth);
 
-  /* Handle auth errors from profile API */
+  const { data: walletData } =
+    useSWR<WalletBalanceResponse>(token ? "/api/wallet/balance" : null, swrFetcher, noRetryOnAuth);
+
   const profileStatus = (customerError as Error & { status?: number })?.status;
   const profileMessage = customerError?.message || "";
   const isCustomerMissing = profileStatus === 401 && profileMessage.includes("could not determine customer");
   const isTokenInvalid = profileStatus === 401 && !isCustomerMissing;
 
-  useEffect(() => {
-    // Only logout on genuinely invalid tokens, NOT on missing customer records
-    if (isTokenInvalid) {
-      logout();
-    }
-  }, [isTokenInvalid, logout]);
+  useEffect(() => { if (isTokenInvalid) logout(); }, [isTokenInvalid, logout]);
 
-  /* Debug banner — only in non-production or when NEXT_PUBLIC_SHOW_AUTH_DEBUG is set */
-  const showDebug = process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_SHOW_AUTH_DEBUG === "1";
-
-  /* Still hydrating auth from localStorage — show loading skeleton */
   if (!isReady) {
     return (
-      <section className="space-y-8">
-        <Skeleton className="h-64 w-full" />
-        <Skeleton className="h-48 w-full" />
-        <Skeleton className="h-48 w-full" />
-      </section>
+      <div className="space-y-3 pb-24">
+        <div className="h-32 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-20 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-40 animate-pulse rounded-2xl bg-white/5" />
+      </div>
     );
   }
 
-  /* Hydrated but no token — user is genuinely not logged in */
   if (!token) {
     return (
-      <section className="mx-auto mt-20 max-w-md space-y-6 rounded-[40px] border border-white/10 bg-night-950/80 p-8 text-center shadow-card">
-        <h2 className="text-2xl font-semibold text-white">Sign in to continue</h2>
-        <p className="text-sm text-white/60">Log in or create an account to access your Account Center.</p>
-        {!redirecting && <p className="text-xs text-white/40">Redirecting to login in a few seconds…</p>}
-        <div className="flex flex-wrap justify-center gap-3">
-          <Button onClick={() => router.push("/login")}>Log in</Button>
-          <Button variant="secondary" onClick={() => router.push("/register")}>Create account</Button>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="space-y-4 text-center">
+          <p className="text-4xl">🔐</p>
+          <p className="text-lg font-bold text-white">Sign in to continue</p>
+          <p className="text-xs text-white/40">Redirecting to login…</p>
+          <div className="flex justify-center gap-2">
+            <Link href="/login" className="inline-flex min-h-[40px] items-center rounded-xl cta-gradient px-5 text-sm font-bold text-white">Log in</Link>
+            <Link href="/register" className="inline-flex min-h-[40px] items-center rounded-xl border border-white/15 px-5 text-sm font-medium text-white">Register</Link>
+          </div>
         </div>
-      </section>
+      </div>
     );
   }
 
-  /* Account not yet provisioned — user exists but no customer record */
   if (isCustomerMissing) {
     return (
-      <section className="mx-auto mt-20 max-w-md space-y-6 rounded-[40px] border border-amber-500/20 bg-amber-500/5 p-8 text-center shadow-card">
-        <h2 className="text-2xl font-semibold text-white">Account pending setup</h2>
-        <p className="text-sm text-white/70">
-          Your login works, but your account profile hasn&apos;t been created yet.
-          This usually takes a few minutes after registration.
-        </p>
-        <p className="text-sm text-white/70">
-          If this persists, contact support so we can link your profile manually.
-        </p>
-        <div className="flex flex-wrap justify-center gap-3">
-          <Button onClick={() => refreshCustomer()}>Try again</Button>
-          <Button variant="secondary" onClick={() => router.push("/support")}>Contact support</Button>
-        </div>
-        {showDebug && (
-          <div className="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3 font-mono text-xs text-amber-200 text-left">
-            <p>Debug: user authenticated but no customer record found</p>
-            <p>Email: {userEmail} | Error: {profileMessage}</p>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="space-y-4 text-center">
+          <p className="text-4xl">⏳</p>
+          <p className="text-lg font-bold text-white">Account pending setup</p>
+          <p className="text-xs text-white/40">Your profile is being created. This usually takes a few minutes.</p>
+          <div className="flex justify-center gap-2">
+            <button onClick={() => refreshCustomer()} className="inline-flex min-h-[40px] items-center rounded-xl cta-gradient px-5 text-sm font-bold text-white">Try again</button>
+            <Link href="/support" className="inline-flex min-h-[40px] items-center rounded-xl border border-white/15 px-5 text-sm font-medium text-white">Contact support</Link>
           </div>
-        )}
-      </section>
+        </div>
+      </div>
     );
   }
 
+  const attrs = customer?.data?.attributes;
+  const userId = customer?.data?.id;
+  const transferHandle = attrs?.transferHandle;
+  const displayId = transferHandle || (userId ? `GH-${String(userId).padStart(6, "0")}` : "");
+  const displayName = attrs?.fullName || profile?.fullName || userEmail || "User";
+  const balance = walletData?.balance ?? 0;
+
   return (
-    <section className="space-y-8">
-      {/* Debug banner */}
-      {showDebug && (
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3 font-mono text-xs text-amber-200">
-          <p>🔧 Auth Debug: isReady={String(isReady)} | hasToken={String(!!token)} | email={userEmail ?? "null"} | profile={profile?.email ?? "loading..."}</p>
-          <p>API base: {process.env.NEXT_PUBLIC_API_BASE_URL ?? "unset"} | Errors: profile={customerError?.message ?? "none"}</p>
+    <div className="space-y-4 pb-24 sm:space-y-6 sm:pb-20">
+      {/* ── Header card ── */}
+      <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-emerald-900/20 to-transparent p-4">
+        <div className="flex items-center gap-3">
+          {/* Avatar */}
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-400/15 text-xl font-bold text-emerald-300">
+            {displayName.charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-base font-bold text-white">{displayName}</p>
+            <div className="flex items-center gap-2">
+              <CopyBadge text={displayId} />
+              {attrs?.emailVerifiedAt ? (
+                <span className="rounded-full bg-emerald-400/15 px-1.5 py-0.5 text-[8px] font-bold text-emerald-300">✓ Verified</span>
+              ) : (
+                <span className="rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[8px] font-bold text-amber-300">Unverified</span>
+              )}
+            </div>
+          </div>
+          {/* Balance */}
+          <div className="text-right">
+            <p className="text-[9px] text-white/30">Balance</p>
+            <p className="text-lg font-bold text-emerald-300">£{balance.toFixed(2)}</p>
+          </div>
         </div>
+      </div>
+
+      {/* ── Quick actions 2x2 ── */}
+      <div className="grid grid-cols-2 gap-2">
+        {[
+          { icon: "💰", label: "Wallet", desc: "Balance & history", href: "/wallet" },
+          { icon: "📦", label: "Orders", desc: "Track deliveries", href: "/orders" },
+          { icon: "🤝", label: "Earn Hub", desc: "Invite & earn", href: "/account/commission" },
+          { icon: "🔔", label: "Notifications", desc: "Alerts & updates", href: "/account/notifications" },
+        ].map((item) => (
+          <Link key={item.href} href={item.href}
+            className="flex items-center gap-2.5 rounded-xl border border-white/8 bg-white/[0.02] p-3 transition hover:bg-white/[0.04]">
+            <span className="text-xl">{item.icon}</span>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-white">{item.label}</p>
+              <p className="truncate text-[9px] text-white/30">{item.desc}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* ── Email verification CTA ── */}
+      {!attrs?.emailVerifiedAt && (
+        <VerifyEmailBanner
+          pendingEmail={attrs?.pendingEmail}
+          onSuccess={() => refreshCustomer()}
+        />
       )}
-      {/* ─────── Profile & Settings ─────── */}
-      <OverviewSection
-        customer={customerProfile}
+
+      {/* ── Profile form ── */}
+      <ProfileSection
+        customer={customer}
         customerLoading={customerLoading}
         customerError={customerError}
         refreshCustomer={refreshCustomer}
@@ -159,32 +182,112 @@ export default function AccountPage() {
         userEmail={userEmail || undefined}
       />
 
-      {/* ─────── Quick links ─────── */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Link href="/wallet" className="group rounded-3xl border border-white/10 bg-card p-6 shadow-card transition hover:border-white/20">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/50">Wallet</p>
-          <p className="mt-2 text-xl font-semibold text-white">Balance & history</p>
-          <p className="mt-1 text-sm text-white/60">Top up, transfer, withdraw, and view transactions.</p>
-          <span className="mt-3 inline-block text-sm text-emerald-300 group-hover:underline">Open wallet →</span>
+      {/* ── Account actions ── */}
+      <div className="space-y-1.5">
+        <Link href="/account/security"
+          className="flex items-center justify-between rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 transition hover:bg-white/[0.04]">
+          <div className="flex items-center gap-3">
+            <span className="text-base">🔒</span>
+            <div>
+              <p className="text-sm font-medium text-white">Security</p>
+              <p className="text-[10px] text-white/30">Change email or password</p>
+            </div>
+          </div>
+          <span className="text-white/20">›</span>
         </Link>
-        <Link href="/account/commission" className="group rounded-3xl border border-white/10 bg-card p-6 shadow-card transition hover:border-white/20">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/50">Referrals</p>
-          <p className="mt-2 text-xl font-semibold text-white">Earn Hub</p>
-          <p className="mt-1 text-sm text-white/60">Invite friends, track earnings, and view your referral stats.</p>
-          <span className="mt-3 inline-block text-sm text-emerald-300 group-hover:underline">View commissions →</span>
+        <Link href="/support"
+          className="flex items-center justify-between rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 transition hover:bg-white/[0.04]">
+          <div className="flex items-center gap-3">
+            <span className="text-base">💬</span>
+            <div>
+              <p className="text-sm font-medium text-white">Support</p>
+              <p className="text-[10px] text-white/30">Get help or submit a ticket</p>
+            </div>
+          </div>
+          <span className="text-white/20">›</span>
+        </Link>
+        <Link href="/how-it-works"
+          className="flex items-center justify-between rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 transition hover:bg-white/[0.04]">
+          <div className="flex items-center gap-3">
+            <span className="text-base">📖</span>
+            <div>
+              <p className="text-sm font-medium text-white">How It Works</p>
+              <p className="text-[10px] text-white/30">Ordering, delivery & payment</p>
+            </div>
+          </div>
+          <span className="text-white/20">›</span>
         </Link>
       </div>
 
-      {/* ─────── Sign out ─────── */}
-      <div className="flex justify-end">
-        <Button variant="secondary" size="sm" onClick={handleSignOut}>Sign out</Button>
-      </div>
-    </section>
+      {/* ── Sign out ── */}
+      <button
+        onClick={() => { logout(); router.push("/login"); }}
+        className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-400/20 bg-red-400/5 py-3 text-sm font-medium text-red-300 transition hover:bg-red-400/10"
+      >
+        Sign Out
+      </button>
+    </div>
   );
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━ Section 1: Overview ━━━━━━━━━━━━━━━━━━━━━ */
-function OverviewSection({
+/* ━━━━━━━━━ Verify Email Banner ━━━━━━━━━ */
+function VerifyEmailBanner({ pendingEmail, onSuccess }: { pendingEmail?: string | null; onSuccess: () => void }) {
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<"idle" | "sent" | "error">("idle");
+
+  const handleVerify = async () => {
+    setLoading(true);
+    setStatus("idle");
+    try {
+      const res = await fetch("/api/account/security/request-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        setStatus("sent");
+        onSuccess();
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="rounded-xl border border-amber-400/20 bg-amber-400/5 p-3">
+      <div className="flex items-start gap-3">
+        <span className="text-lg">✉️</span>
+        <div className="flex-1">
+          <p className="text-xs font-semibold text-amber-200">Verify your email for £5 credit</p>
+          {status === "sent" ? (
+            <p className="mt-1 text-[10px] text-emerald-300">✓ Verification email sent! Check your inbox.</p>
+          ) : status === "error" ? (
+            <p className="mt-1 text-[10px] text-red-300">Failed to send. Try again.</p>
+          ) : pendingEmail ? (
+            <p className="mt-1 text-[10px] text-white/30">Verification sent to {pendingEmail}</p>
+          ) : (
+            <p className="mt-1 text-[10px] text-white/30">Verify and get £5 in your wallet instantly</p>
+          )}
+        </div>
+        <button
+          onClick={handleVerify}
+          disabled={loading}
+          className="shrink-0 rounded-lg bg-amber-400/15 px-3 py-1.5 text-[10px] font-bold text-amber-200 transition hover:bg-amber-400/25 disabled:opacity-40"
+        >
+          {loading ? "…" : status === "sent" ? "Resend" : "Verify"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ━━━━━━━━━ Profile Section ━━━━━━━━━ */
+function ProfileSection({
   customer, customerLoading, customerError, refreshCustomer, refreshProfile, profile, userEmail,
 }: {
   customer?: CustomerProfileResponse;
@@ -196,190 +299,130 @@ function OverviewSection({
   userEmail: string | undefined;
 }) {
   const attrs = customer?.data?.attributes;
-  const userId = customer?.data?.id;
-  const transferHandle = attrs?.transferHandle;
-  const emailVerifiedAt = attrs?.emailVerifiedAt;
-  const pendingEmail = attrs?.pendingEmail;
-  const [copyToast, setCopyToast] = useState<string | null>(null);
-  const [profileAlert, setProfileAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [saving, setSaving] = useState(false);
-  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
-  const profileForm = useForm<ProfileFormValues>({
+  const form = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: { fullName: "", email: "", phone: "", postcode: "" },
   });
 
   useEffect(() => {
     if (!attrs) return;
-    profileForm.reset({
+    form.reset({
       fullName: attrs.fullName || profile?.fullName || "",
       email: attrs.email || profile?.email || userEmail || "",
       phone: attrs.phone || "",
       postcode: attrs.postcode || "",
-
     });
-  }, [customer, profileForm, profile, userEmail, attrs]);
+  }, [customer, form, profile, userEmail, attrs]);
 
-
-
-  const handleCopyId = async (value: string) => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopyToast("Copied!");
-      setTimeout(() => setCopyToast(null), 2000);
-    } catch { setCopyToast("Copy failed"); setTimeout(() => setCopyToast(null), 2000); }
-  };
-
-  const submitProfile = async (values: ProfileFormValues) => {
-    setProfileAlert(null);
+  const onSubmit = async (values: ProfileForm) => {
+    setAlert(null);
     setSaving(true);
     try {
       await apiMutate<{ data?: unknown }>("/api/account/profile", "PUT", {
         phone: values.phone?.trim() || null,
         postcode: values.postcode?.trim().toUpperCase() || null,
-
       });
-      setProfileAlert({ type: "success", message: "Profile updated" });
+      setAlert({ type: "success", message: "Profile updated" });
       await Promise.all([refreshCustomer(), refreshProfile()]);
     } catch (err: any) {
-      setProfileAlert({ type: "error", message: err?.message || "Update failed" });
+      setAlert({ type: "error", message: err?.message || "Update failed" });
     } finally { setSaving(false); }
   };
 
-  return (
-    <div className="rounded-3xl border border-white/10 bg-card p-4 sm:rounded-[40px] sm:p-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-white/50">Account Center</p>
-          <h2 className="text-2xl font-semibold text-white">Profile</h2>
-        </div>
+  if (customerLoading && !customer) {
+    return <div className="h-32 animate-pulse rounded-2xl bg-white/5" />;
+  }
+
+  if (customerError) {
+    return (
+      <div className="rounded-xl border border-red-400/20 bg-red-400/5 p-4 text-center">
+        <p className="text-sm text-red-200">Unable to load profile</p>
+        <button onClick={() => refreshCustomer()} className="mt-2 text-xs text-white/50 underline">Retry</button>
       </div>
+    );
+  }
 
-      {/* User ID badge */}
-      {userId && (
-        <div className="mt-3 flex items-center gap-2">
-          <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-mono text-white/70">
-            User ID: {transferHandle || `GH-${String(userId).padStart(6, "0")}`}
-          </span>
-          <button onClick={() => handleCopyId(transferHandle || `GH-${String(userId).padStart(6, "0")}`)} className="text-xs text-white/50 underline">Copy</button>
-          {copyToast && <span className="text-xs text-emerald-200">{copyToast}</span>}
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex w-full items-center justify-between"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-base">👤</span>
+          <p className="text-sm font-bold text-white">Profile Details</p>
         </div>
-      )}
+        <span className={`text-white/30 transition ${expanded ? "rotate-180" : ""}`}>▾</span>
+      </button>
 
-      {customerLoading && !customer ? (
-        <div className="mt-4 space-y-3"><Skeleton className="h-12 w-full" /><Skeleton className="h-12 w-full" /><Skeleton className="h-12 w-full" /></div>
-      ) : customerError ? (
-        <StateMessage variant="error" title="Unable to load profile" body={customerError.message} actionLabel="Retry" onAction={() => refreshCustomer()} />
-      ) : (
-        <form className="mt-5 space-y-5" onSubmit={profileForm.handleSubmit(submitProfile)}>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Full name" error={profileForm.formState.errors.fullName?.message}>
-              <input type="text" readOnly {...profileForm.register("fullName")} className={inputCls} />
+      {expanded && (
+        <form className="mt-4 space-y-3" onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Full name" error={form.formState.errors.fullName?.message}>
+              <input type="text" readOnly {...form.register("fullName")} className={inputCls + " opacity-50"} />
             </Field>
-            <Field label="Email" error={profileForm.formState.errors.email?.message}>
-              <input type="email" readOnly {...profileForm.register("email")} className={inputCls} />
-              <EmailVerificationBadge
-                emailVerifiedAt={emailVerifiedAt}
-                pendingEmail={pendingEmail}
-                verifyLoading={verifyLoading}
-                onRequestVerify={async () => {
-                  setVerifyLoading(true);
-                  try {
-                    const res = await fetch("/api/account/security/request-verification", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      credentials: "include",
-                    });
-                    const data = await res.json().catch(() => ({}));
-                    if (res.ok && data.success) {
-                      setProfileAlert({ type: "success", message: data.message || "Verification email sent! First verification earns £5." });
-                      refreshCustomer();
-                    } else {
-                      setProfileAlert({ type: "error", message: data.error?.message || data.message || "Failed to send verification email" });
-                    }
-                  } catch {
-                    setProfileAlert({ type: "error", message: "Unable to send verification email" });
-                  } finally {
-                    setVerifyLoading(false);
-                  }
-                }}
-              />
+            <Field label="Email" error={form.formState.errors.email?.message}>
+              <input type="email" readOnly {...form.register("email")} className={inputCls + " opacity-50"} />
             </Field>
-            <Field label="Phone" error={profileForm.formState.errors.phone?.message}>
-              <input type="tel" placeholder="+44 7700 900000" {...profileForm.register("phone")} className={inputCls} />
+            <Field label="Phone" error={form.formState.errors.phone?.message}>
+              <input type="tel" placeholder="+44 7700 900000" {...form.register("phone")} className={inputCls} />
             </Field>
-            <Field label="Postcode" error={profileForm.formState.errors.postcode?.message}>
-              <input type="text" placeholder="BT1 1AA" {...profileForm.register("postcode")} className={inputCls} autoComplete="postal-code" />
+            <Field label="Postcode" error={form.formState.errors.postcode?.message}>
+              <input type="text" placeholder="BT1 1AA" {...form.register("postcode")} className={inputCls} autoComplete="postal-code" />
             </Field>
           </div>
-          {profileAlert && (
-            <div className={`rounded-2xl border px-4 py-3 text-sm ${profileAlert.type === "success" ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-100" : "border-red-400/40 bg-red-400/10 text-red-100"}`}>{profileAlert.message}</div>
+
+          {alert && (
+            <div className={`rounded-xl border px-3 py-2 text-xs ${alert.type === "success" ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200" : "border-red-400/30 bg-red-400/10 text-red-200"}`}>
+              {alert.message}
+            </div>
           )}
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button type="submit" disabled={saving} className="w-full min-h-[48px] text-base sm:w-auto">{saving ? "Saving…" : "Save changes"}</Button>
-            <Button asChild variant="secondary" className="w-full min-h-[48px] text-base sm:w-auto"><Link href="/account/security">Change email or password</Link></Button>
-          </div>
+
+          <button
+            type="submit"
+            disabled={saving}
+            className="flex w-full min-h-[44px] items-center justify-center rounded-xl cta-gradient text-sm font-bold text-white disabled:opacity-40"
+          >
+            {saving ? "Saving…" : "Save Changes"}
+          </button>
         </form>
       )}
     </div>
   );
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━ Shared components ━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━━━━━━━ Copy Badge ━━━━━━━━━ */
+function CopyBadge({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  if (!text) return null;
 
-function EmailVerificationBadge({
-  emailVerifiedAt,
-  pendingEmail,
-  verifyLoading,
-  onRequestVerify,
-}: {
-  emailVerifiedAt?: string | null;
-  pendingEmail?: string | null;
-  verifyLoading: boolean;
-  onRequestVerify: () => void;
-}) {
-  if (emailVerifiedAt) {
-    return (
-      <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-200">
-        ✓ Verified
-      </span>
-    );
-  }
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  };
 
   return (
-    <div className="mt-1.5 space-y-1">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-400/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber-200">
-          ✗ Not verified
-        </span>
-        <button
-          type="button"
-          onClick={onRequestVerify}
-          disabled={verifyLoading}
-          className="rounded-full border border-white/20 px-3 py-1 text-[11px] font-semibold text-white/70 transition hover:border-white/40 disabled:opacity-50"
-        >
-          {verifyLoading ? "Sending…" : "Verify now"}
-        </button>
-      </div>
-      {pendingEmail && (
-        <p className="text-[11px] text-white/40">
-          Verification sent to {pendingEmail} · <button type="button" onClick={onRequestVerify} disabled={verifyLoading} className="underline">Resend</button>
-        </p>
-      )}
-      {!pendingEmail && (
-        <p className="text-[11px] text-white/40">First verification earns £5 wallet bonus</p>
-      )}
-    </div>
+    <button onClick={handleCopy} className="flex items-center gap-1 rounded-full bg-white/5 px-2 py-0.5 text-[9px] font-mono text-white/40 transition hover:text-white/60">
+      {text}
+      <span className="text-[8px]">{copied ? "✓" : "📋"}</span>
+    </button>
   );
 }
 
+/* ━━━━━━━━━ Field ━━━━━━━━━ */
 function Field({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
   return (
-    <label className="block text-xs font-medium uppercase tracking-[0.3em] text-white/60">
-      {label}
-      <div className="mt-1.5">{children}</div>
-      {error && <p className="mt-1 text-xs text-red-300">{error}</p>}
+    <label className="block">
+      <span className="text-[10px] uppercase tracking-wider text-white/40">{label}</span>
+      <div className="mt-1">{children}</div>
+      {error && <p className="mt-1 text-[10px] text-red-300">{error}</p>}
     </label>
   );
 }
