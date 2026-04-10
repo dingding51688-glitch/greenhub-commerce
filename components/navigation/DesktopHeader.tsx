@@ -16,7 +16,7 @@ import { MobileDrawer } from "./MobileDrawer";
 import { LogoMark } from "./LogoMark";
 import { useNotifications } from "@/components/providers/NotificationProvider";
 import { useCart } from "@/components/providers/CartProvider";
-import { UserStatusBar } from "@/components/home/UserStatusBar";
+
 
 function IconLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
   return (
@@ -161,7 +161,6 @@ export function DesktopHeader() {
           <Link href="/" className="flex items-center">
             <LogoMark />
           </Link>
-          <UserStatusBar />
           <nav className="hidden flex-1 items-center justify-center gap-6 lg:flex">
             {primaryNav.map((item) =>
               item.children ? (
@@ -183,7 +182,7 @@ export function DesktopHeader() {
                 <BagIcon />
               </IconButton>
             </span>
-            <IconButton onClick={() => setDrawerOpen(true)} label="Open menu">
+            <IconButton onClick={() => setDrawerOpen(true)} label="Open menu" badge={notificationBadge}>
               <MenuIcon />
             </IconButton>
           </div>
