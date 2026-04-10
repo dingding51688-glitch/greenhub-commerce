@@ -32,6 +32,32 @@ function normalizePostcode(raw: string): string {
   return pc;
 }
 
+/**
+ * Parse InPost opening_hours string.
+ * "24/7" → "24/7"
+ * "MON|06:30-22:00|-;TUE|06:30-22:00|-;..." → "06:30–22:00"
+ * If all days have the same hours, show once. Otherwise show "varies".
+ */
+function parseInPostHours(raw?: string): string {
+  if (!raw) return "24/7";
+  if (raw === "24/7") return "24/7";
+  // Parse pipe-delimited format
+  const parts = raw.split(";").filter(Boolean);
+  const hours = new Set<string>();
+  for (const part of parts) {
+    const segs = part.split("|");
+    if (segs.length >= 2 && segs[1] && segs[1] !== "-") {
+      hours.add(segs[1]);
+    }
+  }
+  if (hours.size === 0) return "24/7";
+  if (hours.size === 1) {
+    const h = [...hours][0];
+    return h.replace("-", "–");
+  }
+  return "See store hours";
+}
+
 export async function searchInPostLockers(
   postcode: string,
   maxDistance = 5000,
@@ -52,7 +78,7 @@ export async function searchInPostLockers(
     lng: p.location?.longitude || 0,
     distance: p.distance ?? null,
     type: "inpost_locker" as const,
-    opening: p.opening_hours || "24/7",
+    opening: parseInPostHours(p.opening_hours),
   }));
 }
 
