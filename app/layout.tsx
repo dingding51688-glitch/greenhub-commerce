@@ -4,7 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { CartProvider } from "@/components/providers/CartProvider";
 import { NotificationProvider } from "@/components/providers/NotificationProvider";
-import { DesktopHeader } from "@/components/navigation";
+import { DesktopHeader, MobileTabBar } from "@/components/navigation";
 import { ReferralCapture } from "@/components/ReferralCapture";
 import { ReferralTrackingProvider } from "@/components/providers/ReferralTrackingProvider";
 import PageTracker from "@/components/tracking/PageTracker";
@@ -32,7 +32,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <PageTracker />
               <div className="min-h-screen flex flex-col">
                 <DesktopHeader />
-                <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
+                <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 pb-24 sm:pb-8">{children}</main>
+                <MobileTabBar />
               </div>
               </ReferralTrackingProvider>
             </NotificationProvider>

@@ -34,13 +34,13 @@ const orderGuideSteps = [
 
 export default function HomePage() {
   return (
-    <div className="space-y-10 pb-20">
+    <div className="space-y-6 pb-20 sm:space-y-10">
       <HeroClassic {...homeHeroContent} />
 
       <FeaturedCollections />
 
       {/* ── Order Guide ── */}
-      <section id="store-journey" className="rounded-3xl border border-white/10 bg-[linear-gradient(135deg,#080808,#050505)] px-5 py-8 shadow-card sm:rounded-[40px] sm:px-12 sm:py-10">
+      <section id="store-journey" className="rounded-2xl border border-white/10 bg-[linear-gradient(135deg,#080808,#050505)] px-4 py-6 shadow-card sm:rounded-[40px] sm:px-12 sm:py-10">
         <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-amber-400/80">ORDER GUIDE</p>
         <h2 className="mt-2 text-xl font-semibold text-white sm:text-3xl">How your order arrives</h2>
 

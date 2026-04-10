@@ -22,7 +22,7 @@ export function HeroClassic(props: Partial<HeroClassicProps>) {
   const alignment = content.alignment ?? "center";
   const tone = content.tone ?? "default";
   const sectionClasses = [
-    "relative isolate overflow-hidden rounded-3xl border border-white/10 px-4 py-8 shadow-card sm:rounded-[40px] sm:px-12 sm:py-12",
+    "relative isolate overflow-hidden rounded-2xl border border-white/10 px-4 py-6 shadow-card sm:rounded-[40px] sm:px-12 sm:py-12",
     tone === "soft" ? "bg-[radial-gradient(circle_at_10%_0%,rgba(45,82,62,0.5),rgba(4,10,7,0.95))]" : "bg-hero-gradient"
   ].join(" ");
   const textAlignment = alignment === "left" ? "items-start text-left" : "items-center text-center";
@@ -43,7 +43,7 @@ export function HeroClassic(props: Partial<HeroClassicProps>) {
               {content.eyebrow}
             </p>
           )}
-          <h1 className="text-[28px] font-semibold leading-[1.3] text-white sm:text-[40px]">
+          <h1 className="text-[22px] font-semibold leading-[1.3] text-white sm:text-[40px]">
             {content.title}
           </h1>
           {content.subtitle && (

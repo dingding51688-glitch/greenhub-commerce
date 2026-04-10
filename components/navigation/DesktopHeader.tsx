@@ -170,15 +170,17 @@ export function DesktopHeader() {
             )}
           </nav>
           <div className="flex items-center gap-2">
-            <IconButton onClick={() => router.push("/account/notifications")} label="Notifications" badge={notificationBadge}>
-              <BellIcon className={iconStroke} />
-            </IconButton>
-            <IconLink href="/account" label="Account">
-              <AccountIcon />
-            </IconLink>
-            <IconButton onClick={() => router.push("/cart")} label="Shopping cart" badge={cartBadge}>
-              <BagIcon />
-            </IconButton>
+            <span className="hidden sm:flex items-center gap-2">
+              <IconButton onClick={() => router.push("/account/notifications")} label="Notifications" badge={notificationBadge}>
+                <BellIcon className={iconStroke} />
+              </IconButton>
+              <IconLink href="/account" label="Account">
+                <AccountIcon />
+              </IconLink>
+              <IconButton onClick={() => router.push("/cart")} label="Shopping cart" badge={cartBadge}>
+                <BagIcon />
+              </IconButton>
+            </span>
             <IconButton onClick={() => setDrawerOpen(true)} label="Open menu">
               <MenuIcon />
             </IconButton>
