@@ -51,16 +51,16 @@ const tabs = [
     match: "prefix" as const,
   },
   {
-    label: "Account",
-    href: "/account",
+    label: "Wallet",
+    href: "/wallet",
     icon: (active: boolean) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 20c1.5-3 4.5-4.5 8-4.5s6.5 1.5 8 4.5" strokeLinecap="round" />
+        <rect x="2" y="5" width="20" height="14" rx="2" />
+        <path d="M16 12h2" strokeLinecap="round" />
+        <path d="M2 10h20" />
       </svg>
     ),
     match: "prefix" as const,
-    badge: "notifications" as const,
   },
 ];
 
