@@ -49,6 +49,11 @@ function resolveNotificationAction(record: NotificationRecord): NotificationActi
   const type = record.type || "";
   const metadata = (record.metadata || {}) as Record<string, any>;
 
+  // Check metadata for explicit CTA (e.g. verify email)
+  if (metadata?.ctaUrl && metadata?.ctaLabel) {
+    return { label: metadata.ctaLabel, href: metadata.ctaUrl };
+  }
+
   if (type.startsWith("order_")) {
     const reference =
       (metadata?.reference as string) ||
