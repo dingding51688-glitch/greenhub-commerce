@@ -65,7 +65,8 @@ export default function LocationPicker({ postcode, onSelect, selected }: Props) 
 
   const formatDist = (m?: number) => {
     if (!m) return "";
-    return m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${m} m`;
+    const miles = m / 1609.34;
+    return miles >= 0.1 ? `${miles.toFixed(1)} mi` : `< 0.1 mi`;
   };
 
   return (
