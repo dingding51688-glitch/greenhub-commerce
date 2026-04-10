@@ -41,7 +41,7 @@ export default function WalletTransferPage() {
 
   const onSubmit = async () => {
     if (!handle.trim()) { setError("Enter recipient ID"); return; }
-    if (amount < 1) { setError("Minimum £1"); return; }
+    if (amount < 20) { setError("Minimum £20"); return; }
     if (amount > transferable) { setError(`Exceeds transferable balance £${transferable.toFixed(2)}`); return; }
     setError(null);
     setSubmitting(true);
@@ -172,7 +172,7 @@ export default function WalletTransferPage() {
       <div className="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 text-[11px] text-white/30">
         <p>• Transfers are instant and free</p>
         <p>• Bonus balance cannot be transferred</p>
-        <p>• Minimum transfer: £1</p>
+        <p>• Minimum transfer: £20</p>
       </div>
     </div>
   );
