@@ -51,7 +51,7 @@ const paymentMethods = [
   {
     icon: "🏦",
     name: "Bank Transfer (GBP)",
-    desc: "Transfer to our UK bank account. Include your GreenHub ID as the reference. Usually arrives within 1–2 hours.",
+    desc: "Transfer to our UK bank account. Include your GreenHub ID as the reference. Usually arrives within 5 minutes, up to 2 hours max.",
     tag: "Recommended",
   },
   {
@@ -63,7 +63,7 @@ const paymentMethods = [
   {
     icon: "₮",
     name: "USDT (Tether)",
-    desc: "Send USDT via TRC20 or ERC20 network. Credited after 1 confirmation. Double-check the network before sending.",
+    desc: "Send USDT via TRC20 or ERC20 network. Double-check the amount before sending — incorrect amounts cannot be credited.",
     tag: "Crypto",
   },
 ];
