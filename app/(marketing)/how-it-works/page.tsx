@@ -71,19 +71,19 @@ const paymentMethods = [
 const faqs = [
   {
     q: "How long does delivery take?",
-    a: "Orders placed before 14:00 are dispatched same day. You'll typically receive your locker code within 4–8 hours.",
+    a: "Orders placed before 14:00 are dispatched same day. You'll typically receive your locker code within 3–5 days.",
   },
   {
     q: "What if I miss the pickup window?",
-    a: "InPost lockers hold parcels for 72 hours. If you miss it, contact support and we'll reroute to another locker or arrange re-delivery.",
+    a: "InPost lockers hold parcels for 72 hours. If you miss it, contact support and we'll help arrange a solution.",
   },
   {
     q: "Is it anonymous?",
-    a: "Yes. No name, no ID, no signature required. Just your pickup code.",
+    a: "Yes. Just your postcode and email — no name, no ID, no signature required.",
   },
   {
     q: "What areas do you cover?",
-    a: "All of the UK. We use the InPost locker network — over 14,000 locations nationwide.",
+    a: "All of the UK via the InPost locker network — over 14,000 locations nationwide. Northern Ireland customers need to provide a real delivery address.",
   },
   {
     q: "Can I get a refund?",
@@ -99,7 +99,7 @@ const faqs = [
   },
   {
     q: "How do withdrawals work?",
-    a: "Go to Wallet → Withdraw. Minimum withdrawal is £100. A 3% processing fee applies. Funds arrive within 24 hours via UK bank transfer.",
+    a: "Go to Wallet → Withdraw. Minimum withdrawal is £100. A 3% processing fee applies. Funds arrive within 24 hours via UK bank transfer or USDT.",
   },
 ];
 
@@ -107,7 +107,7 @@ const trustPoints = [
   { icon: "🔒", title: "Encrypted & secure", desc: "All data is encrypted. We never share your information with third parties." },
   { icon: "📍", title: "14,000+ locker locations", desc: "InPost terminals across the UK, accessible 24/7." },
   { icon: "⚡", title: "Same-day dispatch", desc: "Order before 14:00 for same-day processing and dispatch." },
-  { icon: "🎯", title: "No ID required", desc: "Fully anonymous pickup. Just your code — nothing else." },
+  { icon: "🎯", title: "No ID required", desc: "Fully anonymous pickup. Just your postcode and email — nothing else." },
 ];
 
 /* ── Page ── */
