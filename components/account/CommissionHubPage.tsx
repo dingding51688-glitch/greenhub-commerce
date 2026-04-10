@@ -27,9 +27,9 @@ const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" 
 
 /* ─── Tier system (matches backend TIER_RATES) ─── */
 const TIERS = [
-  { name: "Bronze",  emoji: "🥉", min: 0,   rate: 10, color: "text-amber-400" },
-  { name: "Silver",  emoji: "🥈", min: 100, rate: 15, color: "text-gray-300" },
-  { name: "Gold",    emoji: "🥇", min: 200, rate: 20, color: "text-yellow-300" },
+  { name: "Bronze",  emoji: "🥉", min: 0,   rate: 15, color: "text-amber-400" },
+  { name: "Silver",  emoji: "🥈", min: 100, rate: 20, color: "text-gray-300" },
+  { name: "Gold",    emoji: "🥇", min: 200, rate: 25, color: "text-yellow-300" },
 ];
 
 function getTier(conversions: number) {
