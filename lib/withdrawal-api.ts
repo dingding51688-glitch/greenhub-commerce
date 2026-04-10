@@ -17,7 +17,7 @@ export type CreateWithdrawalResponse = {
 const normalizePayload = (payload: CreateWithdrawalPayload) => {
   const amount = Number(payload.amount);
   const method = payload.payoutMethod === "crypto" ? "usdt_wallet" : payload.payoutMethod === "bank" ? "uk_bank" : payload.payoutMethod;
-  const currency = "USDT";
+  const currency = method === "uk_bank" ? "GBP" : "USDT";
   const body: Record<string, unknown> = { amount, currency, method, note: payload.note?.trim() || undefined };
   const details = (payload.payoutDetails || {}) as Record<string, any>;
   if (method === "uk_bank") {
