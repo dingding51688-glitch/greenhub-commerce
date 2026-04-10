@@ -167,51 +167,94 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
         </div>
       </div>
 
-      {/* Locker details */}
+      {/* Tracking & Shipping */}
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-        <p className="text-[10px] uppercase tracking-wider text-white/40 mb-3">📦 Locker Details</p>
+        <p className="text-[10px] uppercase tracking-wider text-white/40 mb-3">🚚 Tracking & Shipping</p>
         <div className="space-y-3">
-          <div>
-            <p className="text-[9px] uppercase tracking-wider text-white/30">Address</p>
-            <div className="flex items-center">
-              <p className="text-sm text-white">{lockerDisplay || "Pending assignment"}</p>
-              {lockerDisplay && <CopyBtn value={lockerDisplay} />}
-            </div>
-          </div>
+          {/* Tracking number + carrier */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-[9px] uppercase tracking-wider text-white/30">Tracking</p>
+              <p className="text-[9px] uppercase tracking-wider text-white/30">Tracking Number</p>
               <div className="flex items-center">
                 <p className="font-mono text-sm font-bold text-white">{order.trackingNumber || "—"}</p>
                 {order.trackingNumber && <CopyBtn value={order.trackingNumber} />}
               </div>
-              {order.trackingUrl && (
-                <a href={order.trackingUrl} target="_blank" rel="noreferrer" className="text-[9px] text-emerald-400 underline">
-                  Track parcel →
-                </a>
-              )}
             </div>
-            <div>
-              <p className="text-[9px] uppercase tracking-wider text-white/30">Access Code</p>
-              <div className="flex items-center">
-                <p className="font-mono text-lg font-bold text-emerald-300">{order.lockerAccessCode || "—"}</p>
-                {order.lockerAccessCode && <CopyBtn value={order.lockerAccessCode} />}
-              </div>
-            </div>
-          </div>
-          {order.carrier && (
             <div>
               <p className="text-[9px] uppercase tracking-wider text-white/30">Carrier</p>
-              <p className="text-sm text-white">{order.carrier}</p>
+              <p className="text-sm text-white">{order.carrier || "—"}</p>
             </div>
+          </div>
+
+          {/* Yodel tracking link */}
+          {order.trackingNumber && (
+            <a
+              href={`https://www.yodel.co.uk/track/${order.trackingNumber}`}
+              target="_blank" rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-400/20 bg-emerald-400/5 px-3 py-2 text-xs text-emerald-300 hover:bg-emerald-400/10 transition"
+            >
+              🔗 Track on Yodel →
+            </a>
           )}
-          {order.lockerEta && (
-            <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/5 px-3 py-2">
-              <p className="text-xs text-emerald-200">⏱ ETA: {order.lockerEta}</p>
+
+          {/* Locker info if present */}
+          {(order.lockerAddress || order.lockerAccessCode) && (
+            <div className="rounded-xl border border-amber-400/20 bg-amber-400/5 p-3 space-y-2">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-amber-300">📦 Locker Pickup</p>
+              {order.lockerAddress && (
+                <div className="flex items-center">
+                  <p className="text-sm text-white">{order.lockerAddress}</p>
+                  <CopyBtn value={order.lockerAddress} />
+                </div>
+              )}
+              {order.lockerAccessCode && (
+                <div>
+                  <p className="text-[9px] text-white/30">Access Code</p>
+                  <div className="flex items-center">
+                    <p className="font-mono text-lg font-bold text-amber-300">{order.lockerAccessCode}</p>
+                    <CopyBtn value={order.lockerAccessCode} />
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
+
+      {/* Tracking Timeline */}
+      {(order as any).trackingEvents && Array.isArray((order as any).trackingEvents) && (order as any).trackingEvents.length > 0 && (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+          <p className="text-[10px] uppercase tracking-wider text-white/40 mb-4">📍 Tracking Timeline</p>
+          <div className="relative pl-6">
+            {/* Vertical line */}
+            <div className="absolute left-[9px] top-1 bottom-1 w-px bg-white/10" />
+            {((order as any).trackingEvents as Array<{occurred_at: string; code: string; text: string; description: string}>).map((evt, i) => {
+              const isFirst = i === 0;
+              const isDelivered = ["ZA", "ZL", "LF"].includes(evt.code);
+              const dotColor = isFirst
+                ? isDelivered ? "bg-emerald-400" : "bg-amber-400"
+                : "bg-white/20";
+              const textColor = isFirst ? "text-white" : "text-white/50";
+
+              return (
+                <div key={`${evt.code}-${evt.occurred_at}`} className="relative pb-5 last:pb-0">
+                  {/* Dot */}
+                  <div className={`absolute -left-6 top-0.5 h-[14px] w-[14px] rounded-full border-2 border-[#0a0b0e] ${dotColor}`} />
+                  <div>
+                    <p className={`text-xs font-semibold ${textColor}`}>{evt.text || evt.description}</p>
+                    <p className="text-[10px] text-white/25 mt-0.5">
+                      {new Date(evt.occurred_at).toLocaleString("en-GB", {
+                        day: "numeric", month: "short", year: "numeric",
+                        hour: "2-digit", minute: "2-digit"
+                      })}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex gap-2">
