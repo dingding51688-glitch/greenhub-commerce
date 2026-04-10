@@ -166,8 +166,8 @@ export default function CommissionHubPage() {
         <p className="relative mt-1 text-sm text-white/50">Total earnings</p>
 
         <div className="relative mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm">
-          <span className="text-white/60">🔗 Clicks: <span className="font-semibold text-emerald-300">{GBP.format(clickCommission)}</span></span>
-          <span className="text-white/60">🛒 Orders: <span className="font-semibold text-emerald-300">{GBP.format(orderCommission)}</span></span>
+          <span className="text-white/60">👁️ Views: <span className="font-semibold text-emerald-300">{clicks}</span></span>
+          <span className="text-white/60">🛒 Orders: <span className="font-semibold text-emerald-300">{GBP.format(lifetimeCommission)}</span></span>
           {monthlyCommission > 0 && (
             <span className="text-white/60">📅 This month: <span className="font-semibold text-emerald-300">+{GBP.format(monthlyCommission)}</span></span>
           )}
@@ -182,11 +182,7 @@ export default function CommissionHubPage() {
         </div>
       )}
 
-      {clickWarning && (
-        <div className="rounded-2xl border border-yellow-400/40 bg-yellow-400/10 p-3 text-sm text-yellow-100">
-          We couldn&apos;t record the latest click. Please refresh and try again.
-        </div>
-      )}
+
 
       {/* ── 2. Share Section with QR ── */}
       <div className="rounded-3xl border border-white/10 bg-card p-5">
@@ -268,16 +264,12 @@ export default function CommissionHubPage() {
 
       {/* ── 3. Stats Grid ── */}
       <div className="grid grid-cols-3 gap-2.5">
-        <StatCard label="Clicks" value={validClicks.toString()} sub={GBP.format(clickCommission)} />
+        <StatCard label="Views" value={clicks.toString()} sub="Link visits" />
         <StatCard label="Friends" value={totalFriends.toString()} sub={`${qualifiedFriends} qualified · ${totalFriends - qualifiedFriends} not yet`} />
-        <StatCard label="Orders" value={orderCount.toString()} sub="10% commission" />
+        <StatCard label="Orders" value={orderCount.toString()} sub={`${currentRate}% commission`} />
       </div>
 
-      {lastClickTime && (
-        <p className="text-xs text-white/40">
-          Last click: {new Date(lastClickTime).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}
-        </p>
-      )}
+
 
       {/* ── 4. Tier Progress ── */}
       <div className="rounded-2xl border border-white/10 bg-card p-4">
@@ -379,12 +371,12 @@ export default function CommissionHubPage() {
 
       {/* ── 8. Rules ── */}
       <div className="rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-3 text-xs leading-relaxed text-white/40">
-        <p>💡 Every unique click pays <span className="text-white/60">£0.30</span> (24h dedup per visitor). Every friend&apos;s order earns you <span className="text-white/60">10% commission</span>. Referral earnings never expire and are credited to your wallet instantly.</p>
+        <p>💡 Every friend&apos;s order earns you <span className="text-white/60">{currentRate}% commission</span>. Referral earnings never expire and are credited to your wallet instantly. Invite more friends to unlock higher rates!</p>
       </div>
 
       {/* ── 9. Anti-fraud warning ── */}
       <div className="rounded-2xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-xs leading-relaxed text-red-200/70">
-        <p>⚠️ <span className="font-semibold text-red-200">Fair use policy:</span> Our system monitors all click activity in real time. Fraudulent behaviour such as self-clicking, bot traffic, or any form of fake clicks will result in <span className="font-semibold text-red-200">immediate account suspension</span> and forfeiture of all referral earnings. Play fair — we reward genuine referrals.</p>
+        <p>⚠️ <span className="font-semibold text-red-200">Fair use policy:</span> Our system monitors all referral activity. Fraudulent behaviour such as fake accounts or any form of manipulation will result in <span className="font-semibold text-red-200">immediate account suspension</span> and forfeiture of all referral earnings. Play fair — we reward genuine referrals.</p>
       </div>
     </section>
   );
