@@ -13,7 +13,7 @@ import { useCart, type CartItem } from "@/components/providers/CartProvider";
 import { swrFetcher } from "@/lib/api";
 import { createOrder } from "@/lib/orders-api";
 import { getStoredReferralCode } from "@/lib/referral-tracking";
-import { isNorthernIreland, NI_DELIVERY_FEE, type DeliveryLocation } from "@/lib/delivery-api";
+import { isNorthernIreland, DELIVERY_FEE, type DeliveryLocation } from "@/lib/delivery-api";
 import LocationPicker from "@/components/checkout/LocationPicker";
 import type { WalletBalanceResponse } from "@/lib/types";
 
@@ -54,7 +54,7 @@ export default function CheckoutPage() {
 
   const watchedPostcode = form.watch("postcode");
   const isNI = isNorthernIreland(watchedPostcode || "");
-  const deliveryFee = isNI ? NI_DELIVERY_FEE : 0;
+  const deliveryFee = DELIVERY_FEE;
   const grandTotal = subtotal + deliveryFee;
   const shortfall = grandTotal > balance;
 
@@ -301,15 +301,8 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-white/40">Delivery</span>
-                {deliveryFee > 0 ? (
-                  <span className="text-amber-200">{GBP.format(deliveryFee)}</span>
-                ) : (
-                  <span className="text-emerald-300">Free</span>
-                )}
+                <span className="text-white/70">{GBP.format(deliveryFee)}</span>
               </div>
-              {deliveryFee > 0 && (
-                <p className="text-[9px] text-white/20">🚢 Northern Ireland surcharge</p>
-              )}
               <div className="flex justify-between border-t border-white/5 pt-2">
                 <span className="text-sm font-bold text-white">Total</span>
                 <span className="text-lg font-bold text-white">{GBP.format(grandTotal)}</span>

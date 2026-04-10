@@ -20,12 +20,24 @@ export type DeliveryLocation = {
 };
 
 // ─── InPost UK ──────────────────────────────────────────
+/**
+ * Normalize UK postcode: ensure space before last 3 chars.
+ * e.g. "SW1A1AA" → "SW1A 1AA", "BT11AA" → "BT1 1AA"
+ */
+function normalizePostcode(raw: string): string {
+  const pc = raw.replace(/\s+/g, "").toUpperCase();
+  if (pc.length >= 5) {
+    return pc.slice(0, -3) + " " + pc.slice(-3);
+  }
+  return pc;
+}
+
 export async function searchInPostLockers(
   postcode: string,
   maxDistance = 5000,
   limit = 10
 ): Promise<DeliveryLocation[]> {
-  const pc = postcode.replace(/\s+/g, "+");
+  const pc = normalizePostcode(postcode).replace(/ /g, "+");
   const url = `https://api-uk-points.easypack24.net/v1/points?relative_post_code=${pc}&max_distance=${maxDistance}&per_page=${limit}&type=parcel_locker&sort_by=distance_from_relative_point`;
   const res = await fetch(url);
   if (!res.ok) return [];
@@ -119,7 +131,7 @@ export async function searchYodelStores(
 
 // ─── Geocode postcode ───────────────────────────────────
 export async function geocodePostcode(postcode: string): Promise<{ lat: number; lng: number } | null> {
-  const pc = postcode.replace(/\s+/g, "").toUpperCase();
+  const pc = normalizePostcode(postcode).replace(/ /g, "+");
   try {
     const res = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(pc)}`);
     if (!res.ok) return null;
@@ -136,4 +148,5 @@ export function isNorthernIreland(postcode: string): boolean {
   return postcode.trim().toUpperCase().startsWith("BT");
 }
 
-export const NI_DELIVERY_FEE = 5;
+export const DELIVERY_FEE = 5;
+export const NI_DELIVERY_FEE = 5; // alias for backward compat

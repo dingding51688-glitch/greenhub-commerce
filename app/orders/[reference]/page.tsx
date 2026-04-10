@@ -168,7 +168,26 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
           <InfoField label="Postcode" value={order.dropoffPostcode || "Pending"} />
           <InfoField label="Payment" value={order.paymentOption || "Wallet"} />
           {order.contactEmail && <InfoField label="Email" value={order.contactEmail} />}
+          {order.deliveryMethod && (
+            <InfoField label="Method" value={
+              order.deliveryMethod === "inpost_locker" ? "🔐 InPost Locker" :
+              order.deliveryMethod === "oohpod_locker" ? "🔐 OOHPod Locker" :
+              order.deliveryMethod === "yodel_store" ? "🏪 Yodel Collection Point" :
+              order.deliveryMethod
+            } />
+          )}
+          {order.deliveryFee > 0 && <InfoField label="Delivery Fee" value={`£${order.deliveryFee.toFixed(2)}`} />}
         </div>
+        {/* Pickup location */}
+        {order.pickupLocationName && (
+          <div className="mt-3 rounded-xl border border-emerald-400/15 bg-emerald-400/[0.03] p-3">
+            <p className="text-[9px] uppercase tracking-wider text-emerald-300/50 mb-1">Pickup Location</p>
+            <p className="text-sm font-bold text-white">{order.pickupLocationName}</p>
+            {order.pickupLocationAddress && (
+              <p className="text-[10px] text-white/40 mt-0.5">{order.pickupLocationAddress}</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Tracking & Shipping */}

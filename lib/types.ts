@@ -148,6 +148,11 @@ export type OrderRecord = {
   trackingLastChecked?: string | null;
   paymentOption?: string | null;
   walletDebit?: number | null;
+  deliveryMethod?: string | null;
+  deliveryFee?: number;
+  pickupLocationName?: string | null;
+  pickupLocationAddress?: string | null;
+  pickupLocationId?: string | null;
   items?: OrderItem[];
 };
 

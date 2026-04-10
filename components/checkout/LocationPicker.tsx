@@ -8,7 +8,6 @@ import {
   searchOOHPodLockers,
   searchYodelStores,
   geocodePostcode,
-  NI_DELIVERY_FEE,
 } from "@/lib/delivery-api";
 
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
@@ -71,11 +70,11 @@ export default function LocationPicker({ postcode, onSelect, selected }: Props) 
 
   return (
     <div className="space-y-3">
-      {/* NI delivery fee banner */}
+      {/* NI info banner */}
       {isNI && (
         <div className="rounded-xl border border-amber-400/20 bg-amber-400/5 px-3 py-2">
           <p className="text-xs text-amber-200">
-            🚢 Northern Ireland delivery: <span className="font-bold">{GBP.format(NI_DELIVERY_FEE)}</span> per order
+            🚢 Northern Ireland — delivered via Yodel
           </p>
         </div>
       )}
