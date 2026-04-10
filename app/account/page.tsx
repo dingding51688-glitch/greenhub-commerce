@@ -289,6 +289,7 @@ function OverviewSection({
                     const res = await fetch("/api/account/security/request-verification", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
+                      credentials: "include",
                     });
                     const data = await res.json().catch(() => ({}));
                     if (res.ok && data.success) {

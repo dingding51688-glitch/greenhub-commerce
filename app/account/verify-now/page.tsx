@@ -1,23 +1,23 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Button from "@/components/ui/button";
 import { useAuth } from "@/components/providers/AuthProvider";
 
-type State = "sending" | "sent" | "error" | "login";
+type State = "idle" | "sending" | "sent" | "error" | "login";
 
 export default function VerifyNowPage() {
-  const { token } = useAuth();
-  const router = useRouter();
-  const [state, setState] = useState<State>(token ? "sending" : "login");
+  const { token, isReady } = useAuth();
+  const [state, setState] = useState<State>("idle");
   const [message, setMessage] = useState("");
   const calledRef = useRef(false);
 
   useEffect(() => {
-    if (!token || calledRef.current) return;
+    if (!isReady) return; // wait for auth hydration
+    if (!token) { setState("login"); return; }
+    if (calledRef.current) return;
     calledRef.current = true;
+    setState("sending");
 
     async function send() {
       try {
@@ -27,12 +27,15 @@ export default function VerifyNowPage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
         });
         const data = await res.json().catch(() => ({}));
 
         if (res.ok && data.success) {
           setState("sent");
           setMessage(data.message || "Verification email sent! Check your inbox.");
+        } else if (res.status === 401) {
+          setState("login");
         } else {
           setState("error");
           setMessage(data.error?.message || data.message || data.error || "Failed to send verification email.");
@@ -44,69 +47,72 @@ export default function VerifyNowPage() {
     }
 
     send();
-  }, [token]);
+  }, [token, isReady]);
 
-  if (state === "login") {
+  if (state === "idle" || state === "sending") {
     return (
-      <section className="mx-auto max-w-md space-y-6 px-4 py-16 text-center">
-        <p className="text-5xl">🔐</p>
-        <h1 className="text-2xl font-semibold text-white">Please sign in first</h1>
-        <p className="text-sm text-white/60">You need to be logged in to verify your email.</p>
-        <Button asChild className="w-full min-h-[48px]">
-          <Link href="/login">Login</Link>
-        </Button>
-      </section>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="space-y-4 text-center">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-emerald-400" />
+          <p className="text-sm text-white/50">Sending verification email…</p>
+        </div>
+      </div>
     );
   }
 
-  if (state === "sending") {
+  if (state === "login") {
     return (
-      <section className="mx-auto max-w-md space-y-6 px-4 py-16 text-center">
-        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-emerald-400" />
-        <h1 className="text-xl font-semibold text-white">Sending verification email…</h1>
-        <p className="text-sm text-white/60">This will only take a moment.</p>
-      </section>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="space-y-4 text-center">
+          <p className="text-4xl">🔐</p>
+          <p className="text-lg font-bold text-white">Please sign in first</p>
+          <p className="text-xs text-white/40">You need to be logged in to verify your email.</p>
+          <Link href="/login" className="mt-2 inline-flex min-h-[44px] items-center justify-center rounded-xl cta-gradient px-6 text-sm font-bold text-white">
+            Login
+          </Link>
+        </div>
+      </div>
     );
   }
 
   if (state === "sent") {
     return (
-      <section className="mx-auto max-w-md space-y-6 px-4 py-16 text-center">
-        <p className="text-5xl">📧</p>
-        <h1 className="text-2xl font-semibold text-white">Verification email sent!</h1>
-        <p className="text-sm leading-relaxed text-white/70">{message}</p>
-        <div className="rounded-2xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
-          💡 Check your inbox (and spam folder). Click the link in the email to verify and receive your £5 reward!
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="mx-auto max-w-sm space-y-4 text-center">
+          <p className="text-4xl">📧</p>
+          <p className="text-lg font-bold text-white">Verification email sent!</p>
+          <p className="text-xs text-white/50">{message}</p>
+          <div className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-xs text-emerald-200">
+            💡 Check your inbox (and spam folder). Click the link to verify and receive your £5 reward!
+          </div>
+          <Link href="/account" className="mt-2 inline-flex min-h-[44px] items-center justify-center rounded-xl border border-white/15 px-6 text-sm font-medium text-white">
+            Back to account
+          </Link>
         </div>
-        <div className="flex flex-col gap-3">
-          <Button asChild className="w-full min-h-[48px]">
-            <Link href="/account">Back to account</Link>
-          </Button>
-        </div>
-      </section>
+      </div>
     );
   }
 
+  // error
   return (
-    <section className="mx-auto max-w-md space-y-6 px-4 py-16 text-center">
-      <p className="text-5xl">❌</p>
-      <h1 className="text-2xl font-semibold text-white">Could not send verification email</h1>
-      <p className="text-sm leading-relaxed text-white/70">{message}</p>
-      <div className="flex flex-col gap-3">
-        <Button
-          className="w-full min-h-[48px]"
-          onClick={() => {
-            calledRef.current = false;
-            setState("sending");
-            window.location.reload();
-          }}
-        >
-          Try again
-        </Button>
-        <Button asChild variant="secondary" className="w-full min-h-[48px]">
-          <Link href="/account">Back to account</Link>
-        </Button>
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="mx-auto max-w-sm space-y-4 text-center">
+        <p className="text-4xl">❌</p>
+        <p className="text-lg font-bold text-white">Could not send verification email</p>
+        <p className="text-xs text-white/50">{message}</p>
+        <div className="flex flex-col items-center gap-2">
+          <button
+            onClick={() => {
+              calledRef.current = false;
+              setState("idle");
+            }}
+            className="inline-flex min-h-[44px] items-center justify-center rounded-xl cta-gradient px-6 text-sm font-bold text-white"
+          >
+            Try again
+          </button>
+          <Link href="/account" className="text-xs text-white/30 underline">Back to account</Link>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

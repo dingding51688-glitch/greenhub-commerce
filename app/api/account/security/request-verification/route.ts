@@ -13,10 +13,16 @@ function getStrapiBase(): string {
 }
 
 function getToken(request: NextRequest): string | null {
+  // 1. Check Authorization header (client explicitly sent it)
+  const authHeader = request.headers.get("authorization");
+  if (authHeader?.startsWith("Bearer ") && authHeader.length > 10) {
+    return authHeader.slice(7);
+  }
+
+  // 2. Check cookie
   const cookieToken = cookies().get(AUTH_TOKEN_KEY)?.value;
   if (cookieToken) return cookieToken;
-  const authHeader = request.headers.get("authorization");
-  if (authHeader?.startsWith("Bearer ")) return authHeader.slice(7);
+
   return null;
 }
 
@@ -30,7 +36,8 @@ export async function POST(request: NextRequest) {
 
   const token = getToken(request);
   if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    console.error("[request-verification] No token found in header or cookie");
+    return NextResponse.json({ error: "Unauthorized — please log in again" }, { status: 401 });
   }
 
   try {
