@@ -3,313 +3,239 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import useSWR from "swr";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Button from "@/components/ui/button";
-import { StateMessage } from "@/components/StateMessage";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { swrFetcher } from "@/lib/api";
 
 const emailSchema = z
   .object({
     newEmail: z.string().email("Enter a valid email"),
-    confirmEmail: z.string().email("Confirm with the same email"),
+    confirmEmail: z.string().email("Confirm email"),
     currentPassword: z.string().min(8, "Enter your current password"),
   })
-  .refine((data) => data.newEmail === data.confirmEmail, {
-    path: ["confirmEmail"],
-    message: "Emails do not match",
-  });
+  .refine((d) => d.newEmail === d.confirmEmail, { path: ["confirmEmail"], message: "Emails do not match" });
 
 const passwordSchema = z
   .object({
     currentPassword: z.string().min(8, "Enter your current password"),
-    newPassword: z
-      .string()
-      .min(12, "Use at least 12 characters")
-      .regex(/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])/, "Add upper, lower, number, symbol"),
-    confirmPassword: z.string()
+    newPassword: z.string().min(12, "At least 12 characters").regex(/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])/, "Need upper, lower, number, symbol"),
+    confirmPassword: z.string(),
   })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "Passwords do not match"
-  });
+  .refine((d) => d.newPassword === d.confirmPassword, { path: ["confirmPassword"], message: "Passwords do not match" });
 
-type PasswordFormValues = z.infer<typeof passwordSchema>;
+type EmailForm = z.infer<typeof emailSchema>;
+type PasswordForm = z.infer<typeof passwordSchema>;
 
-type EmailFormValues = z.infer<typeof emailSchema>;
+const inputCls = "w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/20 focus:border-white/25";
 
-type DeviceRecord = {
-  id: number;
-  device: string;
-  location: string;
-  lastActive: string;
-  current?: boolean;
-};
-
-const dateFmt = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" });
-
-function passwordStrength(password: string) {
-  const score = [
-    /.{12,}/.test(password),
-    /[A-Z]/.test(password),
-    /[0-9]/.test(password),
-    /[^A-Za-z0-9]/.test(password)
-  ].filter(Boolean).length;
-  if (!password) return { label: "Enter a new password", tone: "muted" };
-  if (score <= 2) return { label: "Weak", tone: "weak" };
-  if (score === 3) return { label: "Okay", tone: "ok" };
-  return { label: "Strong", tone: "strong" };
+function strength(pw: string) {
+  const s = [/.{12,}/, /[A-Z]/, /[0-9]/, /[^A-Za-z0-9]/].filter((r) => r.test(pw)).length;
+  if (!pw) return { label: "", cls: "bg-white/10", pct: 0 };
+  if (s <= 2) return { label: "Weak", cls: "bg-red-400", pct: 33 };
+  if (s === 3) return { label: "Okay", cls: "bg-amber-400", pct: 66 };
+  return { label: "Strong", cls: "bg-emerald-400", pct: 100 };
 }
 
-export default function AccountSecurityPage() {
-  const { token, userEmail, refreshProfile } = useAuth();
+export default function SecurityPage() {
+  const { token, userEmail } = useAuth();
   const router = useRouter();
-  const emailForm = useForm<EmailFormValues>({ resolver: zodResolver(emailSchema) });
-  const passwordForm = useForm<PasswordFormValues>({ resolver: zodResolver(passwordSchema) });
-  const [emailStatus, setEmailStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [section, setSection] = useState<"email" | "password" | null>(null);
+
+  const emailForm = useForm<EmailForm>({ resolver: zodResolver(emailSchema) });
+  const passwordForm = useForm<PasswordForm>({ resolver: zodResolver(passwordSchema) });
+
+  const [emailStatus, setEmailStatus] = useState<{ ok: boolean; msg: string } | null>(null);
   const [emailLoading, setEmailLoading] = useState(false);
-  const [passwordStatus, setPasswordStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
-  const [passwordLoading, setPasswordLoading] = useState(false);
-  const { data: devicesData, error: devicesError, isLoading: devicesLoading, mutate: refreshDevices } = useSWR<{ devices: DeviceRecord[] }>(
-    token ? "/api/account/security/devices" : null,
-    swrFetcher
-  );
+  const [pwStatus, setPwStatus] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [pwLoading, setPwLoading] = useState(false);
 
   if (!token) {
     return (
-      <StateMessage
-        title="Please sign in"
-        body="Log in to manage your security settings."
-        actionLabel="Go to login"
-        onAction={() => router.push("/login")}
-      />
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="space-y-3 text-center">
+          <p className="text-4xl">🔐</p>
+          <p className="text-sm font-bold text-white">Sign in first</p>
+          <Link href="/login" className="inline-flex min-h-[40px] items-center rounded-xl cta-gradient px-5 text-sm font-bold text-white">Log in</Link>
+        </div>
+      </div>
     );
   }
 
-  const onSubmit = async (values: PasswordFormValues) => {
-    setPasswordStatus(null);
-    setPasswordLoading(true);
-    try {
-      const response = await fetch("/api/account/security/change-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          currentPassword: values.currentPassword,
-          password: values.newPassword,
-          passwordConfirmation: values.confirmPassword
-        })
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(payload?.error?.message || "Unable to change password");
-      }
-      passwordForm.reset();
-      setPasswordStatus({ type: "success", message: "Password updated" });
-    } catch (error: any) {
-      setPasswordStatus({ type: "error", message: error?.message || "Update failed" });
-    } finally {
-      setPasswordLoading(false);
-    }
-  };
-
-  const submitEmailChange = async (values: EmailFormValues) => {
+  const submitEmail = async (v: EmailForm) => {
     setEmailStatus(null);
     setEmailLoading(true);
     try {
-      const response = await fetch("/api/account/security/change-email", {
+      const res = await fetch("/api/account/security/change-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          newEmail: values.newEmail,
-          currentPassword: values.currentPassword
-        })
+        body: JSON.stringify({ newEmail: v.newEmail, currentPassword: v.currentPassword }),
       });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(payload?.error?.message || "Unable to change email");
-      }
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d?.error?.message || "Failed");
       emailForm.reset();
-      setEmailStatus({
-        type: "success",
-        message: payload.message || "Verification email sent! Please check your inbox (and Spam/Junk folder).",
-      });
-      // Do NOT refresh profile here - email hasn't changed yet, pending verification
-    } catch (error: any) {
-      setEmailStatus({ type: "error", message: error?.message || "Update failed" });
-    } finally {
-      setEmailLoading(false);
-    }
+      setEmailStatus({ ok: true, msg: d.message || "Verification email sent! Check your inbox." });
+    } catch (e: any) {
+      setEmailStatus({ ok: false, msg: e?.message || "Failed" });
+    } finally { setEmailLoading(false); }
   };
 
-  const strength = passwordStrength(passwordForm.watch("newPassword"));
-
-  const devices = devicesData?.devices || [];
-
-  const revokeDevice = async (id: number) => {
+  const submitPassword = async (v: PasswordForm) => {
+    setPwStatus(null);
+    setPwLoading(true);
     try {
-      await fetch("/api/account/security/devices", {
-        method: "DELETE",
+      const res = await fetch("/api/account/security/change-password", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id })
+        body: JSON.stringify({ currentPassword: v.currentPassword, password: v.newPassword, passwordConfirmation: v.confirmPassword }),
       });
-      await refreshDevices();
-    } catch (error) {
-      console.warn("Failed to revoke device", error);
-    }
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d?.error?.message || "Failed");
+      passwordForm.reset();
+      setPwStatus({ ok: true, msg: "Password updated" });
+    } catch (e: any) {
+      setPwStatus({ ok: false, msg: e?.message || "Failed" });
+    } finally { setPwLoading(false); }
   };
+
+  const pw = passwordForm.watch("newPassword") || "";
+  const str = strength(pw);
 
   return (
-    <section className="space-y-8">
-      <header className="rounded-3xl border border-white/10 bg-card p-6 shadow-card">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/50">Account security</p>
-        <h1 className="hidden text-3xl font-semibold text-white sm:block">Keep your locker safe</h1>
-        <p className="mt-2 hidden text-sm text-white/60 sm:block">Security reminder: avoid saving passwords on shared devices and enable support team approvals for sensitive changes.</p>
-      </header>
+    <div className="space-y-4 pb-24 sm:space-y-6 sm:pb-20">
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <Link href="/account" className="text-white/30 hover:text-white/50">← Account</Link>
+        <span className="text-white/15">/</span>
+        <span className="text-xs text-white/50">Security</span>
+      </div>
 
-      <div className="rounded-3xl border border-white/10 bg-night-950/80 p-6">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-xl font-semibold text-white">Change email</h2>
-          <p className="text-sm leading-relaxed text-white/60">
-            Current: <span className="font-mono text-white">{userEmail || "-"}</span>. We&apos;ll send a verification email to your new address. Your email won&apos;t change until you click the link.
-          </p>
+      <div>
+        <h1 className="text-xl font-bold text-white">Security</h1>
+        <p className="mt-0.5 text-xs text-white/40">Manage your email and password</p>
+      </div>
+
+      {/* Current email display */}
+      <div className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">
+        <span className="text-lg">📧</span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] text-white/30">Current email</p>
+          <p className="truncate text-sm font-mono text-white">{userEmail || "—"}</p>
         </div>
-        <form className="mt-4 space-y-4" onSubmit={emailForm.handleSubmit(submitEmailChange)}>
-          <InputField label="New email" error={emailForm.formState.errors.newEmail?.message}>
-            <input type="email" {...emailForm.register("newEmail")} className="w-full rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-white" />
-          </InputField>
-          <InputField label="Confirm email" error={emailForm.formState.errors.confirmEmail?.message}>
-            <input type="email" {...emailForm.register("confirmEmail")} className="w-full rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-white" />
-          </InputField>
-          <InputField label="Current password" error={emailForm.formState.errors.currentPassword?.message}>
-            <input type="password" {...emailForm.register("currentPassword")} className="w-full rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-white" />
-          </InputField>
-          {emailStatus && (
-            <div
-              className={`rounded-2xl border px-3 py-2 text-sm ${
-                emailStatus.type === "success"
-                  ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-100"
-                  : "border-red-400/40 bg-red-400/10 text-red-100"
-              }`}
-            >
-              {emailStatus.message}
+      </div>
+
+      {/* Change Email */}
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02]">
+        <button
+          onClick={() => setSection(section === "email" ? null : "email")}
+          className="flex w-full items-center justify-between px-4 py-3"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-base">✉️</span>
+            <div className="text-left">
+              <p className="text-sm font-medium text-white">Change Email</p>
+              <p className="text-[10px] text-white/30">We&apos;ll send a verification link to the new address</p>
             </div>
-          )}
-          <div className="flex justify-end">
-            <Button type="submit" disabled={emailLoading}>
-              {emailLoading ? "Sending…" : "Send verification email"}
-            </Button>
           </div>
-        </form>
-      </div>
+          <span className={`text-white/30 transition ${section === "email" ? "rotate-180" : ""}`}>▾</span>
+        </button>
 
-      <div className="rounded-3xl border border-white/10 bg-night-950/80 p-6">
-        <h2 className="text-xl font-semibold text-white">Change password</h2>
-        <p className="text-sm text-white/60">Set a strong, unique password. We&apos;ll sign out other sessions when you change it.</p>
-        <form className="mt-4 space-y-4" onSubmit={passwordForm.handleSubmit(onSubmit)}>
-          <InputField label="Current password" error={passwordForm.formState.errors.currentPassword?.message}>
-            <input type="password" {...passwordForm.register("currentPassword")} className="w-full rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-white" />
-          </InputField>
-          <InputField label="New password" error={passwordForm.formState.errors.newPassword?.message}>
-            <input type="password" {...passwordForm.register("newPassword")} className="w-full rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-white" />
-            <p className={`text-xs ${strength.tone === "weak" ? "text-red-300" : strength.tone === "ok" ? "text-amber-200" : strength.tone === "strong" ? "text-emerald-300" : "text-white/50"}`}>
-              {strength.label}
-            </p>
-          </InputField>
-          <InputField label="Confirm password" error={passwordForm.formState.errors.confirmPassword?.message}>
-            <input type="password" {...passwordForm.register("confirmPassword")} className="w-full rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-white" />
-          </InputField>
-          {passwordStatus && (
-            <div
-              className={`rounded-2xl border px-3 py-2 text-sm ${
-                passwordStatus.type === "success"
-                  ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-100"
-                  : "border-red-400/40 bg-red-400/10 text-red-100"
-              }`}
-            >
-              {passwordStatus.message}
-            </div>
-          )}
-          <div className="flex justify-end">
-            <Button type="submit" disabled={passwordLoading}>
-              {passwordLoading ? "Saving..." : "Update password"}
-            </Button>
-          </div>
-        </form>
-      </div>
+        {section === "email" && (
+          <form className="space-y-3 border-t border-white/5 px-4 pb-4 pt-3" onSubmit={emailForm.handleSubmit(submitEmail)}>
+            <Field label="New email" error={emailForm.formState.errors.newEmail?.message}>
+              <input type="email" placeholder="new@example.com" {...emailForm.register("newEmail")} className={inputCls} />
+            </Field>
+            <Field label="Confirm email" error={emailForm.formState.errors.confirmEmail?.message}>
+              <input type="email" placeholder="new@example.com" {...emailForm.register("confirmEmail")} className={inputCls} />
+            </Field>
+            <Field label="Current password" error={emailForm.formState.errors.currentPassword?.message}>
+              <input type="password" placeholder="••••••••" {...emailForm.register("currentPassword")} className={inputCls} />
+            </Field>
 
-      <div className="rounded-3xl border border-white/10 bg-night-950/70 p-6">
-        <h2 className="text-xl font-semibold text-white">Two-factor reminders</h2>
-        <p className="text-sm text-white/60">
-          Support team approvals double-check sensitive actions today. Full OTP-based 2FA is coming soon — watch the
-          <Link href="/referral" className="underline"> updates feed</Link> for beta access.
-        </p>
-        <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-white/70">
-          <li>Lock down your Telegram handle with a PIN.</li>
-          <li>Enable device biometrics for autofill managers.</li>
-          <li>Report suspicious activity immediately via <Link href="/support" className="underline">support</Link>.</li>
-        </ul>
-      </div>
-
-      <div className="rounded-3xl border border-white/10 bg-night-950/70 p-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">Recent sessions</h2>
-          <button className="text-xs uppercase tracking-[0.3em] text-white/60 underline" onClick={() => refreshDevices()}>
-            Refresh
-          </button>
-        </div>
-        {devicesLoading ? (
-          <div className="mt-4 space-y-3">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="h-16 animate-pulse rounded-2xl bg-white/5" />
-            ))}
-          </div>
-        ) : devicesError ? (
-          <StateMessage
-            variant="error"
-            title="Unable to load devices"
-            body={devicesError.message}
-            actionLabel="Retry"
-            onAction={() => refreshDevices()}
-          />
-        ) : devices.length === 0 ? (
-          <StateMessage variant="empty" title="No sessions" body="We'll list new logins here." />
-        ) : (
-          <div className="mt-4 divide-y divide-white/10 rounded-3xl border border-white/10">
-            {devices.map((device) => (
-              <div key={device.id} className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="font-medium text-white">{device.device}</p>
-                  <p className="text-xs text-white/50">{device.location}</p>
-                </div>
-                <p className="text-sm text-white/60">{dateFmt.format(new Date(device.lastActive))}</p>
-                <div className="flex items-center gap-3">
-                  {device.current && <span className="rounded-full border border-emerald-400/40 px-3 py-1 text-xs text-emerald-200">Current</span>}
-                  {!device.current && (
-                    <button className="text-xs text-red-200 underline" onClick={() => revokeDevice(device.id)}>
-                      Sign out
-                    </button>
-                  )}
-                </div>
+            {emailStatus && (
+              <div className={`rounded-xl border px-3 py-2 text-xs ${emailStatus.ok ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200" : "border-red-400/30 bg-red-400/10 text-red-200"}`}>
+                {emailStatus.msg}
               </div>
-            ))}
-          </div>
+            )}
+
+            <button type="submit" disabled={emailLoading}
+              className="flex w-full min-h-[44px] items-center justify-center rounded-xl cta-gradient text-sm font-bold text-white disabled:opacity-40">
+              {emailLoading ? "Sending…" : "Send Verification Email"}
+            </button>
+          </form>
         )}
       </div>
-    </section>
+
+      {/* Change Password */}
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02]">
+        <button
+          onClick={() => setSection(section === "password" ? null : "password")}
+          className="flex w-full items-center justify-between px-4 py-3"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-base">🔑</span>
+            <div className="text-left">
+              <p className="text-sm font-medium text-white">Change Password</p>
+              <p className="text-[10px] text-white/30">Use a strong, unique password</p>
+            </div>
+          </div>
+          <span className={`text-white/30 transition ${section === "password" ? "rotate-180" : ""}`}>▾</span>
+        </button>
+
+        {section === "password" && (
+          <form className="space-y-3 border-t border-white/5 px-4 pb-4 pt-3" onSubmit={passwordForm.handleSubmit(submitPassword)}>
+            <Field label="Current password" error={passwordForm.formState.errors.currentPassword?.message}>
+              <input type="password" placeholder="••••••••" {...passwordForm.register("currentPassword")} className={inputCls} />
+            </Field>
+            <Field label="New password" error={passwordForm.formState.errors.newPassword?.message}>
+              <input type="password" placeholder="Min 12 chars" {...passwordForm.register("newPassword")} className={inputCls} />
+              {pw && (
+                <div className="mt-1.5 space-y-1">
+                  <div className="h-1 overflow-hidden rounded-full bg-white/8">
+                    <div className={`h-full rounded-full transition-all ${str.cls}`} style={{ width: `${str.pct}%` }} />
+                  </div>
+                  <p className={`text-[9px] ${str.pct === 100 ? "text-emerald-300" : str.pct > 33 ? "text-amber-300" : "text-red-300"}`}>{str.label}</p>
+                </div>
+              )}
+            </Field>
+            <Field label="Confirm password" error={passwordForm.formState.errors.confirmPassword?.message}>
+              <input type="password" placeholder="••••••••" {...passwordForm.register("confirmPassword")} className={inputCls} />
+            </Field>
+
+            {pwStatus && (
+              <div className={`rounded-xl border px-3 py-2 text-xs ${pwStatus.ok ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200" : "border-red-400/30 bg-red-400/10 text-red-200"}`}>
+                {pwStatus.msg}
+              </div>
+            )}
+
+            <button type="submit" disabled={pwLoading}
+              className="flex w-full min-h-[44px] items-center justify-center rounded-xl cta-gradient text-sm font-bold text-white disabled:opacity-40">
+              {pwLoading ? "Saving…" : "Update Password"}
+            </button>
+          </form>
+        )}
+      </div>
+
+      {/* Security tips */}
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+        <p className="text-sm font-bold text-white mb-2">🛡️ Security Tips</p>
+        <div className="space-y-1.5 text-xs text-white/40">
+          <p>• Use a unique password not used on other sites</p>
+          <p>• Enable biometric lock on your password manager</p>
+          <p>• Lock your Telegram with a PIN code</p>
+          <p>• Report suspicious activity via <Link href="/support" className="text-emerald-400 underline">support</Link></p>
+        </div>
+      </div>
+    </div>
   );
 }
 
-function InputField({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
-    <label className="block text-xs uppercase tracking-[0.3em] text-white/40">
-      {label}
-      <div className="mt-1 space-y-1">
-        {children}
-        {error && <p className="text-xs text-red-300">{error}</p>}
-      </div>
+    <label className="block">
+      <span className="text-[10px] uppercase tracking-wider text-white/40">{label}</span>
+      <div className="mt-1">{children}</div>
+      {error && <p className="mt-1 text-[10px] text-red-300">{error}</p>}
     </label>
   );
 }
