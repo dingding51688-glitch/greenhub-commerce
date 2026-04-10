@@ -83,7 +83,7 @@ const faqs = [
   },
   {
     q: "What areas do you cover?",
-    a: "All of Northern Ireland. We use the InPost locker network — over 200 locations across NI.",
+    a: "All of the UK. We use the InPost locker network — over 14,000 locations nationwide.",
   },
   {
     q: "Can I get a refund?",
@@ -105,7 +105,7 @@ const faqs = [
 
 const trustPoints = [
   { icon: "🔒", title: "Encrypted & secure", desc: "All data is encrypted. We never share your information with third parties." },
-  { icon: "📍", title: "200+ locker locations", desc: "InPost terminals across Northern Ireland, accessible 24/7." },
+  { icon: "📍", title: "14,000+ locker locations", desc: "InPost terminals across the UK, accessible 24/7." },
   { icon: "⚡", title: "Same-day dispatch", desc: "Order before 14:00 for same-day processing and dispatch." },
   { icon: "🎯", title: "No ID required", desc: "Fully anonymous pickup. Just your code — nothing else." },
 ];
@@ -126,7 +126,7 @@ export default function HowItWorksPage() {
         </p>
         <div className="mx-auto mt-6 flex flex-wrap justify-center gap-6">
           {[
-            { value: "200+", label: "Pickup points" },
+            { value: "14,000+", label: "Pickup points" },
             { value: "Same day", label: "Dispatch" },
             { value: "72h", label: "Collection window" },
             { value: "No ID", label: "Required" },
