@@ -46,7 +46,7 @@ export function MobileDrawer({ open, onClose, ctas }: MobileDrawerProps) {
 
   useEffect(() => {
     if (!open || !token) return;
-    apiFetch("/api/account/wallet/balance")
+    apiFetch("/api/wallet/balance")
       .then((res: any) => {
         const bal = res?.data?.balance ?? res?.balance;
         if (typeof bal === "number") setBalance(bal);
