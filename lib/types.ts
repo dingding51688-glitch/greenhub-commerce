@@ -136,6 +136,16 @@ export type OrderRecord = {
   trackingNumber?: string | null;
   trackingUrl?: string | null;
   carrier?: string | null;
+  dispatchedAt?: string | null;
+  deliveredAt?: string | null;
+  trackingEvents?: Array<{
+    occurred_at: string;
+    code: string;
+    text: string;
+    description: string;
+  }> | null;
+  trackingState?: string | null;
+  trackingLastChecked?: string | null;
   paymentOption?: string | null;
   walletDebit?: number | null;
   items?: OrderItem[];

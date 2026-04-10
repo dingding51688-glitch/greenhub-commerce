@@ -43,7 +43,11 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
     ])
       .then(([tracking, summary]) => {
         const t = tracking.order ?? null;
-        setOrder(summary ? { ...summary, status: t?.status ?? summary.status } : t);
+        // Merge tracking events into the order object
+        const merged = summary
+          ? { ...summary, status: t?.status ?? summary.status, ...( t ? { trackingEvents: t.trackingEvents, trackingState: t.trackingState, trackingLastChecked: t.trackingLastChecked, dispatchedAt: t.dispatchedAt || summary.dispatchedAt, deliveredAt: t.deliveredAt || summary.deliveredAt } : {}) }
+          : t;
+        setOrder(merged);
       })
       .catch((err) => setError(err?.message || "Unable to load order"))
       .finally(() => setLoading(false));
@@ -222,13 +226,13 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
       </div>
 
       {/* Tracking Timeline */}
-      {(order as any).trackingEvents && Array.isArray((order as any).trackingEvents) && (order as any).trackingEvents.length > 0 && (
+      {order.trackingEvents && Array.isArray(order.trackingEvents) && order.trackingEvents.length > 0 && (
         <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
           <p className="text-[10px] uppercase tracking-wider text-white/40 mb-4">📍 Tracking Timeline</p>
           <div className="relative pl-6">
             {/* Vertical line */}
             <div className="absolute left-[9px] top-1 bottom-1 w-px bg-white/10" />
-            {((order as any).trackingEvents as Array<{occurred_at: string; code: string; text: string; description: string}>).map((evt, i) => {
+            {order.trackingEvents.map((evt, i) => {
               const isFirst = i === 0;
               const isDelivered = ["ZA", "ZL", "LF"].includes(evt.code);
               const dotColor = isFirst
