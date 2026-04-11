@@ -136,7 +136,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
       <div className="grid gap-2 sm:grid-cols-3">
         {[
           { icon: "📦", title: "Discreet Packaging", desc: "Vacuum-sealed, no labels" },
-          { icon: "🔒", title: "14,000+ Lockers", desc: "24/7 InPost collection" },
+          { icon: "🔒", title: "16,000+ Lockers", desc: "24/7 InPost collection" },
           { icon: "⚡", title: "3-5 Day Delivery", desc: "Tracking number provided" },
         ].map((item) => (
           <div key={item.title} className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.02] px-3 py-2.5">
