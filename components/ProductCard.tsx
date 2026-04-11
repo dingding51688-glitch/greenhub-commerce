@@ -30,6 +30,16 @@ function formatPriceRange(product: ProductRecord) {
   return `£${product.priceFrom.toFixed(0)}`;
 }
 
+function computeUnitPrice(option: { label: string; price: number; unitPrice?: string }) {
+  if (option.unitPrice) return option.unitPrice;
+  const m = option.label.match(/([\d.]+)\s*g/i);
+  if (m) {
+    const g = parseFloat(m[1]);
+    if (g > 0) return `£${(option.price / g).toFixed(2)}/g`;
+  }
+  return "";
+}
+
 export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
   const meta = getProductListingMeta(product.slug) ?? {};
   const rating = product.rating ?? meta.rating ?? 4.9;
@@ -88,8 +98,31 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
             <span className="text-[10px] font-medium text-amber-200">{rating.toFixed(1)}</span>
           </div>
 
-          {/* Price */}
-          <p className={`mt-auto pt-2 text-base font-bold ${outOfStock ? "text-white/30 line-through" : "text-emerald-300"}`}>{priceRange}</p>
+          {/* Weight/Price grid */}
+          {product.weightOptions && product.weightOptions.length > 0 ? (
+            <div className={`mt-auto grid grid-cols-2 gap-1 pt-2 ${outOfStock ? "opacity-30" : ""}`}>
+              {product.weightOptions.slice(0, 4).map((opt) => {
+                const up = computeUnitPrice(opt);
+                return (
+                  <div
+                    key={opt.id}
+                    className="relative rounded-lg border border-emerald-400/15 bg-emerald-400/[0.04] px-1.5 py-1.5 text-center"
+                  >
+                    {opt.featured && (
+                      <span className="absolute -top-1.5 right-1 rounded-full bg-emerald-400/25 px-1 text-[6px] font-bold uppercase text-emerald-300">
+                        Popular
+                      </span>
+                    )}
+                    <p className="text-[9px] text-white/40">{opt.label}</p>
+                    <p className="text-sm font-bold text-white">£{opt.price.toFixed(0)}</p>
+                    {up && <p className="text-[8px] text-white/25">{up}</p>}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className={`mt-auto pt-2 text-base font-bold ${outOfStock ? "text-white/30 line-through" : "text-emerald-300"}`}>{priceRange}</p>
+          )}
         </div>
       </Link>
     );
