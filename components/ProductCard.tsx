@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import type { ProductRecord } from "@/lib/types";
 import { getProductListingMeta } from "@/data/fixtures/products";
+import { useCart } from "@/components/providers/CartProvider";
 
 const CMS_BASE = process.env.NEXT_PUBLIC_STRAPI_URL || "https://cms.greenhub420.co.uk";
 function strapiMedia(path?: string | null): string | undefined {
@@ -100,26 +102,7 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
 
           {/* Weight/Price grid */}
           {product.weightOptions && product.weightOptions.length > 0 ? (
-            <div className={`mt-auto grid grid-cols-2 gap-1 pt-2 ${outOfStock ? "opacity-30" : ""}`}>
-              {product.weightOptions.slice(0, 4).map((opt) => {
-                const up = computeUnitPrice(opt);
-                return (
-                  <div
-                    key={opt.id}
-                    className="relative rounded-lg border border-emerald-400/15 bg-emerald-400/[0.04] px-1.5 py-1.5 text-center"
-                  >
-                    {opt.featured && (
-                      <span className="absolute -top-1.5 right-1 rounded-full bg-emerald-400/25 px-1 text-[6px] font-bold uppercase text-emerald-300">
-                        Popular
-                      </span>
-                    )}
-                    <p className="text-[9px] text-white/40">{opt.label}</p>
-                    <p className="text-sm font-bold text-white">£{opt.price.toFixed(0)}</p>
-                    {up && <p className="text-[8px] text-white/25">{up}</p>}
-                  </div>
-                );
-              })}
-            </div>
+            <WeightPriceGrid product={product} outOfStock={outOfStock} />
           ) : (
             <p className={`mt-auto pt-2 text-base font-bold ${outOfStock ? "text-white/30 line-through" : "text-emerald-300"}`}>{priceRange}</p>
           )}
@@ -180,5 +163,76 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
         </span>
       </div>
     </Link>
+  );
+}
+
+/* ── Weight/Price grid with add-to-cart ── */
+
+const CMS = process.env.NEXT_PUBLIC_STRAPI_URL || "https://cms.greenhub420.co.uk";
+
+function WeightPriceGrid({ product, outOfStock }: { product: ProductRecord; outOfStock: boolean }) {
+  const { addItem } = useCart();
+  const [addedId, setAddedId] = useState<number | null>(null);
+
+  const handleAdd = (opt: { id: number; label: string; price: number }, e: React.MouseEvent) => {
+    e.preventDefault(); // prevent Link navigation
+    e.stopPropagation();
+    if (outOfStock) return;
+
+    const featImg = product.featuredImage;
+    let imgUrl: string | null = null;
+    if (featImg?.url) {
+      imgUrl = featImg.url.startsWith("http") ? featImg.url : `${CMS}${featImg.url}`;
+    }
+
+    addItem({
+      productId: product.id,
+      slug: product.slug,
+      title: product.title,
+      image: imgUrl,
+      weight: opt.label,
+      unitPrice: opt.price,
+      quantity: 1,
+    });
+
+    setAddedId(opt.id);
+    setTimeout(() => setAddedId(null), 1200);
+  };
+
+  return (
+    <div className={`mt-auto grid grid-cols-2 gap-1 pt-2 ${outOfStock ? "opacity-30" : ""}`}>
+      {product.weightOptions!.slice(0, 4).map((opt) => {
+        const up = computeUnitPrice(opt);
+        const isAdded = addedId === opt.id;
+        return (
+          <button
+            key={opt.id}
+            type="button"
+            disabled={outOfStock}
+            onClick={(e) => handleAdd(opt, e)}
+            className={`relative rounded-lg border px-1.5 py-1.5 text-center transition ${
+              isAdded
+                ? "border-emerald-400/40 bg-emerald-400/20"
+                : "border-emerald-400/15 bg-emerald-400/[0.04] hover:border-emerald-400/30 hover:bg-emerald-400/10 active:scale-95"
+            }`}
+          >
+            {opt.featured && !isAdded && (
+              <span className="absolute -top-1.5 right-1 rounded-full bg-emerald-400/25 px-1 text-[6px] font-bold uppercase text-emerald-300">
+                Popular
+              </span>
+            )}
+            {isAdded ? (
+              <p className="py-1 text-xs font-bold text-emerald-300">✓ Added</p>
+            ) : (
+              <>
+                <p className="text-[9px] text-white/40">{opt.label}</p>
+                <p className="text-sm font-bold text-white">£{opt.price.toFixed(0)}</p>
+                {up && <p className="text-[8px] text-white/25">{up}</p>}
+              </>
+            )}
+          </button>
+        );
+      })}
+    </div>
   );
 }
