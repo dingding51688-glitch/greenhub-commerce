@@ -14,7 +14,7 @@ export type DeliveryLocation = {
   lat: number;
   lng: number;
   distance?: number; // metres
-  type: "inpost_locker" | "oohpod_locker" | "yodel_store";
+  type: "inpost_locker" | "inpost_shop" | "oohpod_locker" | "yodel_store";
   opening: string;
   extra?: Record<string, unknown>;
 };
@@ -60,31 +60,40 @@ function parseInPostHours(raw?: string): string {
 
 export async function searchInPostLockers(
   postcode: string,
-  maxDistance = 5000,
-  limit = 10
+  maxDistance = 8000,
+  limit = 20
 ): Promise<DeliveryLocation[]> {
   const pc = normalizePostcode(postcode).replace(/ /g, "+");
-  const url = `https://api-uk-points.easypack24.net/v1/points?relative_post_code=${pc}&max_distance=${maxDistance}&per_page=${limit}&type=parcel_locker&sort_by=distance_from_relative_point`;
+  // No type filter — include parcel_locker + POP (shop) points
+  // Fetch extra to filter out non-operating, then trim to limit
+  const fetchLimit = Math.min(limit * 3, 50);
+  const url = `https://api-uk-points.easypack24.net/v1/points?relative_post_code=${pc}&max_distance=${maxDistance}&per_page=${fetchLimit}&sort_by=distance_from_relative_point`;
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
-  return (data.items || []).map((p: any) => {
+  const operating = (data.items || []).filter(
+    (p: any) => p.status === "Operating"
+  );
+  // Sort by distance client-side (API sort is unreliable)
+  operating.sort((a: any, b: any) => (a.distance ?? 0) - (b.distance ?? 0));
+
+  return operating.slice(0, limit).map((p: any) => {
     const street = p.address_details?.street || "";
-    const buildNum = p.address_details?.building_number || "";
     const city = p.address_details?.city || "";
-    const pc = p.address_details?.post_code || "";
-    // Build a readable address: "Sharrow Lane, Sheffield S11 8AN"
-    const addrParts = [street, city, pc].filter(Boolean);
+    const postcode = p.address_details?.post_code || "";
+    const addrParts = [street, city, postcode].filter(Boolean);
+    const types: string[] = p.type || [];
+    const isShop = types.includes("pop") || types.includes("pok");
     return {
       id: p.name,
       name: p.address?.line1 || p.name,
       address: addrParts.join(", ") || p.address?.line2 || "",
-      postcode: pc,
+      postcode,
       city,
       lat: p.location?.latitude || 0,
       lng: p.location?.longitude || 0,
       distance: p.distance ?? null,
-      type: "inpost_locker" as const,
+      type: (isShop ? "inpost_shop" : "inpost_locker") as any,
       opening: parseInPostHours(p.opening_hours),
     };
   });

@@ -124,7 +124,7 @@ export default function LocationPicker({ postcode, onSelect, selected }: Props) 
 
       {/* Label */}
       {!isNI && (
-        <p className="text-[10px] text-white/30">🔐 InPost Locker · 16,000+ locations</p>
+        <p className="text-[10px] text-white/30">🔐 InPost Lockers & Shops · 16,000+ locations</p>
       )}
 
       {/* Loading */}
@@ -158,7 +158,7 @@ export default function LocationPicker({ postcode, onSelect, selected }: Props) 
                 }`}
               >
                 <p className={`text-[11px] font-bold leading-snug ${isSel ? "text-emerald-300" : "text-white"}`}>
-                  {isSel && "✓ "}{loc.name}
+                  {isSel && "✓ "}{loc.type === "inpost_shop" ? "🏪 " : "🔐 "}{loc.name}
                 </p>
                 {loc.address && (
                   <p className="text-[10px] text-white/40 mt-1 leading-snug">{loc.address}</p>
