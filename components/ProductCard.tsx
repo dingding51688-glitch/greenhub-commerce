@@ -175,10 +175,12 @@ function WeightPriceGrid({ product, outOfStock }: { product: ProductRecord; outO
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [addedId, setAddedId] = useState<number | null>(null);
 
-  const handleClick = (opt: { id: number; label: string; price: number }, e: React.MouseEvent) => {
+  const handleClick = (opt: { id: number; label: string; price: number; stock?: number | null }, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (outOfStock) return;
+    // stock === null/undefined means unlimited; stock === 0 means out of stock
+    if (opt.stock === 0) return;
 
     if (selectedId !== opt.id) {
       // First click: select/highlight
@@ -214,26 +216,34 @@ function WeightPriceGrid({ product, outOfStock }: { product: ProductRecord; outO
         const up = computeUnitPrice(opt);
         const isSelected = selectedId === opt.id;
         const isAdded = addedId === opt.id;
+        const optSoldOut = opt.stock === 0;
         return (
           <button
             key={opt.id}
             type="button"
-            disabled={outOfStock}
+            disabled={outOfStock || optSoldOut}
             onClick={(e) => handleClick(opt, e)}
             className={`relative rounded-lg border px-1.5 py-1.5 text-center transition ${
-              isAdded
-                ? "border-emerald-400/40 bg-emerald-400/20"
-                : isSelected
-                  ? "border-emerald-400/40 bg-emerald-400/15 ring-1 ring-emerald-400/30"
-                  : "border-emerald-400/15 bg-emerald-400/[0.04] hover:border-emerald-400/30 hover:bg-emerald-400/10 active:scale-95"
+              optSoldOut
+                ? "border-white/5 bg-white/[0.01] opacity-40"
+                : isAdded
+                  ? "border-emerald-400/40 bg-emerald-400/20"
+                  : isSelected
+                    ? "border-emerald-400/40 bg-emerald-400/15 ring-1 ring-emerald-400/30"
+                    : "border-emerald-400/15 bg-emerald-400/[0.04] hover:border-emerald-400/30 hover:bg-emerald-400/10 active:scale-95"
             }`}
           >
-            {opt.featured && !isAdded && !isSelected && (
+            {opt.featured && !isAdded && !isSelected && !optSoldOut && (
               <span className="absolute -top-1.5 right-1 rounded-full bg-emerald-400/25 px-1 text-[6px] font-bold uppercase text-emerald-300">
                 Popular
               </span>
             )}
-            {isAdded ? (
+            {optSoldOut ? (
+              <>
+                <p className="text-[9px] text-white/30">{opt.label}</p>
+                <p className="text-[10px] font-bold text-red-400/60">Sold Out</p>
+              </>
+            ) : isAdded ? (
               <p className="py-1 text-xs font-bold text-emerald-300">✓ Added</p>
             ) : isSelected ? (
               <p className="py-1 text-xs font-bold text-emerald-300">Tap to add 🛒</p>

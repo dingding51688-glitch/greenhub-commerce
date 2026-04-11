@@ -187,6 +187,7 @@ export type WeightOption = {
   price: number;
   unitPrice: string;
   featured?: boolean;
+  stock?: number | null;
 };
 
 export type ProductImage = {

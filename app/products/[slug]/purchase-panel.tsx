@@ -75,21 +75,29 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
           return (
             <button
               key={o.id}
-              onClick={() => setSelectedId(o.id)}
+              onClick={() => o.stock !== 0 && setSelectedId(o.id)}
+              disabled={o.stock === 0}
               className={clsx(
                 "relative rounded-xl border px-3 py-2.5 text-left transition",
-                active
-                  ? "border-emerald-400/40 bg-emerald-400/10"
-                  : "border-white/8 bg-white/[0.02] hover:border-white/15"
+                o.stock === 0
+                  ? "border-white/5 bg-white/[0.01] opacity-40 cursor-not-allowed"
+                  : active
+                    ? "border-emerald-400/40 bg-emerald-400/10"
+                    : "border-white/8 bg-white/[0.02] hover:border-white/15"
               )}
             >
-              {popular && (
+              {popular && o.stock !== 0 && (
                 <span className="absolute right-1.5 top-1.5 rounded-full bg-emerald-400/20 px-1.5 py-0.5 text-[7px] font-bold uppercase text-emerald-300">
                   Popular
                 </span>
               )}
+              {o.stock === 0 && (
+                <span className="absolute right-1.5 top-1.5 rounded-full bg-red-500/20 px-1.5 py-0.5 text-[7px] font-bold uppercase text-red-300">
+                  Sold Out
+                </span>
+              )}
               <p className="text-[10px] text-white/40">{o.label}</p>
-              <p className="text-base font-bold text-white">£{o.price.toFixed(0)}</p>
+              <p className={clsx("text-base font-bold", o.stock === 0 ? "text-white/30 line-through" : "text-white")}>£{o.price.toFixed(0)}</p>
               {unitPrice(o) && <p className="text-[9px] text-white/25">{unitPrice(o)}</p>}
             </button>
           );
