@@ -7,12 +7,12 @@ export type HeroLink = {
 
 export const heroClassicContent = {
   eyebrow: "Green Hub 420 · Premium Products",
-  title: "Premium products, locker delivery across NI",
+  title: "Premium products, locker delivery across the UK",
   subtitle:
-    "Browse curated flower, carts, and edibles online — order now and collect from your nearest InPost locker whenever you're ready.",
+    "Browse curated flower, carts, and edibles online — order now and collect from your nearest InPost locker or collection point.",
   primaryCta: { label: "Browse products", href: "/products" } satisfies HeroLink,
   secondaryCta: { label: "How it works", href: "/#how-it-works" } satisfies HeroLink,
-  highlight: "Now delivering via InPost lockers across NI",
+  highlight: "Now delivering via InPost lockers across the UK",
   stats: [
     { label: "Dispatch window", value: "24/7" },
     { label: "Members served", value: "3.1k" },
@@ -24,7 +24,7 @@ export const homeHeroContent = {
   highlight: "HOME",
   eyebrow: "ONLINE ORDER · LOCKER PICKUP",
   title: "Order Online & Pick Up at InPost Lockers",
-  subtitle: "According to the postcode you provide, the parcel will be delivered to the nearest InPost locker.",
+  subtitle: "Enter your postcode at checkout and we'll deliver to your nearest InPost locker or collection point.",
   bullets: [
     "24-hour dispatch with real-time tracking updates",
     "Sealed disguise packaging with scent & appearance masking",
@@ -67,7 +67,7 @@ export const orderFlow = {
   ] satisfies OrderStep[],
   tip: {
     label: "Coverage",
-    content: "Belfast + Derry are covered 24/7. Contact support at least 2 hours ahead if you need to change pickup location."
+    content: "UK-wide delivery via 16,000+ InPost locations. Contact support if you need to change your pickup point."
   }
 };
 

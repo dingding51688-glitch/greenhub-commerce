@@ -13,9 +13,11 @@ export function Footer() {
             <a href={`mailto:${footerContact.email}`} className="block hover:text-white">
               {footerContact.email}
             </a>
-            <a href={`tel:${footerContact.phone}`} className="block hover:text-white">
-              {footerContact.phone}
-            </a>
+            {footerContact.phone && (
+              <a href={`tel:${footerContact.phone}`} className="block hover:text-white">
+                {footerContact.phone}
+              </a>
+            )}
           </div>
           <div className="flex flex-wrap gap-2 pt-2 text-[11px] uppercase tracking-[0.3em] text-[rgba(255,255,255,0.6)]">
             {marketingLinks.map((link) => (

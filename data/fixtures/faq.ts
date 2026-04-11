@@ -16,19 +16,19 @@ const deliveryEntries: FaqEntry[] = [
   {
     id: "delivery-access",
     question: "How do I start ordering?",
-    answer: "Create an account, verify your ID inside /account, and place your first order. We'll send a collection code by SMS shortly before pickup.",
+    answer: "Create an account, top up your wallet, and place your first order. You'll receive a collection code by email once your parcel reaches the locker.",
     keywords: ["verify", "delivery"]
   },
   {
     id: "collection-window",
     question: "How long is the collection window?",
-    answer: "Standard window is 120 minutes after the SMS. Reply BEFORE the timer expires if you need an extension so the team can hold your parcel.",
+    answer: "You have 48 hours to collect from the InPost locker. After that, the parcel is returned and we'll arrange a redelivery or credit.",
     keywords: ["window", "pickup"]
   },
   {
     id: "missed-pickup",
     question: "What if I miss the pickup?",
-    answer: "Reply to the SMS or message us on Telegram @greenhub_support. We can reschedule or arrange redelivery once the courier returns.",
+    answer: "Contact support via the website or Telegram. We can arrange a redelivery to the same or a different locker.",
     keywords: ["miss", "pickup"]
   },
   {
@@ -73,7 +73,7 @@ const paymentEntries: FaqEntry[] = [
   {
     id: "payment-methods",
     question: "What payment methods are supported?",
-    answer: "Account top-ups (minimum £20), NowPayments card/USDT bridge, and manual bank or direct USDT transfers. Cash on delivery isn't offered.",
+    answer: "Bank transfer (GBP) to top up your wallet. Minimum top-up is £20. Once funds are confirmed, checkout is instant from your wallet balance.",
     keywords: ["card", "USDT"]
   },
   {

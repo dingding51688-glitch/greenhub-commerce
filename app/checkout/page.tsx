@@ -204,7 +204,7 @@ export default function CheckoutPage() {
                 <input type="email" {...form.register("email")} className={inputCls} placeholder="you@example.com" />
               </Field>
               <Field label="Postcode" error={form.formState.errors.postcode?.message}>
-                <input type="text" {...form.register("postcode")} className={inputCls} placeholder="BT1 1AA" />
+                <input type="text" {...form.register("postcode")} className={inputCls} placeholder="e.g. SW1A 1AA" />
               </Field>
               <LocationPicker
                 postcode={watchedPostcode || ""}

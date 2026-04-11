@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "How It Works — GreenHub 420",
-  description: "Step-by-step guide to ordering, payment, and InPost locker pickup across Northern Ireland.",
+  description: "Step-by-step guide to ordering, payment, and InPost locker pickup across the UK.",
 };
 
 /* ── Data ── */
@@ -25,25 +25,25 @@ const steps = [
     num: 3,
     icon: "🛒",
     title: "Add to cart & checkout",
-    desc: "Select your items and quantities. At checkout, enter your postcode so we can assign the closest InPost locker.",
+    desc: "Select your items and quantities. At checkout, enter your postcode and choose from nearby InPost lockers and shops.",
   },
   {
     num: 4,
     icon: "📦",
     title: "We prepare your order",
-    desc: "Our team packs and dispatches your parcel same-day (orders before 14:00) or next morning.",
+    desc: "Our team packs and dispatches your parcel same day. Orders placed before 14:00 go out that afternoon.",
   },
   {
     num: 5,
     icon: "📱",
     title: "Get your pickup code",
-    desc: "You'll receive an SMS + email with the locker address, PIN code, and QR link as soon as the parcel is loaded.",
+    desc: "You'll receive an email with the locker address and your unique access code once the parcel is delivered to the locker.",
   },
   {
     num: 6,
     icon: "🔓",
     title: "Collect from the locker",
-    desc: "Visit the InPost terminal, scan the QR or enter your PIN. The door opens — grab your parcel. Done in 30 seconds.",
+    desc: "Visit the InPost locker, enter your code. The door opens — grab your parcel. Done in 30 seconds. No ID required.",
   },
 ];
 

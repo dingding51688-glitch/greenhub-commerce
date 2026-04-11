@@ -57,7 +57,7 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
         </div>
         <p className="text-sm text-white/50">This product is currently unavailable. Check back soon!</p>
         <div className="rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2 text-[10px] text-white/25 space-y-0.5">
-          <p>🚚 Ships across England, Scotland & Wales</p>
+          <p>🚚 UK-wide delivery via InPost lockers</p>
           <p>📦 Vacuum-sealed, discreet packaging</p>
         </div>
       </div>

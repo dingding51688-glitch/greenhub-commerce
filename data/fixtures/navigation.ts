@@ -98,8 +98,8 @@ export const socialLinks: NavItem[] = [
 ];
 
 export const footerContact = {
-  address: "Belfast City Centre · NI",
-  email: "hi@greenhub.co.uk",
-  phone: "+44 28 1234 5678",
-  disclaimer: "Cannabis products sold in compliance with NI regulations. 21+ only."
+  address: "UK-Wide Delivery",
+  email: "support@greenhub420.co.uk",
+  phone: "",
+  disclaimer: "Products sold for research and collection purposes only. 21+ only. By using this site you confirm you are of legal age."
 };

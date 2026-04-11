@@ -5,7 +5,7 @@ import { collectionTips, returnPolicies, shippingTimeline, supportSteps } from "
 
 export const metadata = {
   title: "Shipping & delivery guide",
-  description: "Understand GreenHub delivery cutoffs, collection timing, and late fee policies."
+  description: "GreenHub UK-wide delivery via InPost lockers and collection points. Same-day dispatch."
 };
 
 export default function ShippingPage() {
@@ -14,8 +14,8 @@ export default function ShippingPage() {
       <HeroClassic
         highlight="HOME / SHIPPING"
         eyebrow="Shipping & delivery guide"
-        title="Same-evening delivery across Belfast & Derry"
-        subtitle="Order before 20:00, receive your InPost locker collection code before midnight, and follow the etiquette below to avoid late fees."
+        title="UK-wide delivery via InPost lockers"
+        subtitle="Order anytime, we dispatch same day. Your parcel arrives at your chosen InPost locker or collection point, ready for pickup with your unique code."
         primaryCta={{ label: "How it works", href: "/how-it-works" }}
         secondaryCta={{ label: "Contact support", href: "/contact" }}
         alignment="left"

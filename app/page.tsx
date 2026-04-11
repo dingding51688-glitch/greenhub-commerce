@@ -20,14 +20,14 @@ export default function HomePage() {
         <div className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(circle at 20% -10%, rgba(19,168,107,0.45), transparent 55%)" }} aria-hidden="true" />
         <div className="relative z-10">
           <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-emerald-400/80">
-            UK Delivery · InPost Lockers · Anonymous
+            UK-Wide Delivery · InPost & Collection Points · Discreet
           </p>
           <h1 className="mt-3 text-[22px] font-bold leading-tight text-white sm:text-[42px]">
             Order online.<br />
             Pick up anonymously.
           </h1>
           <p className="mt-3 max-w-md text-sm leading-relaxed text-white/60">
-            Premium cannabis delivered to your nearest InPost locker. No name, no ID — just your pickup code.
+            Premium products delivered to your nearest InPost locker or collection point. No name, no ID — just your pickup code.
           </p>
           <div className="mt-5 flex gap-2.5">
             <Link
@@ -46,7 +46,7 @@ export default function HomePage() {
           {/* Quick stats row */}
           <div className="mt-6 flex gap-4 overflow-x-auto text-center sm:gap-8">
             {[
-              { val: "14,000+", label: "Pickup Points" },
+              { val: "16,000+", label: "Locker Locations" },
               { val: "Same Day", label: "Dispatch" },
               { val: "100%", label: "Anonymous" },
             ].map((s) => (
@@ -65,9 +65,9 @@ export default function HomePage() {
       {/* ── 3. Quick Order Flow (3 steps, horizontal on mobile) ── */}
       <section className="flex gap-2.5 overflow-x-auto pb-1 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:overflow-visible">
         {[
-          { icon: "🛒", title: "Order", desc: "Browse menu & pay with wallet balance", color: "emerald" },
-          { icon: "📦", title: "We Ship", desc: "Dispatched same day to your nearest InPost locker", color: "amber" },
-          { icon: "🔓", title: "Collect", desc: "Enter your code, grab your parcel — done in 30 seconds", color: "purple" },
+          { icon: "🛒", title: "Order", desc: "Browse products, pick your weight & pay with wallet balance", color: "emerald" },
+          { icon: "📦", title: "We Ship", desc: "Dispatched same day to your chosen InPost locker or shop", color: "amber" },
+          { icon: "🔓", title: "Collect", desc: "Enter your code at the locker, grab your parcel — done in 30 seconds", color: "purple" },
         ].map((step) => (
           <div key={step.title} className="w-[65vw] shrink-0 snap-start rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:w-auto">
             <span className="text-2xl">{step.icon}</span>
@@ -81,7 +81,7 @@ export default function HomePage() {
       <div className="grid grid-cols-4 gap-2">
         {[
           { icon: "🔒", text: "Encrypted" },
-          { icon: "📍", text: "14,000+" },
+          { icon: "📍", text: "16,000+" },
           { icon: "⚡", text: "Same Day" },
           { icon: "🎯", text: "No ID" },
         ].map((t) => (
@@ -99,7 +99,7 @@ export default function HomePage() {
           <div className="flex-1">
             <h2 className="text-base font-bold text-white sm:text-xl">Earn 15–25% commission</h2>
             <p className="mt-1 text-xs leading-relaxed text-white/55 sm:text-sm">
-              Share your referral link. Every time a friend orders, you earn commission — paid instantly to your wallet.
+              Share your referral link with friends. Every time they order, you earn commission — credited instantly to your wallet.
             </p>
             <Link
               href="/account/commission"
