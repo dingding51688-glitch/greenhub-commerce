@@ -84,7 +84,7 @@ export const featuredProducts: ProductCardData[] = [
     description: "Dessert-forward lift with creamy exhale and relaxed focus for late evenings.",
     price: "From £32",
     badge: "Limited",
-    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_9a7ddbae00.png"
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_d66c882407.png"
   },
   {
     id: "berry-kush",
@@ -100,7 +100,7 @@ export const featuredProducts: ProductCardData[] = [
     category: "Small batch",
     description: "Reserved jars cut from the same micro-batch now on the menu.",
     price: "£60",
-    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_9a7ddbae00.png"
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_d66c882407.png"
   },
   {
     id: "berry-kush-3-5g",
@@ -172,7 +172,7 @@ export const featuredCollectionsContent: FeaturedCollection[] = [
     label: "NOW SHIPPING",
     subtitle: "Fresh eighths ready to ship across NI",
     href: "/products?category=flowers",
-    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_9a7ddbae00.png",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_d66c882407.png",
     imageAlt: "Midnight Gelato jar",
     tone: "green"
   },
@@ -190,7 +190,7 @@ export const featuredCollectionsContent: FeaturedCollection[] = [
     label: "READY TO SHIP",
     subtitle: "Live resin carts en route",
     href: "/products?category=vapes",
-    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_9a7ddbae00.png",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_d66c882407.png",
     imageAlt: "Placeholder vaporizer",
     tone: "cream"
   }

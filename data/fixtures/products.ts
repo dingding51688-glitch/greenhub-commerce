@@ -66,7 +66,7 @@ export const productListingMeta: Record<string, ProductCardMeta> = {
     potencyBadge: "Medium"
   },
   "midnight-gelato": {
-    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_9a7ddbae00.png",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_d66c882407.png",
     imageAlt: "Midnight Gelato flower",
     origin: "🇬🇧 Locker verified",
     rating: 4.8,
@@ -82,7 +82,7 @@ export const productListingMeta: Record<string, ProductCardMeta> = {
     potencyBadge: "Medium"
   },
   "midnight-gelato-7g": {
-    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_9a7ddbae00.png",
+    imageUrl: "https://cms.greenhub420.co.uk/uploads/R_d66c882407.png",
     imageAlt: "Midnight Gelato 7g jar",
     origin: "🇬🇧 Locker verified",
     rating: 4.8,
