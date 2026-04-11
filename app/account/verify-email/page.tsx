@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/button";
@@ -8,6 +8,19 @@ import Button from "@/components/ui/button";
 type VerifyState = "loading" | "success" | "error";
 
 export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <section className="mx-auto max-w-md space-y-6 px-4 py-16 text-center">
+        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-emerald-400" />
+        <h1 className="text-xl font-semibold text-white">Verifying your email…</h1>
+      </section>
+    }>
+      <VerifyEmailInner />
+    </Suspense>
+  );
+}
+
+function VerifyEmailInner() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [state, setState] = useState<VerifyState>("loading");
