@@ -43,6 +43,7 @@ type FormState = {
   origin: string;
   originFlag: string;
   collectionId: string;
+  inStock: boolean;
   featuredImage: MediaAsset | null;
   gallery: MediaAsset[];
   weightOptions: WeightRow[];
@@ -98,6 +99,7 @@ export function ProductEditor({ mode, initialProduct, collections }: ProductEdit
     origin: initialProduct?.origin ?? "",
     originFlag: initialProduct?.originFlag ?? "",
     collectionId: initialProduct?.collection?.id ? String(initialProduct.collection.id) : "",
+    inStock: initialProduct?.inStock !== false,
     featuredImage: mapMedia(initialProduct?.featuredImage ?? null),
     gallery: initialProduct?.gallery
       ? ((initialProduct.gallery.map(mapMedia).filter(Boolean) as MediaAsset[]) || [])
@@ -250,6 +252,7 @@ export function ProductEditor({ mode, initialProduct, collections }: ProductEdit
       potency: form.potency.trim() || undefined,
       origin: form.origin.trim() || undefined,
       originFlag: form.originFlag.trim() || undefined,
+      inStock: form.inStock,
       collection: form.collectionId ? Number(form.collectionId) : undefined,
       featuredImage: form.featuredImage!.id,
       gallery: form.gallery.map((asset) => asset.id),
@@ -342,6 +345,19 @@ export function ProductEditor({ mode, initialProduct, collections }: ProductEdit
           </FormField>
           <FormField label="Price from" required error={fieldErrors.priceFrom}>
             <Input value={form.priceFrom} onChange={(e) => handleInput("priceFrom", e.target.value)} placeholder="45" type="number" step="0.01" />
+          </FormField>
+          <FormField label="Stock status">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.inStock}
+                onChange={(e) => setForm((prev) => ({ ...prev, inStock: e.target.checked }))}
+                className="h-5 w-5 rounded border-night-700 bg-night-800/70 accent-emerald-400"
+              />
+              <span className={`text-sm font-medium ${form.inStock ? "text-emerald-300" : "text-red-300"}`}>
+                {form.inStock ? "✅ In Stock" : "❌ Out of Stock"}
+              </span>
+            </label>
           </FormField>
           <FormField label="Collection">
             <select

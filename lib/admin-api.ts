@@ -59,6 +59,7 @@ export type ProductInputPayload = {
   origin?: string;
   originFlag?: string;
   collection?: number | null;
+  inStock?: boolean;
   featuredImage: number;
   gallery?: number[];
   weightOptions?: WeightOptionInput[];

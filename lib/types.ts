@@ -214,6 +214,7 @@ export type ProductRecord = {
   featuredImage?: { url: string; alternativeText?: string | null; formats?: Record<string, { url: string }> } | null;
   gallery?: Array<{ url: string; alternativeText?: string | null; formats?: Record<string, { url: string }> }>;
   weightOptions?: WeightOption[];
+  inStock?: boolean;
 };
 
 export type FavoriteProduct = {
@@ -296,6 +297,7 @@ export type AdminProductRecord = {
     url: string;
     name?: string;
   }>;
+  inStock?: boolean;
   collection?: {
     id: number;
     title?: string;

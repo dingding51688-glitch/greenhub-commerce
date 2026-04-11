@@ -38,6 +38,7 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
   const imageUrl = strapiMedia(featImg?.url) ?? meta.imageUrl ?? product.coverImage?.url;
   const imageAlt = meta.imageAlt ?? product.coverImage?.alternativeText ?? product.title;
   const priceRange = formatPriceRange(product);
+  const outOfStock = product.inStock === false;
 
   // Compact card for mobile 2-col grid
   if (variant === "compact") {
@@ -63,6 +64,13 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
           <span className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[9px] font-semibold text-white/80">
             {potency}
           </span>
+          {outOfStock && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+              <span className="rounded-full bg-red-500/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+                Out of Stock
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Info */}
@@ -81,7 +89,7 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
           </div>
 
           {/* Price */}
-          <p className="mt-auto pt-2 text-base font-bold text-emerald-300">{priceRange}</p>
+          <p className={`mt-auto pt-2 text-base font-bold ${outOfStock ? "text-white/30 line-through" : "text-emerald-300"}`}>{priceRange}</p>
         </div>
       </Link>
     );

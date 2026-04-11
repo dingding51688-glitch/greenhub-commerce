@@ -26,6 +26,7 @@ function unitPrice(o: WeightOption) {
 export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
   const router = useRouter();
   const { addItem } = useCart();
+  const outOfStock = product.inStock === false;
   const options = (product.weightOptions?.length ? product.weightOptions : FALLBACK).slice(0, 4);
   const [selectedId, setSelectedId] = useState(options[0]?.id ?? null);
   const [qty, setQty] = useState(1);
@@ -47,6 +48,21 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
     setAdded(true);
     setTimeout(() => router.push("/cart"), 600);
   };
+
+  if (outOfStock) {
+    return (
+      <div className="space-y-3 rounded-2xl border border-red-500/20 bg-red-500/[0.03] p-4">
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-red-500/20 px-3 py-1 text-xs font-bold uppercase text-red-300">Out of Stock</span>
+        </div>
+        <p className="text-sm text-white/50">This product is currently unavailable. Check back soon!</p>
+        <div className="rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2 text-[10px] text-white/25 space-y-0.5">
+          <p>🚚 Ships across England, Scotland & Wales</p>
+          <p>📦 Vacuum-sealed, discreet packaging</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
@@ -120,9 +136,9 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
 
       {/* Shipping info */}
       <div className="rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2 text-[10px] text-white/25 space-y-0.5">
-        <p>🚚 Ships across England, Scotland & Wales</p>
+        <p>🚚 Ships across the UK including Northern Ireland</p>
         <p>📦 Vacuum-sealed, discreet packaging</p>
-        <p>⚠️ We do NOT ship to Northern Ireland</p>
+        <p>💷 £5 delivery fee per order</p>
       </div>
     </div>
   );
