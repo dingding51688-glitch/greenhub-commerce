@@ -16,48 +16,43 @@ async function fetchCollections() {
 
 async function fetchProduct(productId: string): Promise<AdminProductRecord | null> {
   try {
-    const response = await serverFetch<
-      StrapiSingleResponse<{
-        title: string;
-        slug: string;
-        description?: string;
-        heroBadge?: string;
-        priceFrom: number;
-        strain?: string;
-        thc?: string;
-        potency?: string;
-        origin?: string;
-        originFlag?: string;
-        weightOptions?: Array<{ id?: number; label: string; price: number; unitPrice?: string; featured?: boolean }>;
-        featuredImage?: { data: StrapiMedia | null };
-        gallery?: { data: StrapiMedia[] };
-        collection?: {
-          data: {
-            id: number;
-            attributes: { title: string };
-          } | null;
-        };
-      }>
-    >(`/api/products/${productId}?populate=featuredImage,gallery,weightOptions,collection`);
+    const response = await serverFetch<{ data: Record<string, any> }>(
+      `/api/products/${productId}?populate=featuredImage,gallery,weightOptions,collection`
+    );
 
     if (!response.data) return null;
-    const attrs = response.data.attributes;
-    const mapMedia = (entity?: StrapiMedia | null) => {
-      if (!entity) return null;
-      return {
-        id: entity.id,
-        url: entity.attributes.url,
-        name: entity.attributes.name
-      };
+    const d = response.data;
+
+    // Support both Strapi 5 flat and Strapi 4 nested
+    const attrs = d.attributes ?? d;
+
+    const mapMediaFlat = (m: any) => {
+      if (!m) return null;
+      // Strapi 5: { id, url, name }
+      if (m.url) return { id: m.id, url: m.url, name: m.name };
+      // Strapi 4: { id, attributes: { url, name } }
+      if (m.attributes?.url) return { id: m.id, url: m.attributes.url, name: m.attributes.name };
+      return null;
     };
 
-    const galleryMedia = attrs.gallery?.data ?? [];
-    const gallery = galleryMedia
-      .map((item) => mapMedia(item))
-      .filter((asset): asset is NonNullable<typeof asset> => Boolean(asset));
+    // featuredImage: Strapi 5 flat object or Strapi 4 { data: ... }
+    const rawFeatured = attrs.featuredImage?.data ?? attrs.featuredImage;
+    const featuredImage = mapMediaFlat(rawFeatured);
+
+    // gallery: Strapi 5 array or Strapi 4 { data: [...] }
+    const rawGallery = attrs.gallery?.data ?? attrs.gallery ?? [];
+    const gallery = (Array.isArray(rawGallery) ? rawGallery : [])
+      .map(mapMediaFlat)
+      .filter((a: any): a is NonNullable<typeof a> => Boolean(a));
+
+    // collection: Strapi 5 flat or Strapi 4 { data: { id, attributes } }
+    const rawCollection = attrs.collection?.data ?? attrs.collection;
+    const collection = rawCollection
+      ? { id: rawCollection.id, title: rawCollection.attributes?.title ?? rawCollection.title }
+      : null;
 
     return {
-      id: response.data.id,
+      id: d.id,
       title: attrs.title,
       slug: attrs.slug,
       description: attrs.description,
@@ -68,12 +63,11 @@ async function fetchProduct(productId: string): Promise<AdminProductRecord | nul
       potency: attrs.potency,
       origin: attrs.origin,
       originFlag: attrs.originFlag,
+      inStock: attrs.inStock,
       weightOptions: attrs.weightOptions,
-      featuredImage: mapMedia(attrs.featuredImage?.data || null),
+      featuredImage,
       gallery,
-      collection: attrs.collection?.data
-        ? { id: attrs.collection.data.id, title: attrs.collection.data.attributes.title }
-        : null
+      collection,
     };
   } catch (error) {
     console.error("Failed to load product", error);
