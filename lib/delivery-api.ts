@@ -174,7 +174,8 @@ export async function searchYodelStores(
 
 // ─── Geocode postcode ───────────────────────────────────
 export async function geocodePostcode(postcode: string): Promise<{ lat: number; lng: number } | null> {
-  const pc = normalizePostcode(postcode).replace(/ /g, "+");
+  // postcodes.io accepts no-space format (BT11AA) — don't use + or spaces
+  const pc = postcode.replace(/\s+/g, "").toUpperCase();
   try {
     const res = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(pc)}`);
     if (!res.ok) return null;
