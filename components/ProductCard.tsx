@@ -50,14 +50,17 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
   const imageUrl = strapiMedia(featImg?.url) ?? meta.imageUrl ?? product.coverImage?.url;
   const imageAlt = meta.imageAlt ?? product.coverImage?.alternativeText ?? product.title;
   const priceRange = formatPriceRange(product);
-  const outOfStock = product.inStock === false;
+  // Out of stock: explicit flag OR all weight options have stock === 0
+  const allWeightsSoldOut = !!(product.weightOptions && product.weightOptions.length > 0 &&
+    product.weightOptions.every((w) => w.stock === 0));
+  const outOfStock = product.inStock === false || allWeightsSoldOut;
 
   // Compact card for mobile 2-col grid
   if (variant === "compact") {
     return (
       <Link
         href={`/products/${product.slug}`}
-        className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition hover:border-white/20"
+        className={`group flex flex-col overflow-hidden rounded-2xl border transition ${outOfStock ? "border-white/5 opacity-60" : "border-white/10 bg-white/[0.02] hover:border-white/20"}`}
       >
         {/* Image */}
         <div className="relative aspect-square overflow-hidden bg-[radial-gradient(circle_at_top,#0d1b13,#050505)]">
@@ -101,10 +104,12 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
           </div>
 
           {/* Weight/Price grid */}
-          {product.weightOptions && product.weightOptions.length > 0 ? (
+          {outOfStock ? (
+            <p className="mt-auto pt-2 text-xs font-semibold text-red-400/70">All sizes sold out</p>
+          ) : product.weightOptions && product.weightOptions.length > 0 ? (
             <WeightPriceGrid product={product} outOfStock={outOfStock} />
           ) : (
-            <p className={`mt-auto pt-2 text-base font-bold ${outOfStock ? "text-white/30 line-through" : "text-emerald-300"}`}>{priceRange}</p>
+            <p className="mt-auto pt-2 text-base font-bold text-emerald-300">{priceRange}</p>
           )}
         </div>
       </Link>
