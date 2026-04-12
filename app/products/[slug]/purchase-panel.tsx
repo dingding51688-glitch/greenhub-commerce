@@ -63,12 +63,12 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
 
   if (outOfStock) {
     return (
-      <div className="space-y-3 rounded-2xl border border-red-500/20 bg-red-500/[0.03] p-4">
+      <div className="space-y-3 rounded-2xl border border-red-500/30 bg-[#1C1C1E] p-5">
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-red-500/20 px-3 py-1 text-xs font-bold uppercase text-red-300">Out of Stock</span>
+          <span className="rounded-full bg-red-500/20 px-3 py-1 text-xs font-bold uppercase text-red-400">Out of Stock</span>
         </div>
-        <p className="text-sm text-white/50">This product is currently unavailable. Check back soon!</p>
-        <div className="rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2 text-[10px] text-white/25 space-y-0.5">
+        <p className="text-sm text-neutral-400">This product is currently unavailable. Check back soon!</p>
+        <div className="rounded-xl bg-[#151517] px-4 py-3 text-xs text-neutral-500 space-y-1">
           <p>🚚 UK-wide delivery via InPost lockers</p>
           <p>📦 Vacuum-sealed, discreet packaging</p>
         </div>
@@ -78,35 +78,11 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
 
   return (
     <div className="space-y-4">
-      {/* ── Price Banner ── */}
-      <div className="rounded-2xl border border-emerald-400/20 bg-gradient-to-br from-emerald-500/10 to-emerald-900/10 p-4">
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="text-[10px] font-medium uppercase tracking-widest text-emerald-400/70">Starting from</p>
-            <p className="mt-0.5 text-4xl font-extrabold text-white">
-              £{options[0]?.price.toFixed(0)}
-            </p>
-            <p className="text-xs text-white/40">{options[0]?.label} · {getUnitPrice(options[0])}</p>
-          </div>
-          {options.length > 1 && (
-            <div className="text-right">
-              <p className="text-[10px] text-white/30">Best value</p>
-              <p className="text-lg font-bold text-emerald-400">
-                £{options[options.length - 1]?.price.toFixed(0)}
-              </p>
-              <p className="text-[10px] text-emerald-400/60">
-                {options[options.length - 1]?.label} · {getUnitPrice(options[options.length - 1])}
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-
       {/* ── Weight Selector ── */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
-        <p className="text-xs font-bold uppercase tracking-wider text-white/50">Choose Weight</p>
+      <div className="rounded-2xl bg-[#1C1C1E] p-5 space-y-4">
+        <p className="text-sm font-bold uppercase tracking-wider text-neutral-400">Choose Weight</p>
 
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {options.map((o) => {
             const active = selected?.id === o.id;
             const soldOut = o.stock === 0;
@@ -119,56 +95,56 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
                 onClick={() => !soldOut && setSelectedId(o.id)}
                 disabled={soldOut}
                 className={clsx(
-                  "relative flex w-full items-center justify-between rounded-xl border px-4 py-3.5 transition",
+                  "relative flex w-full items-center justify-between rounded-2xl border-2 px-5 py-4 transition-all",
                   soldOut
-                    ? "border-white/10 bg-zinc-800/60 opacity-40 cursor-not-allowed"
+                    ? "border-neutral-700 bg-[#252528] opacity-40 cursor-not-allowed"
                     : active
-                      ? "border-emerald-400/60 bg-emerald-500/20 shadow-[0_0_20px_rgba(52,211,153,0.15)]"
-                      : "border-white/15 bg-zinc-800/70 hover:border-white/30 hover:bg-zinc-700/70"
+                      ? "border-emerald-400 bg-emerald-500/10"
+                      : "border-transparent bg-[#252528] hover:border-neutral-600 hover:bg-[#2A2A2D]"
                 )}
               >
-                {/* Left: weight + badges */}
-                <div className="flex items-center gap-3">
-                  {/* Radio dot */}
+                {/* Left side */}
+                <div className="flex items-center gap-4">
+                  {/* Radio */}
                   <div className={clsx(
-                    "h-5 w-5 rounded-full border-2 flex items-center justify-center transition",
-                    active ? "border-emerald-400" : "border-white/20"
+                    "h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0 transition",
+                    active ? "border-emerald-400 bg-emerald-400/10" : "border-neutral-500"
                   )}>
-                    {active && <div className="h-2.5 w-2.5 rounded-full bg-emerald-400" />}
+                    {active && <div className="h-3 w-3 rounded-full bg-emerald-400" />}
                   </div>
 
-                  <div>
+                  <div className="text-left">
                     <div className="flex items-center gap-2">
                       <span className={clsx(
-                        "text-lg font-extrabold",
-                        soldOut ? "text-white/30 line-through" : "text-white"
+                        "text-xl font-extrabold tracking-tight",
+                        soldOut ? "text-neutral-500 line-through" : "text-white"
                       )}>
                         {o.label}
                       </span>
                       {popular && !soldOut && (
-                        <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[9px] font-bold uppercase text-amber-300">
+                        <span className="rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-300">
                           🔥 Popular
                         </span>
                       )}
                       {save && !soldOut && (
-                        <span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[9px] font-bold text-emerald-300">
+                        <span className="rounded-full bg-emerald-400/15 px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-emerald-300">
                           Save {save}%
                         </span>
                       )}
                       {soldOut && (
-                        <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-[9px] font-bold uppercase text-red-300">
+                        <span className="rounded-full bg-red-500/20 px-2.5 py-0.5 text-[10px] font-bold uppercase text-red-400">
                           Sold Out
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-white/50">{getUnitPrice(o)}</p>
+                    <p className="mt-0.5 text-sm text-neutral-400">{getUnitPrice(o)}</p>
                   </div>
                 </div>
 
                 {/* Right: price */}
                 <span className={clsx(
                   "text-2xl font-extrabold tabular-nums",
-                  soldOut ? "text-white/30 line-through" : active ? "text-emerald-400" : "text-white"
+                  soldOut ? "text-neutral-600 line-through" : active ? "text-emerald-400" : "text-white"
                 )}>
                   £{o.price.toFixed(0)}
                 </span>
@@ -179,37 +155,37 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
       </div>
 
       {/* ── Quantity + Total + Add to Cart ── */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
-        {/* Quantity row */}
+      <div className="rounded-2xl bg-[#1C1C1E] p-5 space-y-4">
+        {/* Quantity */}
         <div className="flex items-center justify-between">
-          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Quantity</p>
-          <div className="flex items-center gap-3">
+          <p className="text-sm font-bold uppercase tracking-wider text-neutral-400">Quantity</p>
+          <div className="flex items-center gap-4">
             <button
               onClick={() => setQty((q) => Math.max(MIN_QTY, q - 1))}
               disabled={qty === MIN_QTY}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-lg font-bold text-white transition hover:bg-white/5 disabled:opacity-20"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#252528] text-lg font-bold text-white transition hover:bg-[#303033] disabled:opacity-20"
             >−</button>
-            <span className="w-8 text-center text-xl font-bold text-white tabular-nums">{qty}</span>
+            <span className="w-8 text-center text-2xl font-extrabold text-white tabular-nums">{qty}</span>
             <button
               onClick={() => setQty((q) => Math.min(MAX_QTY, q + 1))}
               disabled={qty === MAX_QTY}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-lg font-bold text-white transition hover:bg-white/5 disabled:opacity-20"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#252528] text-lg font-bold text-white transition hover:bg-[#303033] disabled:opacity-20"
             >+</button>
           </div>
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-white/8" />
+        <div className="h-px bg-neutral-700/50" />
 
-        {/* Total */}
+        {/* Total + CTA */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-white/30">Total</p>
-            <p className="text-3xl font-extrabold text-white tabular-nums">
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">Total</p>
+            <p className="text-4xl font-extrabold text-emerald-400 tabular-nums">
               £{((selected?.price ?? 0) * qty).toFixed(0)}
             </p>
             {qty > 1 && selected && (
-              <p className="text-[10px] text-white/25">{qty} × £{selected.price.toFixed(0)}</p>
+              <p className="mt-0.5 text-sm text-neutral-500">{qty} × £{selected.price.toFixed(0)}</p>
             )}
           </div>
 
@@ -217,15 +193,15 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
             onClick={handleAdd}
             disabled={!selected || added}
             className={clsx(
-              "flex min-h-[52px] min-w-[160px] items-center justify-center gap-2 rounded-xl text-sm font-bold uppercase tracking-wider transition",
+              "flex min-h-[56px] min-w-[170px] items-center justify-center gap-2 rounded-2xl text-base font-bold uppercase tracking-wider transition-all",
               added
-                ? "bg-emerald-400/20 text-emerald-300"
-                : "cta-gradient text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 active:scale-[0.97]"
+                ? "bg-emerald-500/20 text-emerald-300"
+                : "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 hover:shadow-emerald-500/40 active:scale-[0.97]"
             )}
           >
             {added ? "✓ Added" : (
               <>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                 Add to Cart
               </>
             )}
@@ -234,7 +210,7 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
       </div>
 
       {/* Shipping info */}
-      <div className="rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3 text-[11px] text-white/30 space-y-1">
+      <div className="rounded-2xl bg-[#1C1C1E] px-5 py-4 text-sm text-neutral-400 space-y-1.5">
         <p>🚚 Ships across the UK including Northern Ireland</p>
         <p>📦 Vacuum-sealed, discreet packaging</p>
         <p>💷 £5 delivery fee per order</p>

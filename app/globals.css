@@ -9,17 +9,17 @@
     color-scheme: dark;
     --gh-font-sans: 'Geist', 'Geist Sans', 'Space Grotesk', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-    --gh-color-bg: #050505;
-    --gh-color-bg-soft: #070707;
-    --gh-color-bg-alt: #0f1412;
+    --gh-color-bg: #0C0C0E;
+    --gh-color-bg-soft: #111113;
+    --gh-color-bg-alt: #161618;
     --gh-color-cta-start: #0d5b3f;
     --gh-color-cta-end: #13a86b;
     --gh-color-card-orange-start: #af5a13;
     --gh-color-card-orange-end: #f2a33a;
 
-    --gh-color-text-primary: #ffffff;
-    --gh-color-text-secondary: rgba(255, 255, 255, 0.8);
-    --gh-color-text-muted: rgba(255, 255, 255, 0.6);
+    --gh-color-text-primary: #F5F5F5;
+    --gh-color-text-secondary: rgba(255, 255, 255, 0.75);
+    --gh-color-text-muted: rgba(255, 255, 255, 0.55);
 
     --gh-radius-lg: 2.5rem; /* 40px */
     --gh-radius-card: 2rem; /* 32px */
@@ -35,9 +35,9 @@
     /* Enhanced color palette */
     --gh-color-accent: #a78bfa;
     --gh-color-accent-glow: rgba(167,139,250,0.15);
-    --gh-color-glass: rgba(255,255,255,0.03);
-    --gh-color-glass-border: rgba(255,255,255,0.08);
-    --gh-color-glass-border-hover: rgba(255,255,255,0.15);
+    --gh-color-glass: rgba(255,255,255,0.05);
+    --gh-color-glass-border: rgba(255,255,255,0.12);
+    --gh-color-glass-border-hover: rgba(255,255,255,0.22);
 
     /* Upgraded shadows */
     --gh-shadow-card-hover: 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
@@ -52,9 +52,9 @@
     margin: 0;
     min-height: 100vh;
     font-family: var(--gh-font-sans);
-    background: radial-gradient(ellipse at 20% -10%, rgba(13,91,63,0.12), transparent 50%),
-      radial-gradient(ellipse at 80% 100%, rgba(167,139,250,0.06), transparent 50%),
-      linear-gradient(180deg, #050505, #080808);
+    background: radial-gradient(ellipse at 20% -10%, rgba(13,91,63,0.10), transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(167,139,250,0.05), transparent 50%),
+      linear-gradient(180deg, #0C0C0E, #0E0E10);
     color: var(--gh-color-text-primary);
   }
 

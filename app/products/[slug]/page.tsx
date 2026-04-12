@@ -78,10 +78,10 @@ export default async function ProductPage({ params }: { params: { slug: string }
   return (
     <div className="space-y-6 pb-24 sm:space-y-10 sm:pb-20">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-[10px] text-white/30">
-        <Link href="/products" className="hover:text-white/50">Shop</Link>
+      <div className="flex items-center gap-1.5 text-xs text-neutral-500">
+        <Link href="/products" className="hover:text-neutral-300 transition">Shop</Link>
         <span>/</span>
-        <span className="text-white/50">{product.title}</span>
+        <span className="text-neutral-400">{product.title}</span>
       </div>
 
       {/* Hero - stacked on mobile, side-by-side on desktop */}
@@ -96,7 +96,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
           {/* Product info */}
           <div className="space-y-3">
             {product.strain && (
-              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-emerald-400/60">{product.strain} strain</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-400">{product.strain} strain</p>
             )}
             <h1 className="text-2xl font-bold text-white sm:text-3xl">{product.title}</h1>
 
@@ -107,23 +107,23 @@ export default async function ProductPage({ params }: { params: { slug: string }
                   <path d="M12 2.5l2.9 6 6.6.5-5 4.4 1.5 6.4L12 16.7 6 19.8l1.5-6.4-5-4.4 6.6-.5z" />
                 </svg>
                 <span className="text-sm font-semibold text-amber-200">{rating.toFixed(1)}</span>
-                <span className="text-xs text-white/30">({reviews})</span>
+                <span className="text-xs text-neutral-500">({reviews})</span>
               </span>
               <span className="text-lg font-bold text-emerald-300">{formatPriceRange(product)}</span>
             </div>
 
             {/* Description */}
-            <p className="text-sm text-white/50 leading-relaxed">{product.description}</p>
+            <p className="text-sm text-neutral-400 leading-relaxed">{product.description}</p>
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2">
               {product.thc && (
-                <span className="rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-[10px] font-medium text-white/60">{product.thc}</span>
+                <span className="rounded-full border border-neutral-700 bg-neutral-800/80 px-3 py-1.5 text-xs font-medium text-neutral-300">{product.thc}</span>
               )}
               {product.potency && (
-                <span className="rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-[10px] font-medium text-white/60">{product.potency}</span>
+                <span className="rounded-full border border-neutral-700 bg-neutral-800/80 px-3 py-1.5 text-xs font-medium text-neutral-300">{product.potency}</span>
               )}
-              <span className="rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-[10px] font-medium text-white/60">{origin}</span>
+              <span className="rounded-full border border-neutral-700 bg-neutral-800/80 px-3 py-1.5 text-xs font-medium text-neutral-300">{origin}</span>
             </div>
           </div>
 
@@ -139,11 +139,11 @@ export default async function ProductPage({ params }: { params: { slug: string }
           { icon: "🔒", title: "16,000+ Lockers", desc: "24/7 InPost collection" },
           { icon: "⚡", title: "3-5 Day Delivery", desc: "Tracking number provided" },
         ].map((item) => (
-          <div key={item.title} className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.02] px-3 py-2.5">
+          <div key={item.title} className="flex items-center gap-3 rounded-xl border border-neutral-700/50 bg-[#1C1C1E] px-4 py-3">
             <span className="text-xl">{item.icon}</span>
             <div>
-              <p className="text-xs font-semibold text-white">{item.title}</p>
-              <p className="text-[10px] text-white/30">{item.desc}</p>
+              <p className="text-sm font-semibold text-white">{item.title}</p>
+              <p className="text-xs text-neutral-500">{item.desc}</p>
             </div>
           </div>
         ))}
@@ -154,7 +154,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         <div>
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-bold text-white">You might also like</p>
-            <Link href="/products" className="text-[10px] text-white/30 hover:text-white/50">View all →</Link>
+            <Link href="/products" className="text-xs text-neutral-500 hover:text-neutral-300 transition">View all →</Link>
           </div>
           <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
             {related.slice(0, 4).map((p) => (
