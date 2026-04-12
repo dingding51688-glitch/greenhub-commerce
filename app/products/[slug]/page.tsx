@@ -100,7 +100,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
             )}
             <h1 className="text-2xl font-bold text-white sm:text-3xl">{product.title}</h1>
 
-            {/* Rating + Price */}
+            {/* Rating */}
             <div className="flex flex-wrap items-center gap-3">
               <span className="flex items-center gap-1">
                 <svg viewBox="0 0 24 24" className="h-4 w-4 fill-amber-300">
@@ -109,7 +109,6 @@ export default async function ProductPage({ params }: { params: { slug: string }
                 <span className="text-sm font-semibold text-amber-200">{rating.toFixed(1)}</span>
                 <span className="text-xs text-neutral-500">({reviews})</span>
               </span>
-              <span className="text-lg font-bold text-emerald-300">{formatPriceRange(product)}</span>
             </div>
 
             {/* Description */}
