@@ -45,12 +45,9 @@ export function LogoMark({ size = 40, showText = true, className }: LogoMarkProp
       <LeafIcon size={size} />
       {showText && (
         <div className="leading-tight">
-          <p className="text-[13px] font-bold uppercase tracking-[0.3em]">
+          <p className="text-[15px] font-extrabold uppercase tracking-[0.25em]">
             Green Hub
             <span className="ml-1 text-emerald-400">420</span>
-          </p>
-          <p className="text-[9px] font-medium uppercase tracking-[0.35em] text-white/50">
-            Distributor
           </p>
         </div>
       )}
