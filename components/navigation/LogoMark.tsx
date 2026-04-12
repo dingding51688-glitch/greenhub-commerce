@@ -11,68 +11,99 @@ function LogoIcon({ size }: { size: number }) {
     <svg
       width={size}
       height={size}
-      viewBox="0 0 52 52"
+      viewBox="0 0 56 56"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
       <defs>
-        {/* Main gradient - deep emerald to bright green */}
-        <linearGradient id="gh-bg" x1="0" y1="0" x2="52" y2="52">
-          <stop offset="0%" stopColor="#064E3B" />
-          <stop offset="50%" stopColor="#059669" />
-          <stop offset="100%" stopColor="#34D399" />
+        {/* Neon glow filter */}
+        <filter id="gh-neon" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        {/* Background gradient - dark with green edge */}
+        <linearGradient id="gh-hex-bg" x1="0" y1="0" x2="56" y2="56">
+          <stop offset="0%" stopColor="#0A0F0D" />
+          <stop offset="100%" stopColor="#0D1F17" />
         </linearGradient>
-        {/* Inner glow */}
-        <radialGradient id="gh-glow" cx="50%" cy="35%" r="50%">
-          <stop offset="0%" stopColor="#6EE7B7" stopOpacity="0.4" />
+        {/* Neon green gradient for edges */}
+        <linearGradient id="gh-neon-edge" x1="0" y1="0" x2="56" y2="56">
+          <stop offset="0%" stopColor="#34D399" />
+          <stop offset="50%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#6EE7B7" />
+        </linearGradient>
+        {/* Leaf glow */}
+        <radialGradient id="gh-center-glow" cx="50%" cy="45%" r="35%">
+          <stop offset="0%" stopColor="#34D399" stopOpacity="0.25" />
           <stop offset="100%" stopColor="transparent" stopOpacity="0" />
         </radialGradient>
-        {/* Leaf gradient */}
-        <linearGradient id="gh-leaf" x1="16" y1="8" x2="36" y2="42">
-          <stop offset="0%" stopColor="#ffffff" />
-          <stop offset="100%" stopColor="#D1FAE5" stopOpacity="0.9" />
-        </linearGradient>
       </defs>
 
-      {/* Rounded square background */}
-      <rect x="2" y="2" width="48" height="48" rx="14" fill="url(#gh-bg)" />
-      <rect x="2" y="2" width="48" height="48" rx="14" fill="url(#gh-glow)" />
+      {/* Hexagon shape */}
+      <polygon
+        points="28,2 50,15 50,41 28,54 6,41 6,15"
+        fill="url(#gh-hex-bg)"
+      />
+      {/* Center glow */}
+      <polygon
+        points="28,2 50,15 50,41 28,54 6,41 6,15"
+        fill="url(#gh-center-glow)"
+      />
+      {/* Neon border */}
+      <polygon
+        points="28,2 50,15 50,41 28,54 6,41 6,15"
+        fill="none"
+        stroke="url(#gh-neon-edge)"
+        strokeWidth="1.5"
+        filter="url(#gh-neon)"
+      />
 
-      {/* Subtle border */}
-      <rect x="2.5" y="2.5" width="47" height="47" rx="13.5" stroke="white" strokeOpacity="0.15" strokeWidth="1" />
+      {/* Inner circuit lines - tech aesthetic */}
+      <path d="M28 8 L28 14" stroke="#34D399" strokeWidth="0.5" strokeOpacity="0.3" />
+      <path d="M12 18 L18 18" stroke="#34D399" strokeWidth="0.5" strokeOpacity="0.3" />
+      <path d="M38 18 L44 18" stroke="#34D399" strokeWidth="0.5" strokeOpacity="0.3" />
+      <path d="M12 38 L18 38" stroke="#34D399" strokeWidth="0.5" strokeOpacity="0.3" />
+      <path d="M38 38 L44 38" stroke="#34D399" strokeWidth="0.5" strokeOpacity="0.3" />
+      {/* Corner dots */}
+      <circle cx="28" cy="8" r="1" fill="#34D399" opacity="0.5" />
+      <circle cx="12" cy="18" r="1" fill="#34D399" opacity="0.4" />
+      <circle cx="44" cy="18" r="1" fill="#34D399" opacity="0.4" />
 
-      {/* Cannabis leaf - 5-pointed, more detailed */}
-      <g transform="translate(26,26)">
-        {/* Center leaf */}
-        <path d="M0-16 C-2-10 -3-4 -2 0 C-1 3 0 4 0 6 C0 4 1 3 2 0 C3-4 2-10 0-16Z" fill="url(#gh-leaf)" />
-        {/* Left inner leaf */}
-        <path d="M-4-12 C-8-6 -10-1 -8 2 C-7 4 -5 4 -3 3 C-4 1 -4-2 -4-12Z" fill="url(#gh-leaf)" opacity="0.9" />
-        {/* Right inner leaf */}
-        <path d="M4-12 C8-6 10-1 8 2 C7 4 5 4 3 3 C4 1 4-2 4-12Z" fill="url(#gh-leaf)" opacity="0.9" />
-        {/* Left outer leaf */}
-        <path d="M-8-6 C-13 0 -14 5 -11 7 C-9 8 -7 7 -6 5 C-7 3 -8 0 -8-6Z" fill="url(#gh-leaf)" opacity="0.75" />
-        {/* Right outer leaf */}
-        <path d="M8-6 C13 0 14 5 11 7 C9 8 7 7 6 5 C7 3 8 0 8-6Z" fill="url(#gh-leaf)" opacity="0.75" />
+      {/* Minimalist leaf - geometric/angular style */}
+      <g transform="translate(28,28)" filter="url(#gh-neon)">
+        {/* Center blade */}
+        <path d="M0-14 L-2.5-4 L0 2 L2.5-4 Z" fill="#34D399" />
+        {/* Left blade */}
+        <path d="M-3-10 L-9-2 L-6 2 L-2-4 Z" fill="#34D399" opacity="0.8" />
+        {/* Right blade */}
+        <path d="M3-10 L9-2 L6 2 L2-4 Z" fill="#34D399" opacity="0.8" />
+        {/* Far left */}
+        <path d="M-7-4 L-13 2 L-9 5 L-5 0 Z" fill="#34D399" opacity="0.55" />
+        {/* Far right */}
+        <path d="M7-4 L13 2 L9 5 L5 0 Z" fill="#34D399" opacity="0.55" />
         {/* Stem */}
-        <path d="M0 4 C0 8 -0.5 12 0 16" stroke="white" strokeOpacity="0.5" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+        <path d="M0 2 L0 16" stroke="#34D399" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
+        {/* Stem node */}
+        <circle cx="0" cy="10" r="1.5" fill="#0A0F0D" stroke="#34D399" strokeWidth="0.8" />
       </g>
     </svg>
   );
 }
 
-export function LogoMark({ size = 44, showText = true, className }: LogoMarkProps) {
+export function LogoMark({ size = 42, showText = true, className }: LogoMarkProps) {
   return (
     <div className={clsx("flex items-center gap-3", className)}>
       <LogoIcon size={size} />
       {showText && (
-        <div className="flex flex-col leading-none">
-          {/* GREEN HUB */}
-          <span className="text-[17px] font-black uppercase tracking-[0.2em] text-white">
-            GREEN HUB
+        <div className="flex items-baseline gap-1.5 leading-none">
+          <span className="text-[16px] font-black uppercase tracking-[0.15em] text-white drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]">
+            GREEN<span className="text-emerald-400">HUB</span>
           </span>
-          {/* 420 - accent color, slightly offset */}
-          <span className="mt-0.5 text-[22px] font-black tracking-[0.15em] text-emerald-400">
+          <span className="text-[20px] font-black tracking-[0.08em] text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.5)]">
             420
           </span>
         </div>
