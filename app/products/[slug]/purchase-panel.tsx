@@ -119,12 +119,12 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
                 onClick={() => !soldOut && setSelectedId(o.id)}
                 disabled={soldOut}
                 className={clsx(
-                  "relative flex w-full items-center justify-between rounded-xl border px-4 py-3 transition",
+                  "relative flex w-full items-center justify-between rounded-xl border px-4 py-3.5 transition",
                   soldOut
-                    ? "border-white/5 bg-white/[0.01] opacity-40 cursor-not-allowed"
+                    ? "border-white/5 bg-white/[0.03] opacity-40 cursor-not-allowed"
                     : active
-                      ? "border-emerald-400/50 bg-emerald-400/10 shadow-[0_0_20px_rgba(52,211,153,0.08)]"
-                      : "border-white/8 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]"
+                      ? "border-emerald-400/50 bg-emerald-400/15 shadow-[0_0_20px_rgba(52,211,153,0.12)]"
+                      : "border-white/12 bg-white/[0.06] hover:border-white/25 hover:bg-white/[0.08]"
                 )}
               >
                 {/* Left: weight + badges */}
@@ -140,7 +140,7 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className={clsx(
-                        "text-base font-bold",
+                        "text-lg font-extrabold",
                         soldOut ? "text-white/30 line-through" : "text-white"
                       )}>
                         {o.label}
@@ -161,13 +161,13 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] text-white/30">{getUnitPrice(o)}</p>
+                    <p className="text-xs text-white/50">{getUnitPrice(o)}</p>
                   </div>
                 </div>
 
                 {/* Right: price */}
                 <span className={clsx(
-                  "text-xl font-extrabold tabular-nums",
+                  "text-2xl font-extrabold tabular-nums",
                   soldOut ? "text-white/30 line-through" : active ? "text-emerald-400" : "text-white"
                 )}>
                   £{o.price.toFixed(0)}
