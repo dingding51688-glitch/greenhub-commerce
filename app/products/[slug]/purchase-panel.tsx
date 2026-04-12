@@ -121,10 +121,10 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
                 className={clsx(
                   "relative flex w-full items-center justify-between rounded-xl border px-4 py-3.5 transition",
                   soldOut
-                    ? "border-white/5 bg-white/[0.03] opacity-40 cursor-not-allowed"
+                    ? "border-white/10 bg-zinc-800/60 opacity-40 cursor-not-allowed"
                     : active
-                      ? "border-emerald-400/50 bg-emerald-400/15 shadow-[0_0_20px_rgba(52,211,153,0.12)]"
-                      : "border-white/12 bg-white/[0.06] hover:border-white/25 hover:bg-white/[0.08]"
+                      ? "border-emerald-400/60 bg-emerald-500/20 shadow-[0_0_20px_rgba(52,211,153,0.15)]"
+                      : "border-white/15 bg-zinc-800/70 hover:border-white/30 hover:bg-zinc-700/70"
                 )}
               >
                 {/* Left: weight + badges */}
