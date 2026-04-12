@@ -48,7 +48,15 @@ export default function ProductsPage() {
 
   const key = `/api/products?${requestParams.toString()}`;
   const { data, isLoading } = useSWR<ProductsResponse>(key, swrFetcher);
-  const products = useMemo(() => data?.data ?? [], [data]);
+  const products = useMemo(() => {
+    const list = data?.data ?? [];
+    // In-stock products first, then out-of-stock
+    return [...list].sort((a, b) => {
+      const aInStock = a.inStock !== false ? 1 : 0;
+      const bInStock = b.inStock !== false ? 1 : 0;
+      return bInStock - aInStock;
+    });
+  }, [data]);
 
   const handleCategoryChange = (value: ProductCategoryKey) => {
     const next = new URLSearchParams(searchParams.toString());
