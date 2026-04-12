@@ -6,7 +6,7 @@ export function Footer() {
     <footer className="mt-20 border-t border-white/[0.06] bg-gradient-to-b from-white/[0.02] to-transparent">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-10 md:flex-row">
         <div className="flex-1 space-y-3">
-          <p className="text-base font-extrabold uppercase tracking-[0.25em] text-white">Green Hub <span class="text-emerald-400">420</span></p>
+          <p className="text-base font-extrabold uppercase tracking-[0.25em] text-white">Green Hub <span className="text-emerald-400">420</span></p>
           <p className="text-sm text-[rgba(255,255,255,0.75)]">{footerContact.address}</p>
           <div className="text-sm text-[rgba(255,255,255,0.75)]">
             <a href={`mailto:${footerContact.email}`} className="block hover:text-white">
