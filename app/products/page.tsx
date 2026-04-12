@@ -50,11 +50,11 @@ export default function ProductsPage() {
   const { data, isLoading } = useSWR<ProductsResponse>(key, swrFetcher);
   const products = useMemo(() => {
     const list = data?.data ?? [];
-    // In-stock products first, then out-of-stock
+    // In-stock products first — check weightOptions stock, not just inStock flag
     return [...list].sort((a, b) => {
-      const aInStock = a.inStock !== false ? 1 : 0;
-      const bInStock = b.inStock !== false ? 1 : 0;
-      return bInStock - aInStock;
+      const aHasStock = a.inStock !== false && (a.weightOptions ?? []).some((o) => (o.stock ?? 1) > 0) ? 1 : 0;
+      const bHasStock = b.inStock !== false && (b.weightOptions ?? []).some((o) => (o.stock ?? 1) > 0) ? 1 : 0;
+      return bHasStock - aHasStock;
     });
   }, [data]);
 
