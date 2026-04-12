@@ -11,13 +11,50 @@ import PageTracker from "@/components/tracking/PageTracker";
 
 export const dynamic = "force-dynamic";
 
+const SITE_URL = "https://www.greenhub420.co.uk";
+const SITE_NAME = "Green Hub 420";
+const SITE_DESC = "Buy weed online UK — premium cannabis delivered to InPost lockers nationwide. Discreet, vacuum-sealed, 24/7 pickup. Fast delivery across the UK including Northern Ireland.";
+
 export const metadata: Metadata = {
-  title: "Green Hub 420 — Order Online & Collect at InPost Lockers",
-  description: "Premium products delivered to your nearest InPost locker. Secure, anonymous, 24/7 pickup across Northern Ireland.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Green Hub 420 — Buy Weed Online UK | InPost Locker Delivery",
+    template: "%s | Green Hub 420",
+  },
+  description: SITE_DESC,
+  keywords: [
+    "buy weed uk", "buy weed online uk", "weed delivery uk",
+    "cannabis delivery uk", "420 delivery uk",
+    "buy weed inpost locker", "weed inpost delivery",
+    "weed delivery northern ireland", "420 delivery northern ireland",
+    "weed delivery belfast", "cannabis belfast",
+    "discreet weed delivery uk", "buy cannabis online uk",
+    "weed locker pickup uk", "green hub 420",
+  ],
+  openGraph: {
+    type: "website",
+    locale: "en_GB",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: "Green Hub 420 — Buy Weed Online UK | InPost Locker Delivery",
+    description: SITE_DESC,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Green Hub 420 — Buy Weed Online UK",
+    description: SITE_DESC,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
   icons: {
     icon: "/favicon.svg",
-    shortcut: "/favicon.svg"
-  }
+    shortcut: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

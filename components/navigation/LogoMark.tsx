@@ -94,20 +94,15 @@ function LogoIcon({ size }: { size: number }) {
   );
 }
 
-export function LogoMark({ size = 42, showText = true, className }: LogoMarkProps) {
+export function LogoMark({ size: _size = 42, showText: _showText = true, className }: LogoMarkProps) {
   return (
-    <div className={clsx("flex items-center gap-3", className)}>
-      <LogoIcon size={size} />
-      {showText && (
-        <div className="flex items-baseline gap-1.5 leading-none">
-          <span className="text-[16px] font-black uppercase tracking-[0.15em] text-white drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]">
-            GREEN<span className="text-emerald-400">HUB</span>
-          </span>
-          <span className="text-[20px] font-black tracking-[0.08em] text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.5)]">
-            420
-          </span>
-        </div>
-      )}
+    <div className={clsx("flex items-baseline gap-1.5", className)}>
+      <span className="text-[18px] font-black uppercase tracking-[0.12em] text-white">
+        GREEN<span className="text-emerald-400">HUB</span>
+      </span>
+      <span className="text-[22px] font-black tracking-[0.06em] text-emerald-400">
+        420
+      </span>
     </div>
   );
 }
