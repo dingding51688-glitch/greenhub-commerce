@@ -63,6 +63,19 @@ function formatPriceRange(product: ProductRecord) {
   return `From £${product.priceFrom.toFixed(0)}`;
 }
 
+async function getReviewMeta(productId: number): Promise<{ avgRating: number; total: number }> {
+  try {
+    const strapiUrl = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
+    const res = await fetch(`${strapiUrl}/api/reviews/product/${productId}`, {
+      next: { revalidate: 60 },
+    });
+    const data = await res.json();
+    return { avgRating: data?.meta?.avgRating ?? 0, total: data?.meta?.total ?? 0 };
+  } catch {
+    return { avgRating: 0, total: 0 };
+  }
+}
+
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   const [product, related] = await Promise.all([getProduct(params.slug), getRelatedProducts(params.slug)]);
   if (!product) notFound();
@@ -72,8 +85,9 @@ export default async function ProductPage({ params }: { params: { slug: string }
   const imageUrl = strapiMedia(featImg?.url) ?? product.coverImage?.url ?? meta?.imageUrl;
   const imageAlt = featImg?.alternativeText ?? product.coverImage?.alternativeText ?? meta?.imageAlt ?? product.title;
   const galleryImages = product.gallery?.map((g) => ({ url: strapiMedia(g.url)!, alt: g.alternativeText || product.title })) ?? [];
-  const rating = product.rating ?? meta?.rating ?? 4.9;
-  const reviews = product.reviews ?? meta?.reviews ?? 0;
+  const reviewMeta = await getReviewMeta(product.id);
+  const rating = reviewMeta.total > 0 ? reviewMeta.avgRating : (product.rating ?? meta?.rating ?? 0);
+  const reviews = reviewMeta.total;
   const origin = product.origin ?? meta?.origin ?? "🇬🇧 UK Verified";
 
   return (
