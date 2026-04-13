@@ -40,14 +40,16 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
   const { addItem } = useCart();
   const outOfStock = product.inStock === false;
   const options = (product.weightOptions?.length ? product.weightOptions : FALLBACK).slice(0, 4);
-  const [selectedId, setSelectedId] = useState(options[0]?.id ?? null);
+  const firstInStock = options.find((o) => o.stock !== 0);
+  const [selectedId, setSelectedId] = useState(firstInStock?.id ?? options[0]?.id ?? null);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
   const selected = options.find((o) => o.id === selectedId) ?? options[0];
+  const selectedSoldOut = selected?.stock === 0;
 
   const handleAdd = () => {
-    if (!selected) return;
+    if (!selected || selectedSoldOut) return;
     addItem({
       productId: product.id,
       slug: product.slug,
@@ -191,15 +193,17 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
 
           <button
             onClick={handleAdd}
-            disabled={!selected || added}
+            disabled={!selected || added || selectedSoldOut}
             className={clsx(
               "flex min-h-[56px] min-w-[170px] items-center justify-center gap-2 rounded-2xl text-base font-bold uppercase tracking-wider transition-all",
               added
                 ? "bg-emerald-500/20 text-emerald-300"
-                : "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 hover:shadow-emerald-500/40 active:scale-[0.97]"
+                : selectedSoldOut
+                  ? "bg-neutral-700 text-neutral-500 cursor-not-allowed"
+                  : "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 hover:shadow-emerald-500/40 active:scale-[0.97]"
             )}
           >
-            {added ? "✓ Added" : (
+            {added ? "✓ Added" : selectedSoldOut ? "Sold Out" : (
               <>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                 Add to Cart
