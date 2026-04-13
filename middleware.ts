@@ -52,13 +52,20 @@ export function middleware(request: NextRequest) {
     return new NextResponse(null, { status: 404 });
   }
 
-  // Admin bypass: ?admin=greenhub2026 sets a cookie to allow desktop access
+  // Admin bypass: ?admin=greenhub2026 or cookie
   const adminParam = request.nextUrl.searchParams.get("admin");
   const adminCookie = request.cookies.get(ADMIN_COOKIE)?.value;
 
   if (adminParam === ADMIN_KEY) {
     const response = NextResponse.next();
     response.cookies.set(ADMIN_COOKIE, "1", { maxAge: 60 * 60 * 24 * 30, path: "/" });
+    return response;
+  }
+
+  // ?admin=off to disable desktop access
+  if (adminParam === "off") {
+    const response = new NextResponse(null, { status: 404 });
+    response.cookies.delete(ADMIN_COOKIE);
     return response;
   }
 
