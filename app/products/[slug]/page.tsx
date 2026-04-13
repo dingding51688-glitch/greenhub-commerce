@@ -6,6 +6,7 @@ import { serverFetch } from "@/lib/server-api";
 import { ProductDetailPurchase } from "./purchase-panel";
 import { getProductListingMeta } from "@/data/fixtures/products";
 import { ProductCard } from "@/components/ProductCard";
+import { ReviewSection } from "@/components/ReviewSection";
 
 const CMS_BASE = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
 function strapiMedia(path?: string | null): string | undefined {
@@ -147,6 +148,9 @@ export default async function ProductPage({ params }: { params: { slug: string }
           </div>
         ))}
       </div>
+
+      {/* Reviews */}
+      <ReviewSection productId={product.id} />
 
       {/* Related Products */}
       {related.length > 0 && (
