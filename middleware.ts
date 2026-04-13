@@ -4,6 +4,10 @@ import { userAgent } from "next/server";
 // Only allow UK (GB) and Ireland (IE)
 const ALLOWED_COUNTRIES = new Set(["GB", "IE"]);
 
+// Admin bypass key — add ?admin=greenhub2026 to URL to unlock desktop access
+const ADMIN_KEY = "greenhub2026";
+const ADMIN_COOKIE = "gh_admin";
+
 // Block traffic analysis & scraper bots
 const BLOCKED_BOTS = /similarweb|semrush|ahrefs|moz\.com|majestic|serpstat|spyfu|alexa|builtwith|wappalyzer|whatcms|netcraft|censys|shodan|zoomeye|archive\.org|wayback/i;
 
@@ -46,6 +50,20 @@ export function middleware(request: NextRequest) {
   // Block 1: Non-UK/IE visitors (all devices)
   if (country && !ALLOWED_COUNTRIES.has(country)) {
     return new NextResponse(null, { status: 404 });
+  }
+
+  // Admin bypass: ?admin=greenhub2026 sets a cookie to allow desktop access
+  const adminParam = request.nextUrl.searchParams.get("admin");
+  const adminCookie = request.cookies.get(ADMIN_COOKIE)?.value;
+
+  if (adminParam === ADMIN_KEY) {
+    const response = NextResponse.next();
+    response.cookies.set(ADMIN_COOKIE, "1", { maxAge: 60 * 60 * 24 * 30, path: "/" });
+    return response;
+  }
+
+  if (adminCookie === "1") {
+    return NextResponse.next();
   }
 
   // Block 2: Desktop users (even in UK/IE) — mobile only
