@@ -15,7 +15,7 @@ function isMobile(request: NextRequest): boolean {
   return device.type === "mobile" || device.type === "tablet";
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const country = request.geo?.country || request.headers.get("x-vercel-ip-country") || "";
 
   // Allow API routes, static files, and Next.js internals through
@@ -65,7 +65,7 @@ export function middleware(request: NextRequest) {
     try {
       const strapiUrl = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
       const res = await fetch(`${strapiUrl}/api/site-setting/public`, {
-        next: { revalidate: 60 },
+        cache: "no-store",
       });
       const data = await res.json();
       const allowed = !!data?.allowDesktop;
