@@ -8,6 +8,7 @@ import { DesktopHeader, MobileTabBar } from "@/components/navigation";
 import { ReferralCapture } from "@/components/ReferralCapture";
 import { ReferralTrackingProvider } from "@/components/providers/ReferralTrackingProvider";
 import PageTracker from "@/components/tracking/PageTracker";
+import { AgeGate } from "@/components/AgeGate";
 
 export const dynamic = "force-dynamic";
 
@@ -61,21 +62,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="text-white">
-        <AuthProvider>
-          <CartProvider>
-            <NotificationProvider>
-              <Suspense fallback={null}><ReferralCapture /></Suspense>
-              <ReferralTrackingProvider>
-              <PageTracker />
-              <div className="min-h-screen flex flex-col">
-                <DesktopHeader />
-                <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 pb-24 sm:pb-8">{children}</main>
-                <MobileTabBar />
-              </div>
-              </ReferralTrackingProvider>
-            </NotificationProvider>
-          </CartProvider>
-        </AuthProvider>
+        <AgeGate>
+          <AuthProvider>
+            <CartProvider>
+              <NotificationProvider>
+                <Suspense fallback={null}><ReferralCapture /></Suspense>
+                <ReferralTrackingProvider>
+                <PageTracker />
+                <div className="min-h-screen flex flex-col">
+                  <DesktopHeader />
+                  <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 pb-24 sm:pb-8">{children}</main>
+                  <MobileTabBar />
+                </div>
+                </ReferralTrackingProvider>
+              </NotificationProvider>
+            </CartProvider>
+          </AuthProvider>
+        </AgeGate>
       </body>
     </html>
   );
