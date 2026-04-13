@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { userAgent } from "next/server";
 
 // Only allow UK (GB) and Ireland (IE)
 const ALLOWED_COUNTRIES = new Set(["GB", "IE"]);
 
+function isMobile(request: NextRequest): boolean {
+  const { device } = userAgent(request);
+  return device.type === "mobile" || device.type === "tablet";
+}
+
 export function middleware(request: NextRequest) {
-  // Vercel provides geo info via headers
   const country = request.geo?.country || request.headers.get("x-vercel-ip-country") || "";
 
   // Allow API routes, static files, and Next.js internals through
@@ -20,13 +25,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // If no country detected (local dev, bots, etc), allow through
-  if (!country) {
-    return NextResponse.next();
+  // Block 1: Non-UK/IE visitors (all devices)
+  if (country && !ALLOWED_COUNTRIES.has(country)) {
+    return NextResponse.rewrite(new URL("/blocked", request.url));
   }
 
-  // Block non-UK/IE visitors
-  if (!ALLOWED_COUNTRIES.has(country)) {
+  // Block 2: Desktop users (even in UK/IE) — mobile only
+  if (!isMobile(request)) {
     return NextResponse.rewrite(new URL("/blocked", request.url));
   }
 
