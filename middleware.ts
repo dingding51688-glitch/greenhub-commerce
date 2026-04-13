@@ -4,6 +4,9 @@ import { userAgent } from "next/server";
 // Only allow UK (GB) and Ireland (IE)
 const ALLOWED_COUNTRIES = new Set(["GB", "IE"]);
 
+// Block traffic analysis & scraper bots
+const BLOCKED_BOTS = /similarweb|semrush|ahrefs|moz\.com|majestic|serpstat|spyfu|alexa|builtwith|wappalyzer|whatcms|netcraft|censys|shodan|zoomeye|archive\.org|wayback/i;
+
 function isMobile(request: NextRequest): boolean {
   const { device } = userAgent(request);
   return device.type === "mobile" || device.type === "tablet";
@@ -23,6 +26,12 @@ export function middleware(request: NextRequest) {
     pathname === "/blocked"
   ) {
     return NextResponse.next();
+  }
+
+  // Block 0: Traffic analysis & scraper bots
+  const ua = request.headers.get("user-agent") || "";
+  if (BLOCKED_BOTS.test(ua)) {
+    return new NextResponse(null, { status: 404 });
   }
 
   // Block 1: Non-UK/IE visitors (all devices)
