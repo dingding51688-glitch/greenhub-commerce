@@ -50,29 +50,15 @@ export async function middleware(request: NextRequest) {
 
   // Block 2: Desktop users — check if desktop is allowed via Strapi setting
   if (!isMobile(request)) {
-    // Check cached desktop permission (refreshed every 60s)
-    const desktopCookie = request.cookies.get("gh_desktop_check")?.value;
-    
-    if (desktopCookie === "1") {
-      return NextResponse.next();
-    }
-    
-    if (desktopCookie === "0") {
-      return new NextResponse(null, { status: 404 });
-    }
-
-    // No cache — check Strapi
     try {
       const strapiUrl = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
       const res = await fetch(`${strapiUrl}/api/site-setting/public`, {
         cache: "no-store",
       });
       const data = await res.json();
-      const allowed = !!data?.allowDesktop;
-      
-      const response = allowed ? NextResponse.next() : new NextResponse(null, { status: 404 });
-      response.cookies.set("gh_desktop_check", allowed ? "1" : "0", { maxAge: 60, path: "/" });
-      return response;
+      if (!data?.allowDesktop) {
+        return new NextResponse(null, { status: 404 });
+      }
     } catch {
       // If Strapi is down, block desktop by default
       return new NextResponse(null, { status: 404 });
