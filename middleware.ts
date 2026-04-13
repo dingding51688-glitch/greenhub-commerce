@@ -4,10 +4,6 @@ import { userAgent } from "next/server";
 // Only allow UK (GB) and Ireland (IE)
 const ALLOWED_COUNTRIES = new Set(["GB", "IE"]);
 
-// Admin bypass key — add ?admin=greenhub2026 to URL to unlock desktop access
-const ADMIN_KEY = "greenhub2026";
-const ADMIN_COOKIE = "gh_admin";
-
 // Block traffic analysis & scraper bots
 const BLOCKED_BOTS = /similarweb|semrush|ahrefs|moz\.com|majestic|serpstat|spyfu|alexa|builtwith|wappalyzer|whatcms|netcraft|censys|shodan|zoomeye|archive\.org|wayback/i;
 
@@ -52,30 +48,35 @@ export function middleware(request: NextRequest) {
     return new NextResponse(null, { status: 404 });
   }
 
-  // Admin bypass: ?admin=greenhub2026 or cookie
-  const adminParam = request.nextUrl.searchParams.get("admin");
-  const adminCookie = request.cookies.get(ADMIN_COOKIE)?.value;
-
-  if (adminParam === ADMIN_KEY) {
-    const response = NextResponse.next();
-    response.cookies.set(ADMIN_COOKIE, "1", { maxAge: 60 * 60 * 24 * 30, path: "/" });
-    return response;
-  }
-
-  // ?admin=off to disable desktop access
-  if (adminParam === "off") {
-    const response = new NextResponse(null, { status: 404 });
-    response.cookies.delete(ADMIN_COOKIE);
-    return response;
-  }
-
-  if (adminCookie === "1") {
-    return NextResponse.next();
-  }
-
-  // Block 2: Desktop users (even in UK/IE) — mobile only
+  // Block 2: Desktop users — check if desktop is allowed via Strapi setting
   if (!isMobile(request)) {
-    return new NextResponse(null, { status: 404 });
+    // Check cached desktop permission (refreshed every 60s)
+    const desktopCookie = request.cookies.get("gh_desktop_check")?.value;
+    
+    if (desktopCookie === "1") {
+      return NextResponse.next();
+    }
+    
+    if (desktopCookie === "0") {
+      return new NextResponse(null, { status: 404 });
+    }
+
+    // No cache — check Strapi
+    try {
+      const strapiUrl = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
+      const res = await fetch(`${strapiUrl}/api/site-setting/public`, {
+        next: { revalidate: 60 },
+      });
+      const data = await res.json();
+      const allowed = !!data?.allowDesktop;
+      
+      const response = allowed ? NextResponse.next() : new NextResponse(null, { status: 404 });
+      response.cookies.set("gh_desktop_check", allowed ? "1" : "0", { maxAge: 60, path: "/" });
+      return response;
+    } catch {
+      // If Strapi is down, block desktop by default
+      return new NextResponse(null, { status: 404 });
+    }
   }
 
   return NextResponse.next();
