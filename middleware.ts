@@ -27,12 +27,12 @@ export function middleware(request: NextRequest) {
 
   // Block 1: Non-UK/IE visitors (all devices)
   if (country && !ALLOWED_COUNTRIES.has(country)) {
-    return NextResponse.rewrite(new URL("/blocked", request.url));
+    return new NextResponse(null, { status: 404 });
   }
 
   // Block 2: Desktop users (even in UK/IE) — mobile only
   if (!isMobile(request)) {
-    return NextResponse.rewrite(new URL("/blocked", request.url));
+    return new NextResponse(null, { status: 404 });
   }
 
   return NextResponse.next();
