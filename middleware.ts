@@ -7,6 +7,9 @@ const ALLOWED_COUNTRIES = new Set(["GB", "IE"]);
 // Block traffic analysis & scraper bots
 const BLOCKED_BOTS = /similarweb|semrush|ahrefs|moz\.com|majestic|serpstat|spyfu|alexa|builtwith|wappalyzer|whatcms|netcraft|censys|shodan|zoomeye|archive\.org|wayback/i;
 
+// Allow search engine crawlers through (SEO)
+const SEARCH_ENGINES = /googlebot|bingbot|google-site-verification|google\.com\/bot|yandex|baiduspider|duckduckbot|slurp/i;
+
 function isMobile(request: NextRequest): boolean {
   const { device } = userAgent(request);
   return device.type === "mobile" || device.type === "tablet";
@@ -28,8 +31,14 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Block 0: Traffic analysis & scraper bots
   const ua = request.headers.get("user-agent") || "";
+
+  // Allow search engine crawlers (Google, Bing, etc.) — needed for SEO
+  if (SEARCH_ENGINES.test(ua)) {
+    return NextResponse.next();
+  }
+
+  // Block traffic analysis & scraper bots
   if (BLOCKED_BOTS.test(ua)) {
     return new NextResponse(null, { status: 404 });
   }
