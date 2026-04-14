@@ -450,9 +450,9 @@ const PROMO_CAPTION = `🔥 Premium UK bud delivered to your nearest InPost lock
 
 📦 Vacuum-sealed, discreet packaging. Pick up 24/7 from any locker across the UK.
 
-💷 Indoor flower from £6/g. Lab-tested, slow-cured, ready to enjoy.
+✨ Lab-tested, slow-cured indoor strains. Only the best makes the cut.
 
-🚚 Order online → delivered next day → collect from your locker. Simple.`;
+🚚 Order online → dispatched within 3–5 days → collect from your locker. Simple.`;
 
 function InviteLinkCard({
   summaryLink,
