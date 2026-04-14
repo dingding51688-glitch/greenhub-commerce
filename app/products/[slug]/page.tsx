@@ -123,7 +123,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
                     <path d="M12 2.5l2.9 6 6.6.5-5 4.4 1.5 6.4L12 16.7 6 19.8l1.5-6.4-5-4.4 6.6-.5z" />
                   </svg>
                   <span className="text-sm font-semibold text-amber-200">{rating.toFixed(1)}</span>
-                  <span className="text-xs text-neutral-500">({reviews} review{reviews !== 1 ? "s" : ""})</span>
+                  <a href="#reviews" className="text-xs text-neutral-500 hover:text-amber-200 underline-offset-2 hover:underline transition-colors cursor-pointer">({reviews} review{reviews !== 1 ? "s" : ""})</a>
                 </span>
               </div>
             )}
@@ -166,7 +166,9 @@ export default async function ProductPage({ params }: { params: { slug: string }
       </div>
 
       {/* Reviews */}
-      <ReviewSection productId={product.id} />
+      <div id="reviews">
+        <ReviewSection productId={product.id} />
+      </div>
 
       {/* Related Products */}
       {related.length > 0 && (
