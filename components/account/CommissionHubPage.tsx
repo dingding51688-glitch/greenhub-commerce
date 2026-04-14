@@ -17,7 +17,7 @@ import {
 import { consumeClickError, getLastTrackedClickTime } from "@/lib/referral-tracking";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
-import { PromoCardGenerator } from "./PromoCardGenerator";
+
 
 const QRCode = dynamic(
   () => import("qrcode.react").then((mod) => mod.QRCodeCanvas ?? mod.default),
@@ -185,88 +185,17 @@ export default function CommissionHubPage() {
 
 
 
-      {/* ── 2. Share Section with QR ── */}
-      <div className="rounded-3xl border border-white/10 bg-card p-5">
-        <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/50">📤 Your Invite Link</p>
-        <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start">
-          {/* QR Code - tap to copy/save */}
-          {summaryLink && (
-            <div className="shrink-0 self-center sm:self-start">
-              <div ref={qrRef} className="rounded-xl bg-white p-3">
-                <QRCode value={summaryLink} size={120} />
-              </div>
-              <div className="mt-1.5 flex justify-center gap-2">
-                <button
-                  onClick={async () => {
-                    try {
-                      const canvas = qrRef.current?.querySelector("canvas");
-                      if (!canvas) return;
-                      const blob = await new Promise<Blob | null>(r => (canvas as HTMLCanvasElement).toBlob(r, "image/png"));
-                      if (blob) {
-                        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-                        setCopyToast("QR copied!");
-                        setTimeout(() => setCopyToast(null), 2000);
-                      }
-                    } catch {
-                      // Fallback: download instead
-                      const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
-                      if (canvas) {
-                        const a = document.createElement("a");
-                        a.href = canvas.toDataURL("image/png");
-                        a.download = "greenhub-invite-qr.png";
-                        a.click();
-                      }
-                    }
-                  }}
-                  className="text-[10px] text-white/40 hover:text-white/60"
-                >
-                  📋 Copy QR
-                </button>
-                <button
-                  onClick={() => {
-                    const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
-                    if (canvas) {
-                      const a = document.createElement("a");
-                      a.href = canvas.toDataURL("image/png");
-                      a.download = "greenhub-invite-qr.png";
-                      a.click();
-                    }
-                  }}
-                  className="text-[10px] text-white/40 hover:text-white/60"
-                >
-                  ⬇ Save
-                </button>
-              </div>
-            </div>
-          )}
-          <div className="flex-1 min-w-0">
-            <p className="break-all rounded-xl bg-white/5 px-3 py-2.5 font-mono text-sm text-white">
-              {summaryLink || "Link pending…"}
-            </p>
-            <p className="mt-1.5 text-xs text-white/40">Referral code: <span className="font-mono text-white/60">{referralCode}</span></p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Button size="sm" onClick={handleCopy} disabled={!summaryLink} className="min-h-[44px]">
-                {copyToast || "📋 Copy link"}
-              </Button>
-              {whatsappShare && (
-                <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
-                  <a href={whatsappShare} target="_blank" rel="noreferrer">📱 WhatsApp</a>
-                </Button>
-              )}
-              {telegramShare && (
-                <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
-                  <a href={telegramShare} target="_blank" rel="noreferrer">✈️ Telegram</a>
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Promo Card Generator ── */}
-      {summaryLink && (
-        <PromoCardGenerator referralLink={summaryLink} referralCode={referralCode} />
-      )}
+      {/* ── 2. Share Section with QR + Promo Caption ── */}
+      <InviteLinkCard
+        summaryLink={summaryLink}
+        referralCode={referralCode}
+        qrRef={qrRef}
+        copyToast={copyToast}
+        handleCopy={handleCopy}
+        whatsappShare={whatsappShare}
+        telegramShare={telegramShare}
+        setCopyToast={setCopyToast}
+      />
 
       {/* ── 3. Stats Grid ── */}
       <div className="grid grid-cols-3 gap-2.5">
@@ -514,6 +443,160 @@ function StatusPill({ status }: { status?: string | null }) {
     <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase ${classes}`}>
       {status.replace(/_/g, " ")}
     </span>
+  );
+}
+
+const PROMO_CAPTION = `🔥 Premium UK bud delivered to your nearest InPost locker — no meetups, no hassle, just quality.
+
+📦 Vacuum-sealed, discreet packaging. Pick up 24/7 from any locker across the UK.
+
+💷 Indoor flower from £6/g. Lab-tested, slow-cured, ready to enjoy.
+
+🚚 Order online → delivered next day → collect from your locker. Simple.`;
+
+function InviteLinkCard({
+  summaryLink,
+  referralCode,
+  qrRef,
+  copyToast,
+  handleCopy,
+  whatsappShare,
+  telegramShare,
+  setCopyToast,
+}: {
+  summaryLink: string;
+  referralCode: string;
+  qrRef: React.RefObject<HTMLDivElement>;
+  copyToast: string | null;
+  handleCopy: () => void;
+  whatsappShare: string | null;
+  telegramShare: string | null;
+  setCopyToast: (v: string | null) => void;
+}) {
+  const [showPromo, setShowPromo] = useState(false);
+  const [captionCopied, setCaptionCopied] = useState(false);
+
+  const fullCaption = `${PROMO_CAPTION}\n\n👉 ${summaryLink}`;
+
+  const handleCopyCaption = async () => {
+    try {
+      await navigator.clipboard.writeText(fullCaption);
+      setCaptionCopied(true);
+      setTimeout(() => setCaptionCopied(false), 2000);
+    } catch {}
+  };
+
+  // Share caption + link via WhatsApp
+  const promoWhatsApp = `https://api.whatsapp.com/send?text=${encodeURIComponent(fullCaption)}`;
+  const promoTelegram = `https://t.me/share/url?url=${encodeURIComponent(summaryLink)}&text=${encodeURIComponent(PROMO_CAPTION)}`;
+
+  return (
+    <div className="rounded-3xl border border-white/10 bg-card p-5">
+      <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/50">📤 Your Invite Link</p>
+      <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start">
+        {/* QR Code */}
+        {summaryLink && (
+          <div className="shrink-0 self-center sm:self-start">
+            <div ref={qrRef} className="rounded-xl bg-white p-3">
+              <QRCode value={summaryLink} size={120} />
+            </div>
+            <div className="mt-1.5 flex justify-center gap-2">
+              <button
+                onClick={async () => {
+                  try {
+                    const canvas = qrRef.current?.querySelector("canvas");
+                    if (!canvas) return;
+                    const blob = await new Promise<Blob | null>(r => (canvas as HTMLCanvasElement).toBlob(r, "image/png"));
+                    if (blob) {
+                      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+                      setCopyToast("QR copied!");
+                      setTimeout(() => setCopyToast(null), 2000);
+                    }
+                  } catch {
+                    const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
+                    if (canvas) {
+                      const a = document.createElement("a");
+                      a.href = canvas.toDataURL("image/png");
+                      a.download = "greenhub-invite-qr.png";
+                      a.click();
+                    }
+                  }
+                }}
+                className="text-[10px] text-white/40 hover:text-white/60"
+              >
+                📋 Copy QR
+              </button>
+              <button
+                onClick={() => {
+                  const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
+                  if (canvas) {
+                    const a = document.createElement("a");
+                    a.href = canvas.toDataURL("image/png");
+                    a.download = "greenhub-invite-qr.png";
+                    a.click();
+                  }
+                }}
+                className="text-[10px] text-white/40 hover:text-white/60"
+              >
+                ⬇ Save
+              </button>
+            </div>
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <p className="break-all rounded-xl bg-white/5 px-3 py-2.5 font-mono text-sm text-white">
+            {summaryLink || "Link pending…"}
+          </p>
+          <p className="mt-1.5 text-xs text-white/40">Referral code: <span className="font-mono text-white/60">{referralCode}</span></p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button size="sm" onClick={handleCopy} disabled={!summaryLink} className="min-h-[44px]">
+              {copyToast || "📋 Copy link"}
+            </Button>
+            {whatsappShare && (
+              <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
+                <a href={whatsappShare} target="_blank" rel="noreferrer">📱 WhatsApp</a>
+              </Button>
+            )}
+            {telegramShare && (
+              <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
+                <a href={telegramShare} target="_blank" rel="noreferrer">✈️ Telegram</a>
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Promo Caption - expandable */}
+      <div className="mt-4 border-t border-white/5 pt-3">
+        <button
+          onClick={() => setShowPromo(!showPromo)}
+          className="flex w-full items-center justify-between text-left"
+        >
+          <span className="text-sm font-medium text-white/70">📝 Ready-to-share promo caption</span>
+          <span className={`text-white/40 transition-transform ${showPromo ? "rotate-180" : ""}`}>▼</span>
+        </button>
+
+        {showPromo && (
+          <div className="mt-3 space-y-3">
+            <div className="rounded-xl bg-white/5 p-4">
+              <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line">{PROMO_CAPTION}</p>
+              <p className="mt-2 text-sm text-emerald-400">👉 {summaryLink}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" onClick={handleCopyCaption} className="min-h-[44px]">
+                {captionCopied ? "✓ Copied!" : "📋 Copy caption + link"}
+              </Button>
+              <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
+                <a href={promoWhatsApp} target="_blank" rel="noreferrer">📱 Share to WhatsApp</a>
+              </Button>
+              <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
+                <a href={promoTelegram} target="_blank" rel="noreferrer">✈️ Share to Telegram</a>
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
