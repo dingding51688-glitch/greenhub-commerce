@@ -17,6 +17,7 @@ import {
 import { consumeClickError, getLastTrackedClickTime } from "@/lib/referral-tracking";
 import dynamic from "next/dynamic";
 import { useRef } from "react";
+import { PromoCardGenerator } from "./PromoCardGenerator";
 
 const QRCode = dynamic(
   () => import("qrcode.react").then((mod) => mod.QRCodeCanvas ?? mod.default),
@@ -261,6 +262,11 @@ export default function CommissionHubPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Promo Card Generator ── */}
+      {summaryLink && (
+        <PromoCardGenerator referralLink={summaryLink} referralCode={referralCode} />
+      )}
 
       {/* ── 3. Stats Grid ── */}
       <div className="grid grid-cols-3 gap-2.5">
