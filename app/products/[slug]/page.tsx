@@ -86,7 +86,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
   const imageAlt = featImg?.alternativeText ?? product.coverImage?.alternativeText ?? meta?.imageAlt ?? product.title;
   const galleryImages = product.gallery?.map((g) => ({ url: strapiMedia(g.url)!, alt: g.alternativeText || product.title })) ?? [];
   const reviewMeta = await getReviewMeta(product.id);
-  const rating = reviewMeta.total > 0 ? reviewMeta.avgRating : (product.rating ?? meta?.rating ?? 0);
+  const rating = reviewMeta.total > 0 ? reviewMeta.avgRating : 0;
   const reviews = reviewMeta.total;
   const origin = product.origin ?? meta?.origin ?? "🇬🇧 UK Verified";
 
@@ -115,16 +115,18 @@ export default async function ProductPage({ params }: { params: { slug: string }
             )}
             <h1 className="text-2xl font-bold text-white sm:text-3xl">{product.title}</h1>
 
-            {/* Rating */}
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="flex items-center gap-1">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-amber-300">
-                  <path d="M12 2.5l2.9 6 6.6.5-5 4.4 1.5 6.4L12 16.7 6 19.8l1.5-6.4-5-4.4 6.6-.5z" />
-                </svg>
-                <span className="text-sm font-semibold text-amber-200">{rating.toFixed(1)}</span>
-                <span className="text-xs text-neutral-500">({reviews})</span>
-              </span>
-            </div>
+            {/* Rating - only show if there are reviews */}
+            {reviews > 0 && (
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="flex items-center gap-1">
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 fill-amber-300">
+                    <path d="M12 2.5l2.9 6 6.6.5-5 4.4 1.5 6.4L12 16.7 6 19.8l1.5-6.4-5-4.4 6.6-.5z" />
+                  </svg>
+                  <span className="text-sm font-semibold text-amber-200">{rating.toFixed(1)}</span>
+                  <span className="text-xs text-neutral-500">({reviews} review{reviews !== 1 ? "s" : ""})</span>
+                </span>
+              </div>
+            )}
 
             {/* Description */}
             <p className="text-sm text-neutral-400 leading-relaxed">{product.description}</p>
