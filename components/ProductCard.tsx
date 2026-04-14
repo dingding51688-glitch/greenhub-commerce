@@ -44,7 +44,7 @@ function computeUnitPrice(option: { label: string; price: number; unitPrice?: st
 
 export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
   const meta = getProductListingMeta(product.slug) ?? {};
-  const rating = product.rating ?? meta.rating ?? 4.9;
+  const rating = product.rating ?? 0;
   const potency = product.potency ?? meta.potencyBadge ?? "Medium";
   const featImg = product.featuredImage;
   const imageUrl = strapiMedia(featImg?.url) ?? meta.imageUrl ?? product.coverImage?.url;
@@ -95,13 +95,15 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
           )}
           <h3 className="mt-0.5 text-sm font-bold leading-tight text-white line-clamp-2">{product.title}</h3>
 
-          {/* Rating */}
-          <div className="mt-1 flex items-center gap-1">
-            <svg viewBox="0 0 24 24" className="h-3 w-3 fill-amber-300">
-              <path d="M12 2.5l2.9 6 6.6.5-5 4.4 1.5 6.4L12 16.7 6 19.8l1.5-6.4-5-4.4 6.6-.5z" />
-            </svg>
-            <span className="text-[10px] font-medium text-amber-200">{rating.toFixed(1)}</span>
-          </div>
+          {/* Rating - only show if real reviews exist */}
+          {rating > 0 && (
+            <div className="mt-1 flex items-center gap-1">
+              <svg viewBox="0 0 24 24" className="h-3 w-3 fill-amber-300">
+                <path d="M12 2.5l2.9 6 6.6.5-5 4.4 1.5 6.4L12 16.7 6 19.8l1.5-6.4-5-4.4 6.6-.5z" />
+              </svg>
+              <span className="text-[10px] font-medium text-amber-200">{rating.toFixed(1)}</span>
+            </div>
+          )}
 
           {/* Weight/Price grid */}
           {outOfStock ? (
@@ -118,7 +120,7 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
 
   // Original full card (for detail/list contexts)
   const origin = product.origin ?? meta.origin ?? "🇬🇧 Store verified";
-  const reviews = product.reviews ?? meta.reviews ?? 0;
+  const reviews = product.reviews ?? 0;
 
   return (
     <Link
@@ -147,12 +149,14 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
           <h3 className="text-xl font-semibold text-white">{product.title}</h3>
           <p className="text-sm text-white/50 line-clamp-2">{product.description}</p>
           <div className="flex flex-wrap items-center gap-3 text-xs text-white/40">
-            <span className="flex items-center gap-1 text-amber-200">
-              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
-                <path d="M12 2.5l2.9 6 6.6.5-5 4.4 1.5 6.4L12 16.7 6 19.8l1.5-6.4-5-4.4 6.6-.5z" />
-              </svg>
-              {rating.toFixed(1)} ({reviews})
-            </span>
+            {rating > 0 && (
+              <span className="flex items-center gap-1 text-amber-200">
+                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                  <path d="M12 2.5l2.9 6 6.6.5-5 4.4 1.5 6.4L12 16.7 6 19.8l1.5-6.4-5-4.4 6.6-.5z" />
+                </svg>
+                {rating.toFixed(1)} ({reviews})
+              </span>
+            )}
             {product.thc && <span>{product.thc}</span>}
             <span>{origin}</span>
           </div>
