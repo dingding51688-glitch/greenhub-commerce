@@ -452,7 +452,7 @@ const PROMO_CAPTION = `🔥 Premium UK bud delivered to your nearest InPost lock
 
 ✨ Lab-tested, slow-cured indoor strains. Only the best makes the cut.
 
-🚚 Order online → dispatched within 3–5 days → collect from your locker. Simple.`;
+🚚 Order online → dispatched within 24 hours → collect from your locker. Simple.`;
 
 function InviteLinkCard({
   summaryLink,
