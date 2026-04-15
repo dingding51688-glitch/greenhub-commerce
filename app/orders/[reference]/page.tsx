@@ -43,14 +43,24 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
   const [reviewItem, setReviewItem] = useState<{ productId: number; title: string } | null>(null);
   const [reviewedIds, setReviewedIds] = useState<Set<number>>(new Set());
 
-  // Load already-reviewed product IDs on mount
+  // Load already-reviewed product+order pairs on mount
+  const [reviewedPairs, setReviewedPairs] = useState<Array<{productId: number; orderId: number | null}>>([]);
   useEffect(() => {
     if (!token) return;
     fetch("/api/strapi/reviews/mine", { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
-      .then(d => { if (Array.isArray(d?.data)) setReviewedIds(new Set(d.data)); })
+      .then(d => {
+        if (Array.isArray(d?.data)) {
+          setReviewedPairs(d.data);
+        }
+      })
       .catch(() => {});
   }, [token]);
+
+  const isReviewed = (productId: number) => {
+    if (!order) return false;
+    return reviewedPairs.some(r => r.productId === productId && r.orderId === order.id);
+  };
 
   useEffect(() => {
     if (!token) return;
@@ -189,7 +199,7 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
                     </div>
                   </div>
                   {showReview && item.productId && (
-                    reviewedIds.has(item.productId) ? (
+                    (isReviewed(item.productId) || reviewedIds.has(item.productId)) ? (
                       <p className="mt-2 text-[10px] text-emerald-400">✅ Review submitted!</p>
                     ) : (
                       <button
@@ -363,9 +373,11 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
         <ReviewModal
           productId={reviewItem.productId}
           productName={reviewItem.title}
+          orderId={order?.id}
           onClose={() => setReviewItem(null)}
           onSuccess={() => {
             setReviewedIds((prev) => new Set(prev).add(reviewItem.productId));
+            setReviewedPairs((prev) => [...prev, { productId: reviewItem.productId, orderId: order?.id || null }]);
             setReviewItem(null);
           }}
         />

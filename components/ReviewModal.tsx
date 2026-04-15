@@ -23,11 +23,12 @@ function StarPicker({ value, onChange }: { value: number; onChange: (v: number) 
 interface ReviewModalProps {
   productId: number;
   productName: string;
+  orderId?: number;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export function ReviewModal({ productId, productName, onClose, onSuccess }: ReviewModalProps) {
+export function ReviewModal({ productId, productName, orderId, onClose, onSuccess }: ReviewModalProps) {
   const { token } = useAuth();
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
@@ -42,7 +43,7 @@ export function ReviewModal({ productId, productName, onClose, onSuccess }: Revi
       const res = await fetch("/api/strapi/reviews/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ productId, rating, comment }),
+        body: JSON.stringify({ productId, rating, comment, orderId }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data?.error?.message || data?.message || "Failed to submit"); return; }
