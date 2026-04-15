@@ -168,6 +168,11 @@ function OrderRow({ order }: { order: OrderRecord }) {
             <span>{badge.icon}</span>
             <span>{badge.label}</span>
           </span>
+          {(order.status === "completed" || order.status === "delivered") && (
+            <span className="inline-flex items-center gap-0.5 rounded-full border border-amber-400/20 bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold text-amber-200">
+              ⭐ Review
+            </span>
+          )}
         </div>
         <p className="mt-0.5 truncate text-[10px] text-white/30">
           {firstItem ? firstItem.title : "Order"}{extraCount > 0 ? ` +${extraCount} more` : ""}
