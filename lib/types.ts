@@ -109,6 +109,10 @@ export type UnreadCountResponse = {
 };
 
 export type OrderItem = {
+  slug?: string;
+  productSlug?: string;
+  name?: string;
+  productName?: string;
   productId: number;
   title: string;
   quantity: number;
