@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
@@ -12,12 +12,10 @@ import {
   getCommissionHubSnapshot,
   ReferralApiError,
   type CommissionHubSnapshot,
-  type CommissionTransaction
+  type CommissionTransaction,
 } from "@/lib/referral-api";
 import { consumeClickError, getLastTrackedClickTime } from "@/lib/referral-tracking";
 import dynamic from "next/dynamic";
-import { useRef } from "react";
-
 
 const QRCode = dynamic(
   () => import("qrcode.react").then((mod) => mod.QRCodeCanvas ?? mod.default),
@@ -26,32 +24,38 @@ const QRCode = dynamic(
 
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
-/* ─── Tier system (matches backend TIER_RATES) ─── */
+/* Tiers */
 const TIERS = [
-  { name: "Bronze",  emoji: "🥉", min: 0,   rate: 15, color: "text-amber-400" },
-  { name: "Silver",  emoji: "🥈", min: 100, rate: 20, color: "text-gray-300" },
-  { name: "Gold",    emoji: "🥇", min: 200, rate: 25, color: "text-yellow-300" },
+  { name: "Bronze", emoji: "🥉", min: 0, rate: 15, color: "text-amber-400" },
+  { name: "Silver", emoji: "🥈", min: 100, rate: 20, color: "text-gray-300" },
+  { name: "Gold", emoji: "🥇", min: 200, rate: 25, color: "text-yellow-300" },
 ];
 
 function getTier(conversions: number) {
   let tier = TIERS[0];
-  for (const t of TIERS) {
-    if (conversions >= t.min) tier = t;
-  }
+  for (const t of TIERS) if (conversions >= t.min) tier = t;
   const nextTier = TIERS[TIERS.indexOf(tier) + 1];
-  const progress = nextTier
-    ? (conversions - tier.min) / (nextTier.min - tier.min)
-    : 1;
+  const progress = nextTier ? (conversions - tier.min) / (nextTier.min - tier.min) : 1;
   return { tier, nextTier, progress: Math.min(1, Math.max(0, progress)), conversions };
 }
+
+const PROMO_CAPTION = `🔥 Premium UK bud delivered to your nearest InPost locker — no meetups, no hassle, just quality.
+
+📦 Vacuum-sealed, discreet packaging. Pick up 24/7 from any locker across the UK.
+
+✨ Lab-tested, slow-cured indoor strains. Only the best makes the cut.
+
+🚚 Order online → dispatched within 24 hours → collect from your locker. Simple.`;
+
+/* ─── Tab type ─── */
+type Tab = "overview" | "friends" | "history";
 
 export default function CommissionHubPage() {
   const { token } = useAuth();
   const router = useRouter();
   const { notifications } = useNotifications();
   const [copyToast, setCopyToast] = useState<string | null>(null);
-  const [lastClickTime, setLastClickTime] = useState<number | null>(null);
-  const [clickWarning, setClickWarning] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("overview");
   const qrRef = useRef<HTMLDivElement>(null);
 
   const { data, error, isLoading, mutate } = useSWR<CommissionHubSnapshot>(
@@ -59,12 +63,7 @@ export default function CommissionHubPage() {
     getCommissionHubSnapshot
   );
 
-  useEffect(() => {
-    const ts = getLastTrackedClickTime();
-    if (ts) setLastClickTime(ts);
-    const hasError = consumeClickError();
-    if (hasError) setClickWarning(true);
-  }, []);
+  useEffect(() => { consumeClickError(); }, []);
 
   if (!token) {
     return (
@@ -80,583 +79,354 @@ export default function CommissionHubPage() {
   const notFound = error instanceof ReferralApiError && error.status === 404;
   const fatalError = error && !notFound;
   const summary = data?.summary;
-
   const conversions = data?.conversions ?? [];
   const history = data?.history ?? [];
   const hasSnapshot = Boolean(summary) || conversions.length > 0 || history.length > 0;
-  const showEmpty = !isLoading && (!hasSnapshot || notFound);
 
   if (fatalError) {
-    return (
-      <StateMessage
-        variant="error"
-        title="Unable to load Earn Hub"
-        body={error?.message || "Please refresh and try again."}
-        actionLabel="Retry"
-        onAction={() => mutate()}
-      />
-    );
+    return <StateMessage variant="error" title="Unable to load Earn Hub" body={error?.message || "Please refresh."} actionLabel="Retry" onAction={() => mutate()} />;
   }
-
   if (isLoading && !hasSnapshot) {
     return <StateMessage title="Loading Earn Hub" body="Fetching your referral data…" />;
   }
-
-  if (showEmpty) {
+  if (!isLoading && (!hasSnapshot || notFound)) {
     return (
-      <section className="space-y-6 px-4 py-8">
-        <StateMessage
-          variant="empty"
-          title="No referrals yet"
-          body="Share your referral link to start tracking clicks, conversions, and earnings."
-        />
+      <section className="space-y-4 px-3 py-6">
+        <StateMessage variant="empty" title="No referrals yet" body="Share your referral link to start earning." />
         <HowItWorks />
       </section>
     );
   }
 
-  const commissionAlert = notifications.find(
-    (notification) => notification.type === "commission_award" && !notification.read
-  );
-
   const clicks = summary?.clicks ?? 0;
-  const validClicks = summary?.validClicks ?? 0;
   const totalFriends = summary?.totalInvites ?? conversions.length;
-  const registrations = summary?.registrations ?? 0;
   const orderCount = history.filter(h => h.type === "订单佣金" || h.type === "topup_commission" || h.type === "commission").length;
-  const topups = summary?.topups ?? 0;
-  const conversionRate = summary?.conversionRate ?? 0;
   const lifetimeCommission = summary?.bonusEarned ?? 0;
   const clickCommission = summary?.clickPayoutTotal ?? 0;
-  const orderCommission = Math.max(0, lifetimeCommission - clickCommission);
   const monthlyCommission = summary?.monthCommission ?? summary?.thirtyDayCommission ?? 0;
   const summaryLink = summary?.link ?? "";
   const referralCode = summary?.code ?? "—";
+  const currentRate = summary?.commissionRate ? Math.round(summary.commissionRate * 100) : 15;
+  const qualifiedFriends = summary?.topups ?? conversions.filter(c => (c as any).totalCommissionEarned > 0 || c.status === "topped_up" || c.status === "purchased").length;
+  const tierInfo = getTier(qualifiedFriends);
+
   const shareText = encodeURIComponent("Join GreenHub and get great deals. Use my invite link!");
   const shareUrl = summaryLink ? encodeURIComponent(summaryLink) : "";
   const telegramShare = summaryLink ? `https://t.me/share/url?url=${shareUrl}&text=${shareText}` : null;
   const whatsappShare = summaryLink ? `https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}` : null;
-  const currentRate = summary?.commissionRate ? Math.round(summary.commissionRate * 100) : 15;
-  const qualifiedFriends = summary?.topups ?? conversions.filter(c => (c as any).totalCommissionEarned > 0 || c.status === "topped_up" || c.status === "purchased").length;
-  const tierInfo = getTier(qualifiedFriends);
 
   const handleCopy = async () => {
     if (!summaryLink) return;
     try {
       await navigator.clipboard.writeText(summaryLink);
       setCopyToast("Copied!");
-      setTimeout(() => setCopyToast(null), 2500);
-    } catch {
-      setCopyToast("Copy failed");
-      setTimeout(() => setCopyToast(null), 2500);
-    }
+      setTimeout(() => setCopyToast(null), 2000);
+    } catch { setCopyToast("Failed"); setTimeout(() => setCopyToast(null), 2000); }
   };
 
   return (
-    <section className="space-y-5 px-4 py-8">
+    <section className="pb-24 px-3 py-4 space-y-3">
+      {/* ── Hero: compact earnings + tier ── */}
+      <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-3.5">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[9px] uppercase tracking-wider text-white/30">💰 Total Earned</p>
+            <p className="text-2xl font-bold text-white">{GBP.format(lifetimeCommission)}</p>
+          </div>
+          <div className="text-right">
+            <div className="flex items-center gap-1">
+              <span className="text-sm">{tierInfo.tier.emoji}</span>
+              <span className={`text-xs font-bold ${tierInfo.tier.color}`}>{tierInfo.tier.name}</span>
+              <span className="text-xs text-emerald-300 font-bold">{currentRate}%</span>
+            </div>
+            {monthlyCommission > 0 && (
+              <p className="text-[10px] text-emerald-400 mt-0.5">+{GBP.format(monthlyCommission)} this month</p>
+            )}
+          </div>
+        </div>
 
-      {/* ── 1. Hero: Total Earnings ── */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-night-900 via-night-950 to-night-900 p-6 shadow-2xl shadow-brand-600/10">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-emerald-500/10 blur-3xl" />
-        <div className="pointer-events-none absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-brand-500/8 blur-2xl" />
-
-        <p className="relative text-xs font-medium uppercase tracking-[0.3em] text-white/50">💰 Earn Hub</p>
-        <p className="relative mt-2 text-4xl font-extrabold leading-none text-white drop-shadow-sm sm:text-5xl">
-          {GBP.format(lifetimeCommission)}
-        </p>
-        <p className="relative mt-1 text-sm text-white/50">Total earnings</p>
-
-        <div className="relative mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm">
-          <span className="text-white/60">👁️ Views: <span className="font-semibold text-emerald-300">{clicks}</span></span>
-          <span className="text-white/60">🛒 Orders: <span className="font-semibold text-emerald-300">{GBP.format(lifetimeCommission)}</span></span>
-          {monthlyCommission > 0 && (
-            <span className="text-white/60">📅 This month: <span className="font-semibold text-emerald-300">+{GBP.format(monthlyCommission)}</span></span>
-          )}
+        {/* Mini stats row */}
+        <div className="flex gap-4 mt-2.5 pt-2.5 border-t border-white/5">
+          <MiniStat icon="👁" label="Views" value={String(clicks)} />
+          <MiniStat icon="👥" label="Friends" value={String(totalFriends)} />
+          <MiniStat icon="🛒" label="Orders" value={String(orderCount)} />
+          <MiniStat icon="✅" label="Qualified" value={String(qualifiedFriends)} />
         </div>
       </div>
 
-      {/* ── Commission alert ── */}
-      {commissionAlert && (
-        <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
-          <p className="font-semibold">{commissionAlert.title}</p>
-          <p className="text-white/80">{commissionAlert.message}</p>
+      {/* ── Share link — compact ── */}
+      <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-3">
+        <p className="text-[9px] uppercase tracking-wider text-white/30">📤 Your Invite Link</p>
+        <div className="mt-2 flex items-center gap-2">
+          <p className="flex-1 min-w-0 truncate rounded-lg bg-white/5 px-2.5 py-2 font-mono text-[11px] text-white/70">
+            {summaryLink || "Link pending…"}
+          </p>
+          <button onClick={handleCopy} disabled={!summaryLink}
+            className="shrink-0 rounded-lg bg-emerald-500/15 border border-emerald-400/20 px-3 py-2 text-[11px] font-bold text-emerald-300 active:bg-emerald-500/25">
+            {copyToast || "Copy"}
+          </button>
+        </div>
+        <div className="flex gap-2 mt-2">
+          {whatsappShare && (
+            <a href={whatsappShare} target="_blank" rel="noreferrer"
+              className="flex-1 flex items-center justify-center gap-1 rounded-lg border border-white/8 bg-white/[0.03] py-2 text-[11px] text-white/60 active:bg-white/[0.06]">
+              📱 WhatsApp
+            </a>
+          )}
+          {telegramShare && (
+            <a href={telegramShare} target="_blank" rel="noreferrer"
+              className="flex-1 flex items-center justify-center gap-1 rounded-lg border border-white/8 bg-white/[0.03] py-2 text-[11px] text-white/60 active:bg-white/[0.06]">
+              ✈️ Telegram
+            </a>
+          )}
+        </div>
+        <p className="mt-1.5 text-[9px] text-white/25">Code: <span className="font-mono text-white/40">{referralCode}</span></p>
+      </div>
+
+      {/* ── Tabs: Overview / Friends / History ── */}
+      <div className="flex rounded-xl border border-white/8 bg-white/[0.02] p-0.5">
+        {(["overview", "friends", "history"] as Tab[]).map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`flex-1 rounded-lg py-2 text-[11px] font-semibold transition ${
+              activeTab === tab ? "bg-white/10 text-white" : "text-white/30"
+            }`}
+          >
+            {tab === "overview" ? "📊 Overview" : tab === "friends" ? `👥 Friends (${totalFriends})` : `💰 History (${history.length})`}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Tab content ── */}
+      {activeTab === "overview" && (
+        <div className="space-y-3">
+          {/* Tier progress */}
+          <TierCard tierInfo={tierInfo} qualifiedFriends={qualifiedFriends} totalFriends={totalFriends} currentRate={currentRate} />
+
+          {/* QR + Promo (collapsible) */}
+          <ExpandableSection icon="🖼" title="QR Code & Promo Caption">
+            <div className="flex gap-3 items-start">
+              {summaryLink && (
+                <div className="shrink-0">
+                  <div ref={qrRef} className="rounded-lg bg-white p-2">
+                    <QRCode value={summaryLink} size={80} />
+                  </div>
+                </div>
+              )}
+              <div className="flex-1 min-w-0 text-[10px] text-white/50 leading-relaxed whitespace-pre-line line-clamp-6">
+                {PROMO_CAPTION}
+              </div>
+            </div>
+            <CopyPromoButton summaryLink={summaryLink} />
+          </ExpandableSection>
+
+          {/* How it works */}
+          <ExpandableSection icon="❓" title="How It Works">
+            <div className="space-y-2">
+              {[
+                { icon: "📤", title: "Share", desc: "Send your invite link to friends" },
+                { icon: "🛒", title: "They Shop", desc: "Friends sign up and place orders" },
+                { icon: "💰", title: "You Earn", desc: `Earn ${currentRate}% of every order` },
+              ].map(s => (
+                <div key={s.title} className="flex items-center gap-2.5">
+                  <span className="text-lg">{s.icon}</span>
+                  <div>
+                    <p className="text-[12px] font-semibold text-white">{s.title}</p>
+                    <p className="text-[10px] text-white/40">{s.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ExpandableSection>
+
+          {/* Commission rules */}
+          <ExpandableSection icon="💎" title="Commission Rules">
+            <div className="space-y-1.5 text-[11px] text-white/60 leading-relaxed">
+              <p>1. Friends sign up via your link → you earn <span className="text-emerald-300 font-semibold">15–25%</span> commission on their orders.</p>
+              <p>2. Commission is credited to your wallet <span className="text-white/80 font-semibold">instantly</span>.</p>
+              <p>3. You earn on <span className="text-white/80 font-semibold">every order</span> they place — lifetime tracking.</p>
+              <p>4. 🥉 15% → 🥈 20% (100+ friends) → 🥇 25% (200+ friends).</p>
+              <p>5. Earnings never expire. Withdraw anytime.</p>
+            </div>
+          </ExpandableSection>
         </div>
       )}
 
-
-
-      {/* ── 2. Share Section with QR + Promo Caption ── */}
-      <InviteLinkCard
-        summaryLink={summaryLink}
-        referralCode={referralCode}
-        qrRef={qrRef}
-        copyToast={copyToast}
-        handleCopy={handleCopy}
-        whatsappShare={whatsappShare}
-        telegramShare={telegramShare}
-        setCopyToast={setCopyToast}
-      />
-
-      {/* ── 3. Stats Grid ── */}
-      <div className="grid grid-cols-3 gap-2.5">
-        <StatCard label="Views" value={clicks.toString()} sub="Link visits" />
-        <StatCard label="Friends" value={totalFriends.toString()} sub={`${qualifiedFriends} qualified · ${totalFriends - qualifiedFriends} not yet`} />
-        <StatCard label="Orders" value={orderCount.toString()} sub={`${currentRate}% commission`} />
-      </div>
-
-
-
-      {/* ── 4. Tier Progress ── */}
-      <div className="rounded-2xl border border-white/10 bg-card p-4">
-        {/* Current tier header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">{tierInfo.tier.emoji}</span>
-            <div>
-              <p className={`font-semibold ${tierInfo.tier.color}`}>{tierInfo.tier.name} Promoter · <span className="text-emerald-300">{currentRate}%</span></p>
-              <p className="text-xs text-white/40">{qualifiedFriends} qualified / {totalFriends} total friends</p>
-            </div>
-          </div>
-          {tierInfo.nextTier && (
-            <div className="text-right">
-              <p className="text-xs text-white/50">
-                {tierInfo.nextTier.min - qualifiedFriends} more → {tierInfo.nextTier.emoji} {tierInfo.nextTier.name}
-              </p>
-              {tierInfo.nextTier.rate > tierInfo.tier.rate && (
-                <p className="text-[10px] text-emerald-400">Unlocks {tierInfo.nextTier.rate}% commission</p>
-              )}
-            </div>
-          )}
+      {activeTab === "friends" && (
+        <div className="space-y-1">
+          {conversions.length === 0 ? (
+            <p className="text-center text-xs text-white/30 py-6">No friends yet. Share your link!</p>
+          ) : conversions.map((c) => (
+            <FriendRow key={String(c.id)} c={c} />
+          ))}
         </div>
+      )}
 
-        {/* Tier roadmap with inline progress bars */}
-        <div className="mt-4 border-t border-white/5 pt-3">
-          <div className="flex flex-col gap-2">
-            {TIERS.map((t, i) => {
-              const isCurrent = t.name === tierInfo.tier.name;
-              const isReached = totalFriends >= t.min;
-              const nextMin = TIERS[i + 1]?.min ?? t.min;
-              const segmentTotal = nextMin - t.min;
-              const segmentProgress = segmentTotal > 0
-                ? Math.min(1, Math.max(0, (totalFriends - t.min) / segmentTotal))
-                : (isReached ? 1 : 0);
-              const isLast = i === TIERS.length - 1;
-
-              return (
-                <div key={t.name} className={`rounded-xl px-3 py-2 ${isCurrent ? "bg-white/5 ring-1 ring-white/10" : ""}`}>
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">{t.emoji}</span>
-                      <span className={isReached ? t.color + " font-semibold" : "text-white/30"}>{t.name}</span>
-                      {isCurrent && <span className="rounded-full bg-emerald-400/20 px-1.5 py-px text-[9px] font-bold uppercase text-emerald-300">You</span>}
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className={isReached ? "text-white/60" : "text-white/25"}>{t.min === 0 ? "Start" : `${t.min}+ friends`}</span>
-                      <span className={`font-mono font-semibold ${isReached ? "text-emerald-300" : "text-white/25"}`}>{t.rate}%</span>
-                    </div>
-                  </div>
-                  {/* Progress bar for each tier segment */}
-                  {!isLast && (
-                    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-                      <div
-                        className={`h-full rounded-full transition-all duration-500 ${
-                          isReached ? "bg-gradient-to-r from-emerald-500 to-brand-400" : "bg-white/5"
-                        }`}
-                        style={{ width: `${segmentProgress * 100}%` }}
-                      />
-                    </div>
-                  )}
-                  {!isLast && isReached && qualifiedFriends < nextMin && (
-                    <p className="mt-1 text-[10px] text-white/40 text-right">{qualifiedFriends} / {nextMin} friends</p>
-                  )}
-                  {isLast && isReached && (
-                    <div className="mt-1.5 h-1.5 w-full rounded-full bg-gradient-to-r from-emerald-500 to-brand-400" />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          <p className="mt-3 text-[11px] text-white/40 leading-relaxed">
-            ℹ️ Only friends who have placed an order count towards tier progress. Friends who registered but haven&apos;t ordered yet are marked as &quot;not qualified&quot;.
-          </p>
+      {activeTab === "history" && (
+        <div className="space-y-1">
+          {history.length === 0 ? (
+            <p className="text-center text-xs text-white/30 py-6">No commissions yet.</p>
+          ) : history.map((row) => (
+            <HistoryRow key={row.id} row={row} />
+          ))}
         </div>
-      </div>
+      )}
 
-      {/* Tasks removed per request */}
-
-      {/* ── 6. Activity: Conversions + Commission History ── */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-3xl border border-white/10 bg-card p-4">
-          <p className="mb-3 text-xs font-medium uppercase tracking-[0.3em] text-white/50">👥 Conversions</p>
-          <ConversionsList conversions={conversions} />
-        </div>
-        <div className="rounded-3xl border border-white/10 bg-card p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/50">📊 Commission History</p>
-            <Button size="sm" variant="ghost" onClick={() => router.push("/dashboard")}>
-              Dashboard
-            </Button>
-          </div>
-          <CommissionList rows={history} />
-        </div>
-      </div>
-
-      {/* ── 7. How It Works ── */}
-      <HowItWorks />
-
-      {/* ── 8. Rules ── */}
-      <div className="rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-3 text-xs leading-relaxed text-white/40">
-        <p>💡 Every friend&apos;s order earns you <span className="text-white/60">{currentRate}% commission</span>. Referral earnings never expire and are credited to your wallet instantly. Invite more friends to unlock higher rates!</p>
-      </div>
-
-      {/* ── 9. Anti-fraud warning ── */}
-      <div className="rounded-2xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-xs leading-relaxed text-red-200/70">
-        <p>⚠️ <span className="font-semibold text-red-200">Fair use policy:</span> Our system monitors all referral activity. Fraudulent behaviour such as fake accounts or any form of manipulation will result in <span className="font-semibold text-red-200">immediate account suspension</span> and forfeiture of all referral earnings. Play fair — we reward genuine referrals.</p>
-      </div>
+      {/* Anti-fraud */}
+      <p className="text-[9px] text-white/20 leading-relaxed px-1">
+        ⚠️ Fair use: Fraudulent behaviour (fake accounts, manipulation) → account suspension + forfeiture of earnings.
+      </p>
     </section>
   );
 }
 
-/* ─── Sub-components ─── */
-
-function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
+/* ─── Mini stat ─── */
+function MiniStat({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-card p-3 text-center">
-      <p className="text-[10px] uppercase tracking-[0.25em] text-white/50">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-white">{value}</p>
-      {sub && <p className="mt-0.5 text-[11px] text-white/40">{sub}</p>}
+    <div className="flex-1 text-center">
+      <p className="text-[15px] font-bold text-white">{value}</p>
+      <p className="text-[8px] text-white/30">{icon} {label}</p>
     </div>
   );
 }
 
-
-
-function ConversionsList({ conversions }: { conversions: { id: number | string; handle?: string; status?: string; createdAt?: string; orderValue?: number; commission?: number; totalCommissionEarned?: number }[] }) {
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  if (!conversions.length) {
-    return <StateMessage variant="empty" title="No conversions yet" body="Share your link to see activity here." />;
-  }
-
-  const handleCopy = async (id: string, value: string) => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2000);
-    } catch {}
-  };
-
-  return (
-    <div className="space-y-2">
-      {conversions.map((c) => {
-        const id = String(c.id ?? `${c.handle ?? "c"}-${c.createdAt ?? Date.now()}`);
-        return (
-          <div key={id} className="flex items-center justify-between gap-2 rounded-xl bg-white/[0.03] px-3 py-2.5">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="font-mono text-sm font-semibold text-white truncate">{c.handle || "—"}</span>
-              {c.handle && (
-                <button
-                  onClick={() => handleCopy(id, c.handle!)}
-                  className="shrink-0 text-[10px] text-white/30 hover:text-white/50"
-                >
-                  {copiedId === id ? "✓" : "📋"}
-                </button>
-              )}
-              {c.handle && (
-                <Link
-                  href={`/wallet/transfer?to=${encodeURIComponent(c.handle)}`}
-                  className="shrink-0 rounded-full border border-brand-500/40 bg-brand-500/10 px-2 py-0.5 text-[10px] font-medium text-brand-200 hover:bg-brand-500/20"
-                >
-                  ⇒ Transfer
-                </Link>
-              )}
-            </div>
-            <div className="flex items-center gap-3 shrink-0 text-xs">
-              {(c.status === "topped_up" || c.status === "purchased" || (c as any).totalCommissionEarned > 0) ? (
-                <span className="rounded-full border border-emerald-400/40 bg-emerald-400/10 px-2 py-0.5 text-[10px] uppercase text-emerald-300">Qualified</span>
-              ) : (
-                <span className="rounded-full border border-yellow-400/30 bg-yellow-400/10 px-2 py-0.5 text-[10px] uppercase text-yellow-300">Not qualified</span>
-              )}
-              {((c as any).totalCommissionEarned ?? c.orderValue ?? c.commission ?? 0) > 0 && (
-                <span className="text-emerald-300 font-semibold">{GBP.format((c as any).totalCommissionEarned ?? c.orderValue ?? c.commission ?? 0)}</span>
-              )}
-              <span className="text-white/30">
-                {c.createdAt ? new Date(c.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "—"}
-              </span>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function CommissionList({ rows }: { rows: CommissionTransaction[] }) {
-  if (!rows.length) {
-    return <StateMessage variant="empty" title="No commissions yet" body="Share your referral link to start earning." />;
-  }
-
-  return (
-    <div className="space-y-2">
-      {rows.map((row) => {
-        const label = row.sourceInvitee
-          ? `Friend's order · ${row.sourceInvitee}`
-          : row.description || "Commission earned";
-
-        return (
-          <div key={row.id} className="rounded-xl bg-white/[0.03] px-3 py-2.5">
-            <div className="flex items-center justify-between gap-2">
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm">🛒</span>
-                  <p className="text-sm font-medium text-white truncate">{label}</p>
-                </div>
-              </div>
-              <span className="text-sm font-semibold text-emerald-300 shrink-0">+{GBP.format(row.amount ?? 0)}</span>
-            </div>
-            <div className="mt-1 flex items-center gap-2 text-[11px] text-white/40">
-              <span className="ml-auto shrink-0">
-                {row.createdAt ? new Date(row.createdAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "—"}
-              </span>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function StatusPill({ status }: { status?: string | null }) {
-  if (!status) {
-    return <span className="rounded-full border border-white/20 px-2 py-0.5 text-[10px] uppercase text-white/50">Pending</span>;
-  }
-  const palette: Record<string, string> = {
-    paid: "bg-emerald-400/10 text-emerald-200 border-emerald-400/40",
-    active: "bg-brand-500/10 text-brand-200 border-brand-500/40",
-    completed: "bg-emerald-400/10 text-emerald-200 border-emerald-400/40",
-    pending: "bg-yellow-400/10 text-yellow-200 border-yellow-400/40",
-    processing: "bg-blue-400/10 text-blue-200 border-blue-400/40",
-  };
-  const key = status.toLowerCase();
-  const classes = palette[key] || "bg-white/5 text-white/70 border-white/20";
-  return (
-    <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase ${classes}`}>
-      {status.replace(/_/g, " ")}
-    </span>
-  );
-}
-
-const PROMO_CAPTION = `🔥 Premium UK bud delivered to your nearest InPost locker — no meetups, no hassle, just quality.
-
-📦 Vacuum-sealed, discreet packaging. Pick up 24/7 from any locker across the UK.
-
-✨ Lab-tested, slow-cured indoor strains. Only the best makes the cut.
-
-🚚 Order online → dispatched within 24 hours → collect from your locker. Simple.`;
-
-function InviteLinkCard({
-  summaryLink,
-  referralCode,
-  qrRef,
-  copyToast,
-  handleCopy,
-  whatsappShare,
-  telegramShare,
-  setCopyToast,
-}: {
-  summaryLink: string;
-  referralCode: string;
-  qrRef: React.RefObject<HTMLDivElement>;
-  copyToast: string | null;
-  handleCopy: () => void;
-  whatsappShare: string | null;
-  telegramShare: string | null;
-  setCopyToast: (v: string | null) => void;
+/* ─── Tier card ─── */
+function TierCard({ tierInfo, qualifiedFriends, totalFriends, currentRate }: {
+  tierInfo: ReturnType<typeof getTier>; qualifiedFriends: number; totalFriends: number; currentRate: number;
 }) {
-  const [showPromo, setShowPromo] = useState(false);
-  const [showRules, setShowRules] = useState(false);
-  const [captionCopied, setCaptionCopied] = useState(false);
-
-  const fullCaption = `${PROMO_CAPTION}\n\n👉 ${summaryLink}`;
-
-  const handleCopyCaption = async () => {
-    try {
-      await navigator.clipboard.writeText(fullCaption);
-      setCaptionCopied(true);
-      setTimeout(() => setCaptionCopied(false), 2000);
-    } catch {}
-  };
-
-  // Share caption + link via WhatsApp
-  const promoWhatsApp = `https://api.whatsapp.com/send?text=${encodeURIComponent(fullCaption)}`;
-  const promoTelegram = `https://t.me/share/url?url=${encodeURIComponent(summaryLink)}&text=${encodeURIComponent(PROMO_CAPTION)}`;
-
+  const { tier, nextTier, progress } = tierInfo;
   return (
-    <div className="rounded-3xl border border-white/10 bg-card p-5">
-      <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/50">📤 Your Invite Link</p>
-      <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start">
-        {/* QR Code */}
-        {summaryLink && (
-          <div className="shrink-0 self-center sm:self-start">
-            <div ref={qrRef} className="rounded-xl bg-white p-3">
-              <QRCode value={summaryLink} size={120} />
-            </div>
-            <div className="mt-1.5 flex justify-center gap-2">
-              <button
-                onClick={async () => {
-                  try {
-                    const canvas = qrRef.current?.querySelector("canvas");
-                    if (!canvas) return;
-                    const blob = await new Promise<Blob | null>(r => (canvas as HTMLCanvasElement).toBlob(r, "image/png"));
-                    if (blob) {
-                      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-                      setCopyToast("QR copied!");
-                      setTimeout(() => setCopyToast(null), 2000);
-                    }
-                  } catch {
-                    const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
-                    if (canvas) {
-                      const a = document.createElement("a");
-                      a.href = canvas.toDataURL("image/png");
-                      a.download = "greenhub-invite-qr.png";
-                      a.click();
-                    }
-                  }
-                }}
-                className="text-[10px] text-white/40 hover:text-white/60"
-              >
-                📋 Copy QR
-              </button>
-              <button
-                onClick={() => {
-                  const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
-                  if (canvas) {
-                    const a = document.createElement("a");
-                    a.href = canvas.toDataURL("image/png");
-                    a.download = "greenhub-invite-qr.png";
-                    a.click();
-                  }
-                }}
-                className="text-[10px] text-white/40 hover:text-white/60"
-              >
-                ⬇ Save
-              </button>
-            </div>
-          </div>
-        )}
-        <div className="flex-1 min-w-0">
-          <p className="break-all rounded-xl bg-white/5 px-3 py-2.5 font-mono text-sm text-white">
-            {summaryLink || "Link pending…"}
-          </p>
-          <p className="mt-1.5 text-xs text-white/40">Referral code: <span className="font-mono text-white/60">{referralCode}</span></p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Button size="sm" onClick={handleCopy} disabled={!summaryLink} className="min-h-[44px]">
-              {copyToast || "📋 Copy link"}
-            </Button>
-            {whatsappShare && (
-              <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
-                <a href={whatsappShare} target="_blank" rel="noreferrer">📱 WhatsApp</a>
-              </Button>
-            )}
-            {telegramShare && (
-              <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
-                <a href={telegramShare} target="_blank" rel="noreferrer">✈️ Telegram</a>
-              </Button>
-            )}
-          </div>
+    <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          <span>{tier.emoji}</span>
+          <span className={`text-xs font-bold ${tier.color}`}>{tier.name}</span>
+          <span className="text-[10px] text-emerald-300 font-bold">{currentRate}%</span>
         </div>
-      </div>
-
-      {/* Commission Rules - expandable */}
-      <div className="mt-4 border-t border-white/5 pt-3">
-        <button
-          onClick={() => setShowRules(!showRules)}
-          className="flex w-full items-center justify-between text-left"
-        >
-          <span className="text-sm font-medium text-white/70">💎 Commission Rules</span>
-          <span className={`text-white/40 transition-transform ${showRules ? "rotate-180" : ""}`}>▼</span>
-        </button>
-
-        {showRules && (
-          <div className="mt-3 space-y-2 text-sm text-white/70 leading-relaxed">
-            <div className="flex gap-2">
-              <span className="shrink-0">1.</span>
-              <p>Share your invite link — when a friend signs up and places an order, you earn <span className="font-semibold text-emerald-300">15–25%</span> commission on their order total.</p>
-            </div>
-            <div className="flex gap-2">
-              <span className="shrink-0">2.</span>
-              <p>Commission is credited to your wallet <span className="font-semibold text-white/90">instantly</span> once their order is confirmed.</p>
-            </div>
-            <div className="flex gap-2">
-              <span className="shrink-0">3.</span>
-              <p>You earn commission on <span className="font-semibold text-white/90">every order</span> your friend places — not just the first one. Lifetime tracking.</p>
-            </div>
-            <div className="flex gap-2">
-              <span className="shrink-0">4.</span>
-              <p>Tier upgrades: <span className="text-amber-400">🥉 Bronze 15%</span> → <span className="text-gray-300">🥈 Silver 20%</span> (100+ friends) → <span className="text-yellow-300">🥇 Gold 25%</span> (200+ friends).</p>
-            </div>
-            <div className="flex gap-2">
-              <span className="shrink-0">5.</span>
-              <p>Earnings never expire. Withdraw anytime to your bank or use as store credit.</p>
-            </div>
-          </div>
+        {nextTier && (
+          <p className="text-[10px] text-white/30">{nextTier.min - qualifiedFriends} more → {nextTier.emoji} {nextTier.name} ({nextTier.rate}%)</p>
         )}
       </div>
-
-      {/* Promo Caption - expandable */}
-      <div className="mt-4 border-t border-white/5 pt-3">
-        <button
-          onClick={() => setShowPromo(!showPromo)}
-          className="flex w-full items-center justify-between text-left"
-        >
-          <span className="text-sm font-medium text-white/70">📝 Ready-to-share promo caption</span>
-          <span className={`text-white/40 transition-transform ${showPromo ? "rotate-180" : ""}`}>▼</span>
-        </button>
-
-        {showPromo && (
-          <div className="mt-3 space-y-3">
-            <div className="rounded-xl bg-white/5 p-4">
-              <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line">{PROMO_CAPTION}</p>
-              <p className="mt-2 text-sm text-emerald-400">👉 {summaryLink}</p>
+      {/* Single progress bar */}
+      <div className="mt-2 h-1.5 w-full rounded-full bg-white/8 overflow-hidden">
+        <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all"
+          style={{ width: `${progress * 100}%` }} />
+      </div>
+      <div className="flex justify-between mt-1">
+        <span className="text-[8px] text-white/25">{qualifiedFriends} qualified / {totalFriends} total</span>
+        {nextTier && <span className="text-[8px] text-white/25">{nextTier.min} needed</span>}
+      </div>
+      {/* Tier roadmap - inline */}
+      <div className="flex gap-1 mt-2 pt-2 border-t border-white/5">
+        {TIERS.map(t => {
+          const reached = qualifiedFriends >= t.min;
+          return (
+            <div key={t.name} className={`flex-1 rounded-lg px-2 py-1 text-center ${t.name === tier.name ? "bg-white/5 ring-1 ring-white/10" : ""}`}>
+              <span className="text-xs">{t.emoji}</span>
+              <p className={`text-[9px] font-bold ${reached ? t.color : "text-white/20"}`}>{t.rate}%</p>
+              <p className="text-[7px] text-white/20">{t.min === 0 ? "Start" : `${t.min}+`}</p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button size="sm" onClick={handleCopyCaption} className="min-h-[44px]">
-                {captionCopied ? "✓ Copied!" : "📋 Copy caption + link"}
-              </Button>
-              <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
-                <a href={promoWhatsApp} target="_blank" rel="noreferrer">📱 Share to WhatsApp</a>
-              </Button>
-              <Button asChild variant="secondary" size="sm" className="min-h-[44px]">
-                <a href={promoTelegram} target="_blank" rel="noreferrer">✈️ Share to Telegram</a>
-              </Button>
-            </div>
-          </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Expandable section ─── */
+function ExpandableSection({ icon, title, children }: { icon: string; title: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-2xl border border-white/8 bg-white/[0.02]">
+      <button onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between px-3 py-2.5 text-left">
+        <span className="text-[12px] font-semibold text-white/60">{icon} {title}</span>
+        <span className={`text-[10px] text-white/30 transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
+      </button>
+      {open && <div className="px-3 pb-3">{children}</div>}
+    </div>
+  );
+}
+
+/* ─── Copy promo ─── */
+function CopyPromoButton({ summaryLink }: { summaryLink: string }) {
+  const [copied, setCopied] = useState(false);
+  const fullCaption = `${PROMO_CAPTION}\n\n👉 ${summaryLink}`;
+  return (
+    <button
+      onClick={async () => {
+        try { await navigator.clipboard.writeText(fullCaption); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
+      }}
+      className="mt-2 w-full rounded-lg border border-white/8 bg-white/[0.03] py-2 text-[10px] text-white/50 active:bg-white/[0.06]"
+    >
+      {copied ? "✓ Copied!" : "📋 Copy caption + link"}
+    </button>
+  );
+}
+
+/* ─── Friend row ─── */
+function FriendRow({ c }: { c: any }) {
+  const isQualified = c.status === "topped_up" || c.status === "purchased" || (c.totalCommissionEarned ?? 0) > 0;
+  const earned = c.totalCommissionEarned ?? c.orderValue ?? c.commission ?? 0;
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2">
+      <div className="flex items-center gap-2 min-w-0">
+        <span className="font-mono text-[12px] font-semibold text-white truncate">{c.handle || "—"}</span>
+        {isQualified
+          ? <span className="shrink-0 rounded-full bg-emerald-400/10 px-1.5 py-0.5 text-[8px] text-emerald-300">✅</span>
+          : <span className="shrink-0 rounded-full bg-yellow-400/10 px-1.5 py-0.5 text-[8px] text-yellow-300">pending</span>
+        }
+      </div>
+      <div className="flex items-center gap-2 shrink-0">
+        {earned > 0 && <span className="text-[11px] font-semibold text-emerald-300">{GBP.format(earned)}</span>}
+        <span className="text-[9px] text-white/20">
+          {c.createdAt ? new Date(c.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : ""}
+        </span>
+        {c.handle && (
+          <Link href={`/wallet/transfer?to=${encodeURIComponent(c.handle)}`}
+            className="rounded-full border border-white/10 px-1.5 py-0.5 text-[8px] text-white/40 active:bg-white/5">⇒</Link>
         )}
       </div>
     </div>
   );
 }
 
+/* ─── History row ─── */
+function HistoryRow({ row }: { row: CommissionTransaction }) {
+  const label = row.sourceInvitee ? `${row.sourceInvitee}'s order` : row.description || "Commission";
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2">
+      <div className="min-w-0 flex-1">
+        <p className="text-[12px] font-medium text-white truncate">{label}</p>
+        <p className="text-[9px] text-white/20">
+          {row.createdAt ? new Date(row.createdAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}
+        </p>
+      </div>
+      <span className="shrink-0 text-[13px] font-bold text-emerald-300">+{GBP.format(row.amount ?? 0)}</span>
+    </div>
+  );
+}
+
+/* ─── How it works ─── */
 function HowItWorks() {
   return (
-    <div className="rounded-3xl border border-white/10 bg-card p-5">
-      <h2 className="text-lg font-semibold text-white">How it works</h2>
-      <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-        <div>
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/10 text-2xl">📤</div>
-          <p className="mt-2 text-sm font-semibold text-white">Share</p>
-          <p className="mt-0.5 text-xs text-white/50">Send your invite link to friends</p>
-        </div>
-        <div>
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-2xl">🛒</div>
-          <p className="mt-2 text-sm font-semibold text-white">They Shop</p>
-          <p className="mt-0.5 text-xs text-white/50">Friends sign up and place orders</p>
-        </div>
-        <div>
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 text-2xl">💰</div>
-          <p className="mt-2 text-sm font-semibold text-white">You Earn</p>
-          <p className="mt-0.5 text-xs text-white/50">Earn 15-25% of every order</p>
-        </div>
+    <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-3">
+      <p className="text-xs font-bold text-white mb-2">How it works</p>
+      <div className="space-y-2">
+        {[
+          { icon: "📤", title: "Share", desc: "Send your invite link to friends" },
+          { icon: "🛒", title: "They Shop", desc: "Friends sign up and place orders" },
+          { icon: "💰", title: "You Earn", desc: "Earn 15-25% of every order" },
+        ].map(s => (
+          <div key={s.title} className="flex items-center gap-2.5">
+            <span className="text-lg">{s.icon}</span>
+            <div>
+              <p className="text-[12px] font-semibold text-white">{s.title}</p>
+              <p className="text-[10px] text-white/40">{s.desc}</p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
