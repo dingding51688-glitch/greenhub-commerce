@@ -139,19 +139,31 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
           <p className="text-xs text-white/30">No items data</p>
         ) : (
           <div className="space-y-1.5">
-            {items.map((item, i) => (
-              <div key={`${item.productId}-${item.weight}-${i}`}
-                className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2.5">
-                <div>
-                  <p className="text-xs font-semibold text-white">{item.title || `Product #${item.productId}`}</p>
-                  <p className="text-[9px] text-white/30">
-                    {item.weight || "—"} × {item.quantity}
-                    {item.unitPrice ? ` · ${GBP.format(item.unitPrice)} each` : ""}
-                  </p>
+            {items.map((item, i) => {
+              const slug = item.slug || item.productSlug || (item.title || item.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+              const showReview = order.status === "completed" || order.status === "delivered";
+              return (
+                <div key={`${item.productId}-${item.weight}-${i}`}
+                  className="rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2.5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-semibold text-white">{item.title || `Product #${item.productId}`}</p>
+                      <p className="text-[9px] text-white/30">
+                        {item.weight || "—"} × {item.quantity}
+                        {item.unitPrice ? ` · ${GBP.format(item.unitPrice)} each` : ""}
+                      </p>
+                    </div>
+                    <p className="text-sm font-bold text-white">{GBP.format(item.lineTotal)}</p>
+                  </div>
+                  {showReview && slug && (
+                    <Link href={`/products/${slug}#reviews`}
+                      className="mt-2 inline-flex items-center gap-1 rounded-lg bg-amber-400/10 border border-amber-400/20 px-2.5 py-1 text-[10px] font-semibold text-amber-200 hover:bg-amber-400/20 transition">
+                      ⭐ Leave a review
+                    </Link>
+                  )}
                 </div>
-                <p className="text-sm font-bold text-white">{GBP.format(item.lineTotal)}</p>
-              </div>
-            ))}
+              );
+            })}
             {/* Subtotal + Delivery + Total */}
             <div className="border-t border-white/5 pt-2 mt-1 space-y-1">
               <div className="flex items-center justify-between">
@@ -290,25 +302,6 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
                     </p>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Review prompt — only for completed orders */}
-      {(order.status === "completed" || order.status === "delivered") && items.length > 0 && (
-        <div className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-4">
-          <p className="text-sm font-bold text-amber-200 mb-2">⭐ How was your order?</p>
-          <p className="text-xs text-white/50 mb-3">Help other customers by leaving a review on the products you purchased.</p>
-          <div className="flex flex-wrap gap-2">
-            {items.map((item: any, i: number) => {
-              const slug = item.slug || item.productSlug || (item.title || item.name || item.productName || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-              return (
-                <Link key={i} href={slug ? `/products/${slug}#reviews` : "/products"}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-amber-400/10 border border-amber-400/20 px-3 py-1.5 text-xs font-medium text-amber-200 hover:bg-amber-400/20 transition">
-                  ⭐ Review {item.title || item.name || item.productName || 'Product'}
-                </Link>
               );
             })}
           </div>
