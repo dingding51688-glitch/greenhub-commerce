@@ -47,17 +47,21 @@ function itemImg(path?: string | null) {
   return path.startsWith("http") ? path : `${CMS}${path}`;
 }
 
-/* ── Mini progress dots ── */
+/* ── Mini progress bar ── */
+const STEP_LABELS = ["Placed", "Processing", "Shipped", "Delivered"];
 function MiniProgress({ step }: { step: number }) {
   if (step < 0) return null;
+  const pct = Math.min(step / 3, 1) * 100;
   return (
-    <div className="flex items-center gap-0.5">
-      {[0, 1, 2, 3].map((s) => (
-        <div key={s} className="flex items-center">
-          <div className={`h-1.5 w-1.5 rounded-full ${s <= step ? "bg-emerald-400" : "bg-white/10"}`} />
-          {s < 3 && <div className={`h-[1px] w-2.5 ${s < step ? "bg-emerald-400/60" : "bg-white/8"}`} />}
-        </div>
-      ))}
+    <div>
+      <div className="relative h-[3px] w-full rounded-full bg-white/8 overflow-hidden">
+        <div className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all" style={{ width: `${pct}%` }} />
+      </div>
+      <div className="flex justify-between mt-1">
+        {STEP_LABELS.map((l, i) => (
+          <span key={l} className={`text-[8px] ${i <= step ? "text-emerald-400/70" : "text-white/15"}`}>{l}</span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -214,12 +218,14 @@ function OrderCard({ order }: { order: OrderRecord }) {
               {cfg.icon} {cfg.label}
             </span>
           </div>
-          <p className="mt-0.5 text-[10px] text-white/25">{relativeDate(order.createdAt)}</p>
         </div>
-        <span className="text-[15px] font-bold text-white">{GBP.format(order.totalAmount)}</span>
+        <div className="text-right">
+          <span className="text-[15px] font-bold text-white">{GBP.format(order.totalAmount)}</span>
+          <p className="text-[10px] text-white/25">{relativeDate(order.createdAt)}</p>
+        </div>
       </div>
 
-      {/* Row 2: Progress dots */}
+      {/* Row 2: Progress bar */}
       <div className="mt-2.5">
         <MiniProgress step={cfg.step} />
       </div>
