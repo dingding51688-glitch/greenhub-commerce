@@ -150,7 +150,13 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
                   className="rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2.5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-semibold text-white">{item.title || `Product #${item.productId}`}</p>
+                      {slug ? (
+                        <Link href={`/products/${slug}`} className="text-xs font-semibold text-white hover:text-amber-200 underline-offset-2 hover:underline transition-colors">
+                          {item.title || `Product #${item.productId}`}
+                        </Link>
+                      ) : (
+                        <p className="text-xs font-semibold text-white">{item.title || `Product #${item.productId}`}</p>
+                      )}
                       <p className="text-[9px] text-white/30">
                         {item.weight || "—"} × {item.quantity}
                         {item.unitPrice ? ` · ${GBP.format(item.unitPrice)} each` : ""}
