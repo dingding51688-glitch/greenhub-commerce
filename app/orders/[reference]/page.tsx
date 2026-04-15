@@ -37,6 +37,15 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
   const [reviewItem, setReviewItem] = useState<{ productId: number; title: string } | null>(null);
   const [reviewedIds, setReviewedIds] = useState<Set<number>>(new Set());
 
+  // Load already-reviewed product IDs on mount
+  useEffect(() => {
+    if (!token) return;
+    fetch("/api/strapi/reviews/mine", { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then(d => { if (Array.isArray(d?.data)) setReviewedIds(new Set(d.data)); })
+      .catch(() => {});
+  }, [token]);
+
   useEffect(() => {
     if (!token) return;
     setLoading(true);
