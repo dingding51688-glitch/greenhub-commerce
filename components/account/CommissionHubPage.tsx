@@ -474,6 +474,7 @@ function InviteLinkCard({
   setCopyToast: (v: string | null) => void;
 }) {
   const [showPromo, setShowPromo] = useState(false);
+  const [showRules, setShowRules] = useState(false);
   const [captionCopied, setCaptionCopied] = useState(false);
 
   const fullCaption = `${PROMO_CAPTION}\n\n👉 ${summaryLink}`;
@@ -566,31 +567,40 @@ function InviteLinkCard({
         </div>
       </div>
 
-      {/* Commission Rules */}
-      <div className="mt-4 border-t border-white/5 pt-4">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/50 mb-3">💎 Commission Rules</p>
-        <div className="space-y-2 text-sm text-white/70 leading-relaxed">
-          <div className="flex gap-2">
-            <span className="shrink-0">1.</span>
-            <p>Share your invite link — when a friend signs up and places an order, you earn <span className="font-semibold text-emerald-300">15–25%</span> commission on their order total.</p>
+      {/* Commission Rules - expandable */}
+      <div className="mt-4 border-t border-white/5 pt-3">
+        <button
+          onClick={() => setShowRules(!showRules)}
+          className="flex w-full items-center justify-between text-left"
+        >
+          <span className="text-sm font-medium text-white/70">💎 Commission Rules</span>
+          <span className={`text-white/40 transition-transform ${showRules ? "rotate-180" : ""}`}>▼</span>
+        </button>
+
+        {showRules && (
+          <div className="mt-3 space-y-2 text-sm text-white/70 leading-relaxed">
+            <div className="flex gap-2">
+              <span className="shrink-0">1.</span>
+              <p>Share your invite link — when a friend signs up and places an order, you earn <span className="font-semibold text-emerald-300">15–25%</span> commission on their order total.</p>
+            </div>
+            <div className="flex gap-2">
+              <span className="shrink-0">2.</span>
+              <p>Commission is credited to your wallet <span className="font-semibold text-white/90">instantly</span> once their order is confirmed.</p>
+            </div>
+            <div className="flex gap-2">
+              <span className="shrink-0">3.</span>
+              <p>You earn commission on <span className="font-semibold text-white/90">every order</span> your friend places — not just the first one. Lifetime tracking.</p>
+            </div>
+            <div className="flex gap-2">
+              <span className="shrink-0">4.</span>
+              <p>Tier upgrades: <span className="text-amber-400">🥉 Bronze 15%</span> → <span className="text-gray-300">🥈 Silver 20%</span> (100+ friends) → <span className="text-yellow-300">🥇 Gold 25%</span> (200+ friends).</p>
+            </div>
+            <div className="flex gap-2">
+              <span className="shrink-0">5.</span>
+              <p>Earnings never expire. Withdraw anytime to your bank or use as store credit.</p>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <span className="shrink-0">2.</span>
-            <p>Commission is credited to your wallet <span className="font-semibold text-white/90">instantly</span> once their order is confirmed.</p>
-          </div>
-          <div className="flex gap-2">
-            <span className="shrink-0">3.</span>
-            <p>You earn commission on <span className="font-semibold text-white/90">every order</span> your friend places — not just the first one. Lifetime tracking.</p>
-          </div>
-          <div className="flex gap-2">
-            <span className="shrink-0">4.</span>
-            <p>Tier upgrades: <span className="text-amber-400">🥉 Bronze 15%</span> → <span className="text-gray-300">🥈 Silver 20%</span> (100+ friends) → <span className="text-yellow-300">🥇 Gold 25%</span> (200+ friends).</p>
-          </div>
-          <div className="flex gap-2">
-            <span className="shrink-0">5.</span>
-            <p>Earnings never expire. Withdraw anytime to your bank or use as store credit.</p>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Promo Caption - expandable */}
