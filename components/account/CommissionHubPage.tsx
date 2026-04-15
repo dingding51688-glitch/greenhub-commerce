@@ -180,7 +180,7 @@ export default function CommissionHubPage() {
             </a>
           )}
         </div>
-        <p className="mt-1.5 text-[9px] text-white/25">Code: <span className="font-mono text-white/40">{referralCode}</span></p>
+
       </div>
 
       {/* ── Tabs: Overview / Friends / History ── */}
