@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import useSWRInfinite from "swr/infinite";
 import { useAuth } from "@/components/providers/AuthProvider";
 import type { OrderRecord } from "@/lib/types";
 import { listMyOrders } from "@/lib/orders-api";
 
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+const CMS = "https://cms.greenhub420.co.uk";
 const PAGE_SIZE = 10;
 
 const FILTERS = [
@@ -18,24 +18,23 @@ const FILTERS = [
   { id: "canceled", label: "Canceled", statuses: new Set(["canceled", "rejected", "refunded"]) },
 ] as const;
 
-const STATUS_BADGE: Record<string, { bg: string; text: string; label: string; icon: string }> = {
-  pending:   { bg: "bg-amber-400/10 border-amber-400/20", text: "text-amber-300", label: "Pending", icon: "⏳" },
-  paid:      { bg: "bg-blue-400/10 border-blue-400/20", text: "text-blue-300", label: "Paid", icon: "💳" },
-  processing:{ bg: "bg-blue-400/10 border-blue-400/20", text: "text-blue-300", label: "Processing", icon: "⚙️" },
-  dispatched:{ bg: "bg-purple-400/10 border-purple-400/20", text: "text-purple-300", label: "Dispatched", icon: "🚚" },
-  delivered: { bg: "bg-emerald-400/10 border-emerald-400/20", text: "text-emerald-300", label: "Delivered", icon: "✅" },
-  completed: { bg: "bg-emerald-400/10 border-emerald-400/20", text: "text-emerald-300", label: "Completed", icon: "✅" },
-  canceled:  { bg: "bg-red-400/10 border-red-400/20", text: "text-red-300", label: "Cancelled", icon: "❌" },
-  rejected:  { bg: "bg-red-400/10 border-red-400/20", text: "text-red-300", label: "Rejected", icon: "❌" },
-  refunded:  { bg: "bg-red-400/10 border-red-400/20", text: "text-red-300", label: "Refunded", icon: "🔄" },
+const STATUS_CFG: Record<string, { color: string; label: string; icon: string; step: number }> = {
+  pending:    { color: "text-amber-300",   label: "Pending",    icon: "⏳", step: 0 },
+  paid:       { color: "text-blue-300",    label: "Paid",       icon: "💳", step: 1 },
+  processing: { color: "text-blue-300",    label: "Processing", icon: "⚙️", step: 1 },
+  dispatched: { color: "text-purple-300",  label: "Dispatched", icon: "🚚", step: 2 },
+  delivered:  { color: "text-emerald-300", label: "Delivered",  icon: "✅", step: 3 },
+  completed:  { color: "text-emerald-300", label: "Completed",  icon: "✅", step: 3 },
+  canceled:   { color: "text-red-300",     label: "Cancelled",  icon: "❌", step: -1 },
+  rejected:   { color: "text-red-300",     label: "Rejected",   icon: "❌", step: -1 },
+  refunded:   { color: "text-red-300",     label: "Refunded",   icon: "🔄", step: -1 },
 };
-const DEFAULT_BADGE = { bg: "bg-white/5 border-white/10", text: "text-white/40", label: "Unknown", icon: "❓" };
+const DEFAULT_CFG = { color: "text-white/40", label: "Unknown", icon: "❓", step: 0 };
 
 function relativeDate(iso?: string) {
   if (!iso) return "";
   const d = new Date(iso);
-  const now = new Date();
-  const diffMs = now.getTime() - d.getTime();
+  const diffMs = Date.now() - d.getTime();
   const days = Math.floor(diffMs / 86400000);
   if (days === 0) return "Today";
   if (days === 1) return "Yesterday";
@@ -43,8 +42,51 @@ function relativeDate(iso?: string) {
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
+function itemImg(path?: string | null) {
+  if (!path) return null;
+  return path.startsWith("http") ? path : `${CMS}${path}`;
+}
+
+/* ── Mini progress dots ── */
+function MiniProgress({ step }: { step: number }) {
+  if (step < 0) return null;
+  return (
+    <div className="flex items-center gap-0.5">
+      {[0, 1, 2, 3].map((s) => (
+        <div key={s} className="flex items-center">
+          <div className={`h-1.5 w-1.5 rounded-full ${s <= step ? "bg-emerald-400" : "bg-white/10"}`} />
+          {s < 3 && <div className={`h-[1px] w-2.5 ${s < step ? "bg-emerald-400/60" : "bg-white/8"}`} />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Product thumbnail stack ── */
+function ItemThumbs({ items }: { items: any[] }) {
+  const visible = items.slice(0, 3);
+  const extra = items.length - 3;
+  if (!visible.length) return null;
+  return (
+    <div className="flex -space-x-2">
+      {visible.map((item, i) => {
+        const src = itemImg(item.image);
+        return src ? (
+          <img key={i} src={src} alt="" className="h-9 w-9 rounded-lg border-2 border-[#0a0b0e] object-cover bg-white/5" />
+        ) : (
+          <div key={i} className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-[#0a0b0e] bg-white/5 text-[10px] text-white/30">📦</div>
+        );
+      })}
+      {extra > 0 && (
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-[#0a0b0e] bg-white/10 text-[10px] font-bold text-white/50">
+          +{extra}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function OrdersPage() {
-  const router = useRouter();
   const { token } = useAuth();
   const [filterId, setFilterId] = useState<string>("all");
 
@@ -76,33 +118,33 @@ export default function OrdersPage() {
         <div className="space-y-4 text-center">
           <p className="text-4xl">🔐</p>
           <p className="text-lg font-bold text-white">Sign in to view orders</p>
-          <Link href="/login" className="inline-flex min-h-[40px] items-center rounded-xl cta-gradient px-5 text-sm font-bold text-white">Log in</Link>
+          <Link href="/login" className="inline-flex min-h-[44px] items-center rounded-xl cta-gradient px-5 text-sm font-bold text-white">Log in</Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4 pb-24 sm:space-y-6 sm:pb-20">
+    <div className="space-y-4 pb-24">
       {/* Header */}
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white sm:text-2xl">Orders</h1>
+          <h1 className="text-xl font-bold text-white">Orders</h1>
           <p className="mt-0.5 text-xs text-white/40">{orders.length} orders · {GBP.format(totalSpend)} spent</p>
         </div>
-        <button onClick={() => mutate()} className="text-[10px] text-white/30 hover:text-white/50">↻ Refresh</button>
+        <button onClick={() => mutate()} className="text-[10px] text-white/30 hover:text-white/50 active:text-white/70">↻ Refresh</button>
       </div>
 
       {/* Filter pills */}
-      <div className="flex gap-1.5 overflow-x-auto">
+      <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
         {FILTERS.map((f) => (
           <button
             key={f.id}
             onClick={() => setFilterId(f.id)}
-            className={`shrink-0 rounded-full px-3 py-1.5 text-[11px] font-medium transition ${
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-[11px] font-medium transition-all ${
               filterId === f.id
-                ? "bg-white/10 text-white"
-                : "text-white/40 hover:text-white/60"
+                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                : "text-white/40 hover:text-white/60 border border-transparent"
             }`}
           >
             {f.label}
@@ -112,33 +154,35 @@ export default function OrdersPage() {
 
       {/* List */}
       {loadingInitial ? (
-        <div className="space-y-2">
-          {[1, 2, 3].map((i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-white/5" />)}
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-28 animate-pulse rounded-2xl bg-white/5" />
+          ))}
         </div>
       ) : error && orders.length === 0 ? (
-        <div className="rounded-xl border border-red-400/20 bg-red-400/5 p-4 text-center">
+        <div className="rounded-2xl border border-red-400/20 bg-red-400/5 p-6 text-center">
           <p className="text-sm text-red-200">Failed to load orders</p>
           <button onClick={() => mutate()} className="mt-2 text-xs text-white/50 underline">Retry</button>
         </div>
       ) : filtered.length === 0 ? (
         <div className="flex min-h-[30vh] items-center justify-center">
           <div className="space-y-3 text-center">
-            <p className="text-3xl">📦</p>
+            <p className="text-4xl">📦</p>
             <p className="text-sm font-medium text-white">No orders yet</p>
             <p className="text-xs text-white/30">Your orders will appear here</p>
-            <Link href="/products" className="inline-flex min-h-[36px] items-center rounded-xl cta-gradient px-4 text-xs font-bold text-white">Browse products</Link>
+            <Link href="/products" className="inline-flex min-h-[44px] items-center rounded-xl cta-gradient px-5 text-xs font-bold text-white">Browse products</Link>
           </div>
         </div>
       ) : (
-        <div className="space-y-1.5">
+        <div className="space-y-2.5">
           {filtered.map((order) => (
-            <OrderRow key={order.reference} order={order} />
+            <OrderCard key={order.reference} order={order} />
           ))}
           {hasMore && (
             <button
               onClick={() => setSize(size + 1)}
               disabled={isValidating}
-              className="flex w-full items-center justify-center rounded-xl border border-white/8 py-3 text-xs text-white/40 hover:text-white/60 disabled:opacity-40"
+              className="flex w-full min-h-[44px] items-center justify-center rounded-2xl border border-white/8 text-xs text-white/40 hover:text-white/60 disabled:opacity-40"
             >
               {isValidating ? "Loading…" : "Load more"}
             </button>
@@ -149,44 +193,51 @@ export default function OrdersPage() {
   );
 }
 
-function OrderRow({ order }: { order: OrderRecord }) {
-  const badge = STATUS_BADGE[order.status] || DEFAULT_BADGE;
+function OrderCard({ order }: { order: OrderRecord }) {
+  const cfg = STATUS_CFG[order.status] || DEFAULT_CFG;
   const items = order.items || [];
   const firstItem = items[0];
   const extraCount = Math.max(0, items.length - 1);
+  const showReview = order.status === "completed" || order.status === "delivered";
 
   return (
     <Link
       href={`/orders/${order.reference}`}
-      className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.02] px-3 py-3 transition hover:bg-white/[0.04] active:bg-white/[0.06]"
+      className="block rounded-2xl border border-white/8 bg-white/[0.02] p-3.5 transition active:bg-white/[0.06] hover:bg-white/[0.04]"
     >
-      {/* Info */}
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-white">{order.reference}</span>
-          <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${badge.bg} ${badge.text}`}>
-            <span>{badge.icon}</span>
-            <span>{badge.label}</span>
-          </span>
-          {(order.status === "completed" || order.status === "delivered") && (
-            <span className="inline-flex items-center gap-0.5 rounded-full border border-amber-400/20 bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold text-amber-200">
-              ⭐ Review
+      {/* Row 1: Reference + Status + Amount */}
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-[13px] font-bold text-white">{order.reference}</span>
+            <span className={`text-[10px] font-semibold ${cfg.color}`}>
+              {cfg.icon} {cfg.label}
             </span>
-          )}
+          </div>
+          <p className="mt-0.5 text-[10px] text-white/25">{relativeDate(order.createdAt)}</p>
         </div>
-        <p className="mt-0.5 truncate text-[10px] text-white/30">
-          {firstItem ? firstItem.title : "Order"}{extraCount > 0 ? ` +${extraCount} more` : ""}
-          {order.dropoffPostcode ? ` · ${order.dropoffPostcode}` : ""}
-        </p>
+        <span className="text-[15px] font-bold text-white">{GBP.format(order.totalAmount)}</span>
       </div>
 
-      {/* Amount + date */}
-      <div className="shrink-0 text-right">
-        <p className="text-sm font-bold text-white">{GBP.format(order.totalAmount)}</p>
-        <p className="text-[9px] text-white/25">{relativeDate(order.createdAt)}</p>
+      {/* Row 2: Progress dots */}
+      <div className="mt-2.5">
+        <MiniProgress step={cfg.step} />
       </div>
 
-      <span className="text-white/15">›</span>
+      {/* Row 3: Thumbnails + item summary + review badge */}
+      <div className="mt-2.5 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <ItemThumbs items={items} />
+          <p className="text-[11px] text-white/40">
+            {firstItem?.title || "Order"}{extraCount > 0 ? ` +${extraCount}` : ""}
+          </p>
+        </div>
+        {showReview && (
+          <span className="shrink-0 inline-flex items-center gap-0.5 rounded-full border border-amber-400/20 bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold text-amber-200">
+            ⭐ Review
+          </span>
+        )}
+      </div>
     </Link>
   );
 }
