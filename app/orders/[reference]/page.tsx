@@ -297,17 +297,20 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
       )}
 
       {/* Review prompt — only for completed orders */}
-      {(order.status === "completed" || order.status === "delivered") && order.items && order.items.length > 0 && (
+      {(order.status === "completed" || order.status === "delivered") && items.length > 0 && (
         <div className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-4">
           <p className="text-sm font-bold text-amber-200 mb-2">⭐ How was your order?</p>
           <p className="text-xs text-white/50 mb-3">Help other customers by leaving a review on the products you purchased.</p>
           <div className="flex flex-wrap gap-2">
-            {order.items.map((item: any, i: number) => (
-              <Link key={i} href={`/products/${item.slug || item.productSlug || '#'}#reviews`}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-amber-400/10 border border-amber-400/20 px-3 py-1.5 text-xs font-medium text-amber-200 hover:bg-amber-400/20 transition">
-                ⭐ Review {item.name || item.productName || 'Product'}
-              </Link>
-            ))}
+            {items.map((item: any, i: number) => {
+              const slug = item.slug || item.productSlug || (item.title || item.name || item.productName || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+              return (
+                <Link key={i} href={slug ? `/products/${slug}#reviews` : "/products"}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-amber-400/10 border border-amber-400/20 px-3 py-1.5 text-xs font-medium text-amber-200 hover:bg-amber-400/20 transition">
+                  ⭐ Review {item.title || item.name || item.productName || 'Product'}
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}
