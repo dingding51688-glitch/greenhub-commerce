@@ -219,16 +219,23 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
             </div>
           </div>
 
-          {/* Yodel tracking link */}
-          {order.trackingNumber && (
-            <a
-              href={`https://www.yodel.co.uk/track/${order.trackingNumber}`}
-              target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-400/20 bg-emerald-400/5 px-3 py-2 text-xs text-emerald-300 hover:bg-emerald-400/10 transition"
-            >
-              🔗 Track on Yodel →
-            </a>
-          )}
+          {/* Carrier tracking link */}
+          {order.trackingNumber && (() => {
+            const c = (order.carrier || "").toLowerCase();
+            const tn = order.trackingNumber;
+            let url = `https://www.yodel.co.uk/track/${tn}`;
+            let label = "Track on Yodel";
+            if (c.includes("inpost")) { url = `https://inpost.co.uk/track-and-trace?number=${tn}`; label = "Track on InPost"; }
+            else if (c.includes("royal") || c.includes("rm")) { url = `https://www.royalmail.com/track-your-item#/tracking-results/${tn}`; label = "Track on Royal Mail"; }
+            else if (c.includes("dpd")) { url = `https://www.dpd.co.uk/tracking/quicktrack?search=${tn}`; label = "Track on DPD"; }
+            else if (c.includes("evri") || c.includes("hermes")) { url = `https://www.evri.com/track-a-parcel/${tn}`; label = "Track on Evri"; }
+            return (
+              <a href={url} target="_blank" rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-400/20 bg-emerald-400/5 px-3 py-2 text-xs text-emerald-300 hover:bg-emerald-400/10 transition">
+                🔗 {label} →
+              </a>
+            );
+          })()}
 
           {/* Locker info if present */}
           {(order.lockerAddress || order.lockerAccessCode) && (
