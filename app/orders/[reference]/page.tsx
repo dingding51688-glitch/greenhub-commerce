@@ -9,6 +9,12 @@ import { ReviewModal } from "@/components/ReviewModal";
 import type { OrderRecord } from "@/lib/types";
 
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+const CMS = "https://cms.greenhub420.co.uk";
+function itemImg(path?: string | null) {
+  if (!path) return null;
+  if (path.startsWith("http")) return path;
+  return `${CMS}${path}`;
+}
 const DATE_FMT = new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" });
 
 const STATUS_STEP: Record<string, number> = {
@@ -157,21 +163,30 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
               return (
                 <div key={`${item.productId}-${item.weight}-${i}`}
                   className="rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2.5">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      {slug ? (
-                        <Link href={`/products/${slug}`} className="text-xs font-semibold text-white hover:text-amber-200 underline-offset-2 hover:underline transition-colors">
-                          {item.title || `Product #${item.productId}`}
-                        </Link>
-                      ) : (
-                        <p className="text-xs font-semibold text-white">{item.title || `Product #${item.productId}`}</p>
-                      )}
-                      <p className="text-[9px] text-white/30">
-                        {item.weight || "—"} × {item.quantity}
-                        {item.unitPrice ? ` · ${GBP.format(item.unitPrice)} each` : ""}
-                      </p>
+                  <div className="flex items-center gap-3">
+                    {itemImg(item.image) && (
+                      <Link href={slug ? `/products/${slug}` : "#"} className="shrink-0">
+                        <img src={itemImg(item.image)!} alt={item.title || ""} className="h-12 w-12 rounded-lg object-cover bg-white/5" />
+                      </Link>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          {slug ? (
+                            <Link href={`/products/${slug}`} className="text-xs font-semibold text-white hover:text-amber-200 underline-offset-2 hover:underline transition-colors">
+                              {item.title || `Product #${item.productId}`}
+                            </Link>
+                          ) : (
+                            <p className="text-xs font-semibold text-white">{item.title || `Product #${item.productId}`}</p>
+                          )}
+                          <p className="text-[9px] text-white/30">
+                            {item.weight || "—"} × {item.quantity}
+                            {item.unitPrice ? ` · ${GBP.format(item.unitPrice)} each` : ""}
+                          </p>
+                        </div>
+                        <p className="text-sm font-bold text-white">{GBP.format(item.lineTotal)}</p>
+                      </div>
                     </div>
-                    <p className="text-sm font-bold text-white">{GBP.format(item.lineTotal)}</p>
                   </div>
                   {showReview && item.productId && (
                     reviewedIds.has(item.productId) ? (

@@ -113,6 +113,7 @@ export type OrderItem = {
   productSlug?: string;
   name?: string;
   productName?: string;
+  image?: string | null;
   productId: number;
   title: string;
   quantity: number;
