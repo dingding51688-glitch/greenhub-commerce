@@ -152,10 +152,20 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
                 <p className="text-sm font-bold text-white">{GBP.format(item.lineTotal)}</p>
               </div>
             ))}
-            {/* Total row */}
-            <div className="flex items-center justify-between border-t border-white/5 pt-2 mt-1">
-              <span className="text-[10px] text-white/40">Total</span>
-              <span className="text-sm font-bold text-emerald-300">{GBP.format(order.totalAmount)}</span>
+            {/* Subtotal + Delivery + Total */}
+            <div className="border-t border-white/5 pt-2 mt-1 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-white/40">Subtotal</span>
+                <span className="text-xs text-white/60">{GBP.format(items.reduce((s, it) => s + (it.lineTotal || (it.unitPrice || 0) * (it.quantity || 1)), 0))}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-white/40">🚚 Delivery</span>
+                <span className="text-xs text-white/60">{GBP.format(order.deliveryFee ?? 5)}</span>
+              </div>
+              <div className="flex items-center justify-between pt-1 border-t border-white/5">
+                <span className="text-[10px] text-white/40 font-semibold">Order Total</span>
+                <span className="text-sm font-bold text-emerald-300">{GBP.format(order.totalAmount)}</span>
+              </div>
             </div>
           </div>
         )}
