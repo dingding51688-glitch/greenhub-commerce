@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { findOrderSummary, getOrderTracking } from "@/lib/orders-api";
+import { ReviewModal } from "@/components/ReviewModal";
 import type { OrderRecord } from "@/lib/types";
 
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
@@ -33,6 +34,8 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
   const [order, setOrder] = useState<OrderRecord | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [reviewItem, setReviewItem] = useState<{ productId: number; title: string } | null>(null);
+  const [reviewedIds, setReviewedIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (!token) return;
@@ -155,11 +158,16 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
                     </div>
                     <p className="text-sm font-bold text-white">{GBP.format(item.lineTotal)}</p>
                   </div>
-                  {showReview && slug && (
-                    <Link href={`/products/${slug}#reviews`}
-                      className="mt-2 inline-flex items-center gap-1 rounded-lg bg-amber-400/10 border border-amber-400/20 px-2.5 py-1 text-[10px] font-semibold text-amber-200 hover:bg-amber-400/20 transition">
-                      ⭐ Leave a review
-                    </Link>
+                  {showReview && item.productId && (
+                    reviewedIds.has(item.productId) ? (
+                      <p className="mt-2 text-[10px] text-emerald-400">✅ Review submitted!</p>
+                    ) : (
+                      <button
+                        onClick={() => setReviewItem({ productId: item.productId, title: item.title || `Product #${item.productId}` })}
+                        className="mt-2 inline-flex items-center gap-1 rounded-lg bg-amber-400/10 border border-amber-400/20 px-2.5 py-1 text-[10px] font-semibold text-amber-200 hover:bg-amber-400/20 transition">
+                        ⭐ Leave a review
+                      </button>
+                    )
                   )}
                 </div>
               );
@@ -319,6 +327,19 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
           All Orders
         </Link>
       </div>
+
+      {/* Review Modal */}
+      {reviewItem && (
+        <ReviewModal
+          productId={reviewItem.productId}
+          productName={reviewItem.title}
+          onClose={() => setReviewItem(null)}
+          onSuccess={() => {
+            setReviewedIds((prev) => new Set(prev).add(reviewItem.productId));
+            setReviewItem(null);
+          }}
+        />
+      )}
     </div>
   );
 }
