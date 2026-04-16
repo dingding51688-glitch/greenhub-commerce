@@ -131,3 +131,10 @@
     border-color: rgba(167,139,250,0.4);
   }
 }
+
+/* Prevent iOS Safari auto-zoom on input focus */
+@supports (-webkit-touch-callout: none) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}

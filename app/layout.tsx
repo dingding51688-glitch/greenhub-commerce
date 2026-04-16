@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
@@ -11,6 +11,13 @@ import PageTracker from "@/components/tracking/PageTracker";
 import { AgeGate } from "@/components/AgeGate";
 
 export const dynamic = "force-dynamic";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 const SITE_URL = "https://www.greenhub420.co.uk";
 const SITE_NAME = "Green Hub 420";
