@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Button from "@/components/ui/button";
 
 const schema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -13,8 +12,7 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-const inputClass =
-  "mt-1 w-full rounded-2xl border border-white/15 bg-transparent px-3 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40";
+const inputCls = "w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-base text-white outline-none placeholder:text-white/25 focus:border-emerald-400/40 focus:bg-white/[0.06] transition";
 
 export default function ForgotPasswordPage() {
   const [error, setError] = useState<string | null>(null);
@@ -50,45 +48,70 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <section className="mx-auto mt-10 max-w-md space-y-6 rounded-[40px] border border-white/10 bg-night-950/80 p-6 shadow-card">
-      <div className="space-y-2">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-ink-500">Account recovery</p>
-        <h1 className="text-3xl font-semibold text-white">Forgot password?</h1>
-        <p className="text-sm text-ink-400">
-          Enter the email you registered with and we&apos;ll send you a password reset link.
+    <div className="mx-auto w-full max-w-sm space-y-5 pb-8">
+      {/* Header */}
+      <div className="text-center">
+        <p className="text-4xl">🔑</p>
+        <h1 className="mt-2 text-xl font-bold text-white">Forgot Password?</h1>
+        <p className="mt-1 text-sm text-white/40">
+          Enter your email and we&apos;ll send a reset link
         </p>
       </div>
 
       {sent ? (
-        <div className="space-y-3 rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-100">
-          <p className="font-semibold text-emerald-200">✅ Check your email</p>
-          <p>If an account exists for that email, we&apos;ve sent a password reset link. Check your inbox (and spam folder).</p>
-          <Button asChild size="lg" className="w-full">
-            <Link href="/login">Back to login</Link>
-          </Button>
+        <div className="space-y-4 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-5">
+          <div className="text-center">
+            <p className="text-4xl">📧</p>
+            <p className="mt-2 text-base font-bold text-emerald-200">Check your email</p>
+            <p className="mt-1 text-sm text-emerald-200/70">
+              If an account exists for that email, we&apos;ve sent a password reset link. Check your inbox and spam folder.
+            </p>
+          </div>
+          <Link
+            href="/login"
+            className="flex w-full min-h-[48px] items-center justify-center rounded-xl cta-gradient text-sm font-bold text-white"
+          >
+            Back to Login
+          </Link>
         </div>
       ) : (
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
-          <label className="block text-xs uppercase tracking-[0.3em] text-ink-500">
-            Email address
-            <input type="email" {...register("email")} className={inputClass} placeholder="you@email.com" />
+          <div>
+            <label className="text-[10px] uppercase tracking-wider text-white/40">Email address</label>
+            <div className="mt-1">
+              <input
+                type="email"
+                {...register("email")}
+                className={inputCls}
+                placeholder="you@email.com"
+                autoComplete="email"
+              />
+            </div>
             {errors.email && <p className="mt-1 text-xs text-red-300">{errors.email.message}</p>}
-          </label>
+          </div>
 
-          {error && <p className="text-sm text-red-300">{error}</p>}
+          {error && (
+            <div className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
+              {error}
+            </div>
+          )}
 
-          <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Sending…" : "Send reset link"}
-          </Button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="flex w-full min-h-[52px] items-center justify-center rounded-xl cta-gradient text-base font-bold text-white disabled:opacity-40 active:scale-[0.98] transition"
+          >
+            {isSubmitting ? "Sending…" : "Send Reset Link"}
+          </button>
         </form>
       )}
 
-      <p className="text-sm text-ink-400">
-        Remember your password?{" "}
-        <Link className="text-white underline" href="/login">
-          Log in
+      {/* Back to login */}
+      <div className="text-center">
+        <Link href="/login" className="text-sm text-white/50 hover:text-white transition">
+          ← Back to login
         </Link>
-      </p>
-    </section>
+      </div>
+    </div>
   );
 }
