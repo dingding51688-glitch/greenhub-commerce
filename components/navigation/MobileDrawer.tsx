@@ -40,8 +40,7 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
   }, [open, token]);
 
   const go = (href: string) => { onClose(); router.push(href); };
-
-  const displayName = profile?.fullName || "Guest";
+  const displayName = profile?.fullName || "";
 
   return (
     <div className={clsx("fixed inset-0 z-40 transition duration-300", open ? "pointer-events-auto" : "pointer-events-none")}>
@@ -50,10 +49,10 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
         "absolute inset-y-0 right-0 flex w-[85vw] max-w-[340px] flex-col border-l border-white/10 bg-[#0a0a0a] shadow-2xl transition-transform duration-300",
         open ? "translate-x-0" : "translate-x-full"
       )}>
-        {/* Header — user info or sign in */}
+        {/* ── Header ── */}
         <div className="border-b border-white/8 px-5 py-4">
           <div className="flex items-center justify-between">
-            {isAuthenticated ? (
+            {isAuthenticated && displayName ? (
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-400/15 text-base font-bold text-emerald-300">
                   {displayName.charAt(0).toUpperCase()}
@@ -68,7 +67,7 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
             ) : (
               <div className="flex items-center gap-3">
                 <LogoMark size={28} />
-                <p className="text-xs text-white/40">Sign in to get started</p>
+                <span className="text-sm font-bold text-white">GREENHUB</span>
               </div>
             )}
             <button onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white" aria-label="Close">
@@ -78,22 +77,43 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {/* Main navigation */}
+          {/* ── 🔥 Earn Hub — 醒目推广卡片 ── */}
+          <div className="px-4 pt-4 pb-2">
+            <button onClick={() => go("/account/commission")}
+              className="relative w-full overflow-hidden rounded-2xl border border-emerald-400/30 bg-gradient-to-br from-emerald-500/20 via-emerald-400/10 to-transparent p-4 text-left active:scale-[0.98] transition">
+              {/* 背景装饰 */}
+              <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-emerald-400/10 blur-2xl" />
+              <div className="absolute -bottom-2 -left-2 h-16 w-16 rounded-full bg-emerald-400/5 blur-xl" />
+              <div className="relative">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-lg">💰</span>
+                  <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-300">15%+ Commission</span>
+                </div>
+                <p className="text-base font-bold text-white">Earn Hub</p>
+                <p className="mt-0.5 text-xs text-white/50">Invite friends &amp; earn on every order they place — for life</p>
+                <div className="mt-3 flex items-center gap-1.5 text-emerald-300">
+                  <span className="text-xs font-semibold">Start earning</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          {/* ── Quick actions (logged in) ── */}
           {isAuthenticated && (
-            <div className="px-3 py-3 space-y-0.5">
-              <MenuItem icon="📦" label="My Orders" desc="Track & manage" href="/orders" onClick={go} active={pathname === "/orders"} />
-              <MenuItem icon="💳" label="Wallet" desc={balance !== null ? `£${balance.toFixed(2)}` : "Top up & pay"} href="/wallet" onClick={go} active={pathname?.startsWith("/wallet")} />
-              <MenuItem icon="💰" label="Earn Hub" desc="Invite friends, earn commission" href="/account/commission" onClick={go} active={pathname === "/account/commission"} />
-              <MenuItem icon="🔔" label="Notifications" href="/account/notifications" onClick={go} active={pathname === "/account/notifications"}
-                badge={unreadCount > 0 ? (unreadCount > 99 ? "99+" : `${unreadCount}`) : undefined} />
-              <MenuItem icon="👤" label="Account" desc="Profile & settings" href="/account" onClick={go} active={pathname === "/account"} />
+            <div className="px-4 py-2">
+              <div className="grid grid-cols-3 gap-2">
+                <QuickAction emoji="📦" label="Orders" onClick={() => go("/orders")} />
+                <QuickAction emoji="💳" label="Wallet" onClick={() => go("/wallet")} />
+                <QuickAction emoji="🔔" label="Alerts" onClick={() => go("/account/notifications")} badge={unreadCount > 0 ? (unreadCount > 99 ? "99+" : `${unreadCount}`) : undefined} />
+              </div>
             </div>
           )}
 
-          {/* Shop */}
+          {/* ── Shop ── */}
           <div className="px-3 py-2">
             <p className="px-2 text-[9px] font-bold uppercase tracking-[0.3em] text-white/25 mb-1.5">Shop</p>
-            <div className="space-y-0.5">
+            <div className="grid grid-cols-2 gap-1.5">
               {[
                 { emoji: "🛍️", label: "All Products", href: "/products" },
                 { emoji: "🌿", label: "Flowers", href: "/products?category=flowers" },
@@ -106,22 +126,22 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
                 return (
                   <button key={cat.href} onClick={() => go(cat.href)}
                     className={clsx(
-                      "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition",
-                      isActive ? "bg-emerald-400/10 text-emerald-300" : "text-white/60 active:bg-white/[0.04]"
+                      "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition",
+                      isActive ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" : "border-white/6 bg-white/[0.02] text-white/60 active:bg-white/[0.05]"
                     )}>
                     <span className="text-base">{cat.emoji}</span>
-                    <span className="text-sm font-medium">{cat.label}</span>
+                    <span className="text-xs font-medium">{cat.label}</span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Cart shortcut */}
+          {/* ── Cart (if has items) ── */}
           {totalItems > 0 && (
             <div className="px-3 py-2">
               <button onClick={() => go("/cart")}
-                className="flex w-full items-center justify-between rounded-xl border border-emerald-400/20 bg-emerald-400/5 px-4 py-3">
+                className="flex w-full items-center justify-between rounded-xl border border-emerald-400/20 bg-emerald-400/5 px-4 py-3 active:scale-[0.98] transition">
                 <div className="flex items-center gap-3">
                   <span className="text-base">🛒</span>
                   <span className="text-sm font-semibold text-white">Cart</span>
@@ -131,18 +151,20 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
             </div>
           )}
 
-          {/* Help & info */}
+          {/* ── Account & Help ── */}
           <div className="px-3 py-2 border-t border-white/5">
-            <p className="px-2 text-[9px] font-bold uppercase tracking-[0.3em] text-white/25 mb-1.5">Help</p>
             <div className="space-y-0.5">
-              <MenuItem icon="📖" label="How It Works" href="/how-it-works" onClick={go} active={pathname === "/how-it-works"} />
-              <MenuItem icon="💬" label="Support" href="/support" onClick={go} active={pathname === "/support"} />
-              <MenuItem icon="❓" label="FAQ" href="/faq" onClick={go} active={pathname === "/faq"} />
+              {isAuthenticated && (
+                <NavRow icon="👤" label="Account" href="/account" onClick={go} active={pathname === "/account"} />
+              )}
+              <NavRow icon="📖" label="How It Works" href="/how-it-works" onClick={go} active={pathname === "/how-it-works"} />
+              <NavRow icon="💬" label="Support" href="/support" onClick={go} active={pathname === "/support"} />
+              <NavRow icon="❓" label="FAQ" href="/faq" onClick={go} active={pathname === "/faq"} />
             </div>
           </div>
         </div>
 
-        {/* Footer */}
+        {/* ── Footer ── */}
         <div className="border-t border-white/8 px-5 py-3">
           {isAuthenticated ? (
             <button onClick={() => { logout(); onClose(); router.push("/login"); }}
@@ -167,25 +189,34 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
   );
 }
 
-/* ── Menu Item ── */
-function MenuItem({ icon, label, desc, href, onClick, active, badge }: {
-  icon: string; label: string; desc?: string; href: string;
-  onClick: (href: string) => void; active?: boolean; badge?: string;
+/* ── Quick Action Button ── */
+function QuickAction({ emoji, label, onClick, badge }: {
+  emoji: string; label: string; onClick: () => void; badge?: string;
+}) {
+  return (
+    <button onClick={onClick}
+      className="relative flex flex-col items-center gap-1.5 rounded-xl border border-white/8 bg-white/[0.03] py-3 active:bg-white/[0.06] transition">
+      <span className="text-lg">{emoji}</span>
+      <span className="text-[10px] font-medium text-white/50">{label}</span>
+      {badge && (
+        <span className="absolute -right-1 -top-1 min-w-[16px] rounded-full bg-rose-500 px-1 text-[9px] font-bold leading-[16px] text-white text-center">{badge}</span>
+      )}
+    </button>
+  );
+}
+
+/* ── Nav Row ── */
+function NavRow({ icon, label, href, onClick, active }: {
+  icon: string; label: string; href: string; onClick: (h: string) => void; active?: boolean;
 }) {
   return (
     <button onClick={() => onClick(href)}
       className={clsx(
         "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition",
-        active ? "bg-white/[0.06] text-white" : "text-white/60 active:bg-white/[0.04]"
+        active ? "bg-white/[0.06] text-white" : "text-white/50 active:bg-white/[0.04]"
       )}>
       <span className="text-base">{icon}</span>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium">{label}</p>
-        {desc && <p className="text-[10px] text-white/30 truncate">{desc}</p>}
-      </div>
-      {badge && (
-        <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] font-bold text-white">{badge}</span>
-      )}
+      <span className="text-sm font-medium">{label}</span>
     </button>
   );
 }
