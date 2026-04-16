@@ -40,7 +40,7 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
   }, [open, token]);
 
   const go = (href: string) => { onClose(); router.push(href); };
-  const displayName = profile?.fullName || "";
+  const displayName = profile?.fullName || profile?.username || profile?.email?.split("@")[0] || "";
 
   return (
     <div className={clsx("fixed inset-0 z-40 transition duration-300", open ? "pointer-events-auto" : "pointer-events-none")}>
@@ -52,23 +52,20 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
         {/* ── Header ── */}
         <div className="border-b border-white/8 px-5 py-4">
           <div className="flex items-center justify-between">
-            {isAuthenticated && displayName ? (
+            {isAuthenticated ? (
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-400/15 text-base font-bold text-emerald-300">
-                  {displayName.charAt(0).toUpperCase()}
+                  {displayName ? displayName.charAt(0).toUpperCase() : "★"}
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-bold text-white">{displayName}</p>
+                  <p className="truncate text-sm font-bold text-white">{displayName || "Member"}</p>
                   <p className="text-xs font-semibold text-emerald-400">
                     {balance !== null ? `£${balance.toFixed(2)}` : "—"}
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-3">
-                <LogoMark size={28} />
-                <span className="text-sm font-bold text-white">GREENHUB</span>
-              </div>
+              <LogoMark size={32} />
             )}
             <button onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white" aria-label="Close">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
