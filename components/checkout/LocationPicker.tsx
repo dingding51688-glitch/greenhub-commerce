@@ -26,6 +26,7 @@ export default function LocationPicker({ postcode, onSelect, selected }: Props) 
   const [searched, setSearched] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState("");
+  const [showList, setShowList] = useState(true);
   const lastSearchRef = useRef("");
 
   // Auto-search when postcode is valid (5+ chars) or tab changes
@@ -141,8 +142,40 @@ export default function LocationPicker({ postcode, onSelect, selected }: Props) 
         </p>
       )}
 
-      {/* Results — top 3 by default */}
-      {visible.length > 0 && (
+      {/* Selected locker — collapsed view */}
+      {selected && !showList && results.length > 0 && (
+        <div className="rounded-xl border border-emerald-400/30 bg-emerald-400/[0.06] px-3 py-2.5">
+          <div className="flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-bold text-emerald-300 leading-snug">
+                ✓ {selected.type === "inpost_shop" ? "🏪" : "🔐"} {selected.name}
+              </p>
+              {selected.address && (
+                <p className="text-[10px] text-white/40 mt-0.5 leading-snug truncate">{selected.address}</p>
+              )}
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-[9px] text-emerald-300/50">{selected.opening}</span>
+                {selected.distance !== undefined && selected.distance > 0 && (
+                  <>
+                    <span className="text-[9px] text-white/10">·</span>
+                    <span className="text-[9px] text-white/30">{formatDist(selected.distance)}</span>
+                  </>
+                )}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowList(true)}
+              className="shrink-0 rounded-lg border border-white/15 px-2.5 py-1 text-[10px] font-medium text-white/50 active:bg-white/5"
+            >
+              Change
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Results list — shown when no selection or user clicked Change */}
+      {(showList || !selected) && visible.length > 0 && (
         <div className="space-y-1.5">
           {visible.map((loc) => {
             const isSel = selected?.id === loc.id;
@@ -150,7 +183,7 @@ export default function LocationPicker({ postcode, onSelect, selected }: Props) 
               <button
                 key={loc.id}
                 type="button"
-                onClick={() => onSelect(loc)}
+                onClick={() => { onSelect(loc); setShowList(false); }}
                 className={`w-full rounded-xl border px-3 py-2.5 text-left transition ${
                   isSel
                     ? "border-emerald-400/40 bg-emerald-400/10"
@@ -186,15 +219,6 @@ export default function LocationPicker({ postcode, onSelect, selected }: Props) 
               {expanded ? "Show less ↑" : `Show ${results.length - 3} more ↓`}
             </button>
           )}
-        </div>
-      )}
-
-      {/* Selected summary */}
-      {selected && !visible.find((l) => l.id === selected.id) && (
-        <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/5 px-3 py-2">
-          <p className="text-[9px] uppercase tracking-wider text-emerald-300/50 mb-0.5">Selected</p>
-          <p className="text-[11px] font-bold text-white">{selected.name}</p>
-          <p className="text-[9px] text-white/40">{selected.postcode}</p>
         </div>
       )}
     </div>
