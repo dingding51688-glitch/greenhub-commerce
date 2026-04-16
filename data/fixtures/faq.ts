@@ -22,14 +22,8 @@ const deliveryEntries: FaqEntry[] = [
   {
     id: "collection-window",
     question: "How long is the collection window?",
-    answer: "You have 48 hours to collect from the InPost locker. After that, the parcel is returned and we'll arrange a redelivery or credit.",
+    answer: "You have 72 hours to collect from the InPost locker. After that, the parcel is returned and we are not responsible for missed collections.",
     keywords: ["window", "pickup"]
-  },
-  {
-    id: "missed-pickup",
-    question: "What if I miss the pickup?",
-    answer: "Contact support via the website or Telegram. We can arrange a redelivery to the same or a different locker.",
-    keywords: ["miss", "pickup"]
   },
   {
     id: "locker-how",
@@ -58,8 +52,8 @@ const deliveryEntries: FaqEntry[] = [
   {
     id: "locker-collect-time",
     question: "How long do I have to collect?",
-    answer: "You have 48 hours from the time we notify you that your order is ready. After that, the parcel is returned to our hub and we'll arrange a re-delivery or refund.",
-    keywords: ["locker", "collect", "time", "48 hours"]
+    answer: "You have 72 hours from the time we notify you that your order is ready. After that, the parcel is returned and we are not responsible for missed collections.",
+    keywords: ["locker", "collect", "time", "72 hours"]
   },
   {
     id: "locker-choose",
@@ -103,12 +97,7 @@ const orderEntries: FaqEntry[] = [
     answer: "Yes—reply to the SMS or message Telegram @greenhub_support with the new postcode. We need roughly 2 hours' notice to reassign.",
     keywords: ["change", "delivery"]
   },
-  {
-    id: "damaged",
-    question: "What if the parcel looks tampered?",
-    answer: "Take photos and contact support immediately with your order reference. The team will inspect and issue a refund or redelivery.",
-    keywords: ["damaged", "parcel"]
-  }
+
 ];
 
 const balanceEntries: FaqEntry[] = [
