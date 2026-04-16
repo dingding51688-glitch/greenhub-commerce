@@ -1,19 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import useSWR from "swr";
-import Button from "@/components/ui/button";
-import Card from "@/components/ui/card";
 import { ProductCard } from "@/components/ProductCard";
 import { StateMessage } from "@/components/StateMessage";
+import { Skeleton } from "@/components/Skeleton";
 import type { ProductRecord } from "@/lib/types";
 import { searchProducts } from "@/lib/search-api";
 
 const RECENT_KEY = "gh_recent_searches";
 const strainOptions = ["Hybrid", "Indica", "Sativa", "CBD"];
 const potencyOptions = ["Balanced", "Medium", "Strong", "Ultra"];
-const thcOptions = ["18%", "20%", "25%", "30%"];
 
 export default function SearchPage() {
   const router = useRouter();
@@ -21,23 +19,20 @@ export default function SearchPage() {
   const initialQ = params?.get("q") ?? "";
   const [query, setQuery] = useState(initialQ);
   const [activeQuery, setActiveQuery] = useState(initialQ);
-  const [filters, setFilters] = useState({ strain: "", potency: "", thc: "" });
+  const [filters, setFilters] = useState({ strain: "", potency: "" });
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(RECENT_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          setRecentSearches(parsed as string[]);
-        }
-      } catch (error) {
-        console.warn("Unable to parse recent searches", error);
-      }
-    }
+    try {
+      const stored = window.localStorage.getItem(RECENT_KEY);
+      if (stored) setRecentSearches(JSON.parse(stored));
+    } catch {}
   }, []);
+
+  // Auto-focus search input on mount
+  useEffect(() => { inputRef.current?.focus(); }, []);
 
   useEffect(() => {
     const q = params?.get("q") ?? "";
@@ -46,10 +41,8 @@ export default function SearchPage() {
   }, [params]);
 
   const swrKey = useMemo(() => {
-    if (!activeQuery && !filters.strain && !filters.potency && !filters.thc) {
-      return null;
-    }
-    return ["product-search", activeQuery, filters.strain, filters.potency, filters.thc];
+    if (!activeQuery && !filters.strain && !filters.potency) return null;
+    return ["product-search", activeQuery, filters.strain, filters.potency];
   }, [activeQuery, filters]);
 
   const { data, error, isLoading, mutate } = useSWR<ProductRecord[]>(swrKey, () =>
@@ -57,12 +50,11 @@ export default function SearchPage() {
       q: activeQuery,
       strain: filters.strain || undefined,
       potency: filters.potency || undefined,
-      thc: filters.thc || undefined
     })
   );
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     const trimmed = query.trim();
     setActiveQuery(trimmed);
     if (trimmed) {
@@ -73,7 +65,7 @@ export default function SearchPage() {
 
   const saveRecent = (term: string) => {
     if (typeof window === "undefined" || !term) return;
-    const next = [term, ...recentSearches.filter((item) => item !== term)].slice(0, 5);
+    const next = [term, ...recentSearches.filter((i) => i !== term)].slice(0, 5);
     setRecentSearches(next);
     window.localStorage.setItem(RECENT_KEY, JSON.stringify(next));
   };
@@ -85,159 +77,144 @@ export default function SearchPage() {
     router.replace(`/search?q=${encodeURIComponent(term)}`);
   };
 
-  const hasQueryOrFilter = Boolean(activeQuery || filters.strain || filters.potency || filters.thc);
+  const clearRecent = () => {
+    setRecentSearches([]);
+    if (typeof window !== "undefined") window.localStorage.removeItem(RECENT_KEY);
+  };
 
+  const hasQueryOrFilter = Boolean(activeQuery || filters.strain || filters.potency);
   const results = data ?? [];
 
-  return (
-    <section className="space-y-8">
-      <header className="rounded-3xl border border-white/10 bg-night-950/80 p-6">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/50">Search</p>
-        <h1 className="text-3xl font-semibold text-white">Find a product</h1>
-        <p className="mt-2 text-sm text-white/60">Search by name, strain, or THC potency. Filters refine results in real time.</p>
-        <form className="mt-4 flex flex-col gap-3 sm:flex-row" onSubmit={handleSubmit}>
-          <input
-            type="search"
-            placeholder="Search strain, category, terp profile…"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            className="flex-1 rounded-2xl border border-white/15 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/40"
-          />
-          <Button type="submit" className="w-full sm:w-auto">
-            Search products
-          </Button>
-        </form>
-        {recentSearches.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2 text-xs text-white/60">
-            <span className="uppercase tracking-[0.3em] text-white/30">Recent</span>
-            {recentSearches.map((term) => (
-              <button
-                key={term}
-                className="rounded-full border border-white/15 px-3 py-1 text-white/70 transition hover:border-white/50"
-                onClick={() => applyRecent(term)}
-              >
-                {term}
-              </button>
-            ))}
-          </div>
-        )}
-      </header>
-
-      <FilterPanel filters={filters} setFilters={setFilters} />
-
-      {!hasQueryOrFilter && (
-        <Card className="border border-dashed border-white/15 bg-night-950/50 p-6 text-sm text-white/60">
-          Type a search query or apply a filter to see results.
-        </Card>
-      )}
-
-      {hasQueryOrFilter && (
-        <div className="space-y-4">
-          {isLoading && (
-            <div className="grid gap-4 md:grid-cols-2">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="h-64 animate-pulse rounded-3xl bg-white/5" />
-              ))}
-            </div>
-          )}
-          {error && (
-            <StateMessage
-              variant="error"
-              title="Unable to search products"
-              body={error.message}
-              actionLabel="Retry"
-              onAction={() => mutate()}
-            />
-          )}
-          {!isLoading && !error && results.length === 0 && (
-            <StateMessage
-              variant="empty"
-              title="No products match your filters"
-              body="Try a different keyword or reset the filters."
-              actionLabel="Reset filters"
-              onAction={() => {
-                setFilters({ strain: "", potency: "", thc: "" });
-                setActiveQuery("");
-                setQuery("");
-                router.replace("/search");
-              }}
-            />
-          )}
-          {!isLoading && !error && results.length > 0 && (
-            <div className="grid gap-4 md:grid-cols-2">
-              {results.map((product) => (
-                <ProductCard key={product.documentId} product={product} variant="list" />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-    </section>
-  );
-}
-
-type FilterPanelProps = {
-  filters: { strain: string; potency: string; thc: string };
-  setFilters: React.Dispatch<React.SetStateAction<{ strain: string; potency: string; thc: string }>>;
-};
-
-function FilterPanel({ filters, setFilters }: FilterPanelProps) {
-  const toggleValue = (key: keyof typeof filters, value: string) => {
+  const toggleFilter = (key: "strain" | "potency", value: string) => {
     setFilters((prev) => ({ ...prev, [key]: prev[key] === value ? "" : value }));
   };
 
   return (
-    <Card className="space-y-4 border border-white/10 bg-night-950/70 p-6">
-      <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-white/50">Strain</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {strainOptions.map((option) => (
-            <Chip key={option} active={filters.strain === option} onClick={() => toggleValue("strain", option)}>
-              {option}
-            </Chip>
-          ))}
+    <div className="space-y-4 pb-24">
+      {/* Search bar */}
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <div className="relative flex-1">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+          <input
+            ref={inputRef}
+            type="search"
+            placeholder="Search products..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full rounded-xl border border-white/10 bg-white/[0.04] pl-10 pr-4 py-3 text-base text-white outline-none placeholder:text-white/25 focus:border-emerald-400/40 transition"
+          />
+          {query && (
+            <button type="button" onClick={() => { setQuery(""); setActiveQuery(""); inputRef.current?.focus(); }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 active:text-white/60">✕</button>
+          )}
         </div>
-      </div>
-      <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-white/50">Potency</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {potencyOptions.map((option) => (
-            <Chip key={option} active={filters.potency === option} onClick={() => toggleValue("potency", option)}>
-              {option}
-            </Chip>
-          ))}
-        </div>
-      </div>
-      <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-white/50">THC</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {thcOptions.map((option) => (
-            <Chip key={option} active={filters.thc === option} onClick={() => toggleValue("thc", option)}>
-              {option}
-            </Chip>
-          ))}
-        </div>
-      </div>
-    </Card>
-  );
-}
+        <button type="submit"
+          className="shrink-0 rounded-xl cta-gradient px-4 min-h-[44px] text-sm font-bold text-white active:scale-[0.98]">
+          Search
+        </button>
+      </form>
 
-type ChipProps = {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-};
+      {/* Quick filters */}
+      <div className="space-y-2">
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
+          {strainOptions.map((s) => (
+            <button key={s} type="button" onClick={() => toggleFilter("strain", s)}
+              className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                filters.strain === s
+                  ? "bg-emerald-400/15 text-emerald-300 border border-emerald-400/30"
+                  : "bg-white/[0.04] text-white/50 border border-white/8"
+              }`}>
+              {s}
+            </button>
+          ))}
+          <span className="text-white/10 self-center">|</span>
+          {potencyOptions.map((p) => (
+            <button key={p} type="button" onClick={() => toggleFilter("potency", p)}
+              className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                filters.potency === p
+                  ? "bg-emerald-400/15 text-emerald-300 border border-emerald-400/30"
+                  : "bg-white/[0.04] text-white/50 border border-white/8"
+              }`}>
+              {p}
+            </button>
+          ))}
+        </div>
+      </div>
 
-function Chip({ active, onClick, children }: ChipProps) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full px-4 py-2 text-sm transition ${
-        active ? "border border-white text-white" : "border border-white/20 text-white/70 hover:border-white/60"
-      }`}
-    >
-      {children}
-    </button>
+      {/* Recent searches */}
+      {!hasQueryOrFilter && recentSearches.length > 0 && (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] uppercase tracking-wider text-white/40">Recent</p>
+            <button onClick={clearRecent} className="text-[10px] text-white/25 active:text-white/40">Clear</button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {recentSearches.map((term) => (
+              <button key={term} onClick={() => applyRecent(term)}
+                className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-white/60 active:bg-white/[0.08]">
+                🔍 {term}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!hasQueryOrFilter && recentSearches.length === 0 && (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8 text-center">
+          <p className="text-3xl">🔍</p>
+          <p className="mt-2 text-sm font-medium text-white/60">Search for products</p>
+          <p className="mt-1 text-xs text-white/30">By name, strain, or use the filters above</p>
+        </div>
+      )}
+
+      {/* Loading */}
+      {isLoading && (
+        <div className="grid grid-cols-2 gap-2.5">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="aspect-[3/4] rounded-2xl" />
+          ))}
+        </div>
+      )}
+
+      {/* Error */}
+      {error && !isLoading && (
+        <StateMessage
+          variant="error"
+          title="Search failed"
+          body={error.message}
+          actionLabel="Retry"
+          onAction={() => mutate()}
+        />
+      )}
+
+      {/* No results */}
+      {hasQueryOrFilter && !isLoading && !error && results.length === 0 && (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-center">
+          <p className="text-3xl">😔</p>
+          <p className="mt-2 text-sm font-medium text-white/60">No products found</p>
+          <p className="mt-1 text-xs text-white/30">Try a different keyword or reset filters</p>
+          <button onClick={() => { setFilters({ strain: "", potency: "" }); setActiveQuery(""); setQuery(""); }}
+            className="mt-3 rounded-xl border border-white/10 px-4 py-2 text-xs text-white/50 active:bg-white/5">
+            Reset all
+          </button>
+        </div>
+      )}
+
+      {/* Results */}
+      {hasQueryOrFilter && !isLoading && !error && results.length > 0 && (
+        <>
+          <p className="text-[10px] uppercase tracking-wider text-white/30">{results.length} results</p>
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
+            {results.map((product) => (
+              <ProductCard key={product.documentId} product={product} variant="compact" />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
   );
 }

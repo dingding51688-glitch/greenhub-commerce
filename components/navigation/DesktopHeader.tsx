@@ -171,6 +171,13 @@ export function DesktopHeader() {
             )}
           </nav>
           <div className="flex items-center gap-2">
+            {/* Search — visible on mobile */}
+            <IconButton onClick={() => router.push("/search")} label="Search">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={iconStroke}>
+                <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.5" />
+                <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </IconButton>
             <span className="hidden sm:flex items-center gap-2">
               <IconButton onClick={() => router.push("/account/notifications")} label="Notifications" badge={notificationBadge}>
                 <BellIcon className={iconStroke} />
