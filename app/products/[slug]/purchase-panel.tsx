@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useCart } from "@/components/providers/CartProvider";
 import type { ProductRecord, WeightOption } from "@/lib/types";
 
@@ -36,8 +36,7 @@ function savePct(options: WeightOption[], current: WeightOption): number | null 
 }
 
 export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
-  const router = useRouter();
-  const { addItem } = useCart();
+  const { addItem, totalItems } = useCart();
   const outOfStock = product.inStock === false;
   const options = (product.weightOptions?.length ? product.weightOptions : FALLBACK).slice(0, 4);
   const firstInStock = options.find((o) => o.stock !== 0);
@@ -60,7 +59,11 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
       quantity: qty,
     });
     setAdded(true);
-    setTimeout(() => router.push("/cart"), 600);
+  };
+
+  const handleAddMore = () => {
+    setAdded(false);
+    setQty(1);
   };
 
   if (outOfStock) {
@@ -80,138 +83,165 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
 
   return (
     <div className="space-y-4">
+      {/* ── Success toast ── */}
+      {added && (
+        <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 space-y-3 animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-400/20">
+              <span className="text-lg">✅</span>
+            </div>
+            <div>
+              <p className="text-sm font-bold text-emerald-200">Added to cart!</p>
+              <p className="text-xs text-emerald-200/60">{product.title} · {selected?.label} × {qty}</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Link
+              href="/cart"
+              className="flex flex-1 min-h-[44px] items-center justify-center rounded-xl cta-gradient text-sm font-bold text-white active:scale-[0.98]"
+            >
+              Go to Cart ({totalItems})
+            </Link>
+            <button
+              onClick={handleAddMore}
+              className="flex flex-1 min-h-[44px] items-center justify-center rounded-xl border border-white/15 text-sm font-medium text-white/70 active:scale-[0.98]"
+            >
+              Add More
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ── Weight Selector ── */}
-      <div className="rounded-2xl bg-[#1C1C1E] p-5 space-y-4">
-        <p className="text-sm font-bold uppercase tracking-wider text-neutral-400">Choose Weight</p>
+      {!added && (
+        <>
+          <div className="rounded-2xl bg-[#1C1C1E] p-5 space-y-4">
+            <p className="text-sm font-bold uppercase tracking-wider text-neutral-400">Choose Weight</p>
 
-        <div className="space-y-2.5">
-          {options.map((o) => {
-            const active = selected?.id === o.id;
-            const soldOut = o.stock === 0;
-            const popular = o.featured || o.label.toLowerCase().includes("28");
-            const save = savePct(options, o);
+            <div className="space-y-2.5">
+              {options.map((o) => {
+                const active = selected?.id === o.id;
+                const soldOut = o.stock === 0;
+                const popular = o.featured || o.label.toLowerCase().includes("28");
+                const save = savePct(options, o);
 
-            return (
+                return (
+                  <button
+                    key={o.id}
+                    onClick={() => !soldOut && setSelectedId(o.id)}
+                    disabled={soldOut}
+                    className={clsx(
+                      "relative flex w-full items-center justify-between rounded-2xl border-2 px-5 py-4 transition-all",
+                      soldOut
+                        ? "border-neutral-700 bg-[#252528] opacity-40 cursor-not-allowed"
+                        : active
+                          ? "border-emerald-400 bg-emerald-500/10"
+                          : "border-transparent bg-[#252528] hover:border-neutral-600 hover:bg-[#2A2A2D]"
+                    )}
+                  >
+                    {/* Left side */}
+                    <div className="flex items-center gap-4">
+                      {/* Radio */}
+                      <div className={clsx(
+                        "h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0 transition",
+                        active ? "border-emerald-400 bg-emerald-400/10" : "border-neutral-500"
+                      )}>
+                        {active && <div className="h-3 w-3 rounded-full bg-emerald-400" />}
+                      </div>
+
+                      <div className="text-left">
+                        <div className="flex items-center gap-2">
+                          <span className={clsx(
+                            "text-xl font-extrabold tracking-tight",
+                            soldOut ? "text-neutral-500 line-through" : "text-white"
+                          )}>
+                            {o.label}
+                          </span>
+                          {popular && !soldOut && (
+                            <span className="rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-300">
+                              🔥 Popular
+                            </span>
+                          )}
+                          {save && !soldOut && (
+                            <span className="rounded-full bg-emerald-400/15 px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-emerald-300">
+                              Save {save}%
+                            </span>
+                          )}
+                          {soldOut && (
+                            <span className="rounded-full bg-red-500/20 px-2.5 py-0.5 text-[10px] font-bold uppercase text-red-400">
+                              Sold Out
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-0.5 text-sm text-neutral-400">{getUnitPrice(o)}</p>
+                      </div>
+                    </div>
+
+                    {/* Right: price */}
+                    <span className={clsx(
+                      "text-2xl font-extrabold tabular-nums",
+                      soldOut ? "text-neutral-600 line-through" : active ? "text-emerald-400" : "text-white"
+                    )}>
+                      £{o.price.toFixed(0)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── Quantity + Total + Add to Cart ── */}
+          <div className="rounded-2xl bg-[#1C1C1E] p-5 space-y-4">
+            {/* Quantity */}
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-bold uppercase tracking-wider text-neutral-400">Quantity</p>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setQty((q) => Math.max(MIN_QTY, q - 1))}
+                  disabled={qty === MIN_QTY}
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-[#252528] text-lg font-bold text-white transition hover:bg-[#303033] disabled:opacity-20"
+                >−</button>
+                <span className="w-8 text-center text-2xl font-extrabold text-white tabular-nums">{qty}</span>
+                <button
+                  onClick={() => setQty((q) => Math.min(MAX_QTY, q + 1))}
+                  disabled={qty === MAX_QTY}
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-[#252528] text-lg font-bold text-white transition hover:bg-[#303033] disabled:opacity-20"
+                >+</button>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="h-px bg-neutral-700/50" />
+
+            {/* Total + CTA */}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">Total</p>
+                <p className="text-4xl font-extrabold text-emerald-400 tabular-nums">
+                  £{((selected?.price ?? 0) * qty).toFixed(0)}
+                </p>
+                {qty > 1 && selected && (
+                  <p className="mt-0.5 text-sm text-neutral-500">{qty} × £{selected.price.toFixed(0)}</p>
+                )}
+              </div>
+
               <button
-                key={o.id}
-                onClick={() => !soldOut && setSelectedId(o.id)}
-                disabled={soldOut}
+                onClick={handleAdd}
+                disabled={!selected || selectedSoldOut}
                 className={clsx(
-                  "relative flex w-full items-center justify-between rounded-2xl border-2 px-5 py-4 transition-all",
-                  soldOut
-                    ? "border-neutral-700 bg-[#252528] opacity-40 cursor-not-allowed"
-                    : active
-                      ? "border-emerald-400 bg-emerald-500/10"
-                      : "border-transparent bg-[#252528] hover:border-neutral-600 hover:bg-[#2A2A2D]"
+                  "flex min-h-[56px] min-w-[170px] items-center justify-center gap-2 rounded-2xl text-base font-bold uppercase tracking-wider transition-all",
+                  selectedSoldOut
+                    ? "bg-neutral-700 text-neutral-500 cursor-not-allowed"
+                    : "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 hover:shadow-emerald-500/40 active:scale-[0.97]"
                 )}
               >
-                {/* Left side */}
-                <div className="flex items-center gap-4">
-                  {/* Radio */}
-                  <div className={clsx(
-                    "h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0 transition",
-                    active ? "border-emerald-400 bg-emerald-400/10" : "border-neutral-500"
-                  )}>
-                    {active && <div className="h-3 w-3 rounded-full bg-emerald-400" />}
-                  </div>
-
-                  <div className="text-left">
-                    <div className="flex items-center gap-2">
-                      <span className={clsx(
-                        "text-xl font-extrabold tracking-tight",
-                        soldOut ? "text-neutral-500 line-through" : "text-white"
-                      )}>
-                        {o.label}
-                      </span>
-                      {popular && !soldOut && (
-                        <span className="rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-300">
-                          🔥 Popular
-                        </span>
-                      )}
-                      {save && !soldOut && (
-                        <span className="rounded-full bg-emerald-400/15 px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-emerald-300">
-                          Save {save}%
-                        </span>
-                      )}
-                      {soldOut && (
-                        <span className="rounded-full bg-red-500/20 px-2.5 py-0.5 text-[10px] font-bold uppercase text-red-400">
-                          Sold Out
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-0.5 text-sm text-neutral-400">{getUnitPrice(o)}</p>
-                  </div>
-                </div>
-
-                {/* Right: price */}
-                <span className={clsx(
-                  "text-2xl font-extrabold tabular-nums",
-                  soldOut ? "text-neutral-600 line-through" : active ? "text-emerald-400" : "text-white"
-                )}>
-                  £{o.price.toFixed(0)}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── Quantity + Total + Add to Cart ── */}
-      <div className="rounded-2xl bg-[#1C1C1E] p-5 space-y-4">
-        {/* Quantity */}
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-bold uppercase tracking-wider text-neutral-400">Quantity</p>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setQty((q) => Math.max(MIN_QTY, q - 1))}
-              disabled={qty === MIN_QTY}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#252528] text-lg font-bold text-white transition hover:bg-[#303033] disabled:opacity-20"
-            >−</button>
-            <span className="w-8 text-center text-2xl font-extrabold text-white tabular-nums">{qty}</span>
-            <button
-              onClick={() => setQty((q) => Math.min(MAX_QTY, q + 1))}
-              disabled={qty === MAX_QTY}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#252528] text-lg font-bold text-white transition hover:bg-[#303033] disabled:opacity-20"
-            >+</button>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="h-px bg-neutral-700/50" />
-
-        {/* Total + CTA */}
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">Total</p>
-            <p className="text-4xl font-extrabold text-emerald-400 tabular-nums">
-              £{((selected?.price ?? 0) * qty).toFixed(0)}
-            </p>
-            {qty > 1 && selected && (
-              <p className="mt-0.5 text-sm text-neutral-500">{qty} × £{selected.price.toFixed(0)}</p>
-            )}
-          </div>
-
-          <button
-            onClick={handleAdd}
-            disabled={!selected || added || selectedSoldOut}
-            className={clsx(
-              "flex min-h-[56px] min-w-[170px] items-center justify-center gap-2 rounded-2xl text-base font-bold uppercase tracking-wider transition-all",
-              added
-                ? "bg-emerald-500/20 text-emerald-300"
-                : selectedSoldOut
-                  ? "bg-neutral-700 text-neutral-500 cursor-not-allowed"
-                  : "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-400 hover:shadow-emerald-500/40 active:scale-[0.97]"
-            )}
-          >
-            {added ? "✓ Added" : selectedSoldOut ? "Sold Out" : (
-              <>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                 Add to Cart
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Shipping info */}
       <div className="rounded-2xl bg-[#1C1C1E] px-5 py-4 text-sm text-neutral-400 space-y-1.5">
