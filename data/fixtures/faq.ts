@@ -142,7 +142,7 @@ const referralEntries: FaqEntry[] = [
   {
     id: "referral-rewards",
     question: "How much do I earn?",
-    answer: "You earn 10% commission on every order your referred friends place. Commission is credited to your wallet instantly after each order.",
+    answer: "You earn at least 15% commission on every order your referred friends place. Commission is credited to your wallet instantly after each order.",
     keywords: ["commission", "rewards", "percent"]
   },
   {
