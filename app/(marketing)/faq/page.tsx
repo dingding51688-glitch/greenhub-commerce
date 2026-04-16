@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import Button from "@/components/ui/button";
-import Input from "@/components/ui/input";
 import { faqCategories, flatFaqEntries } from "@/data/fixtures/faq";
 
 export default function FaqPage() {
@@ -15,123 +13,144 @@ export default function FaqPage() {
   const initialCategory = searchParams?.get("category") || "all";
   const [category, setCategory] = useState(initialCategory);
   const [query, setQuery] = useState("");
+  const [openId, setOpenId] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    setCategory(initialCategory);
-  }, [initialCategory]);
+  useEffect(() => { setCategory(initialCategory); }, [initialCategory]);
 
   const entries = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const q = query.trim().toLowerCase();
     const source = category === "all"
       ? flatFaqEntries
-      : flatFaqEntries.filter((entry: any) => entry.category === category);
-    if (!normalizedQuery) return source;
-    return source.filter((entry) =>
-      entry.question.toLowerCase().includes(normalizedQuery) ||
-      entry.answer.toLowerCase().includes(normalizedQuery) ||
-      entry.keywords?.some((keyword) => keyword.toLowerCase().includes(normalizedQuery))
+      : flatFaqEntries.filter((e: any) => e.category === category);
+    if (!q) return source;
+    return source.filter((e) =>
+      e.question.toLowerCase().includes(q) ||
+      e.answer.toLowerCase().includes(q) ||
+      e.keywords?.some((k: string) => k.toLowerCase().includes(q))
     );
   }, [category, query]);
 
-  const topCards = entries.slice(0, 3);
-
-  const handleCategoryChange = (nextCategory: string) => {
-    setCategory(nextCategory);
+  const handleCategoryChange = (next: string) => {
+    setCategory(next);
+    setOpenId(null);
     const params = new URLSearchParams(searchParams?.toString());
-    if (nextCategory === "all") {
-      params.delete("category");
-    } else {
-      params.set("category", nextCategory);
-    }
+    if (next === "all") params.delete("category");
+    else params.set("category", next);
     router.replace(params.toString() ? `${pathname}?${params.toString()}` : pathname, { scroll: false });
   };
 
   return (
-    <section className="space-y-10 pb-20">
-      <header className="rounded-[40px] border border-white/10 bg-night-950/80 px-6 py-10 text-white sm:px-12">
-        <p className="text-xs uppercase tracking-[0.35em] text-white/50">FAQ</p>
-        <h1 className="mt-2 text-4xl font-semibold">Help center</h1>
-        <p className="mt-2 text-lg text-white/70">Search or browse by topic. Links below open guides, payment walkthroughs, and support threads.</p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          {faqCategories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => handleCategoryChange(cat.id)}
-              className={`rounded-full border px-4 py-2 text-sm transition ${
-                category === cat.id ? "border-white bg-white/10 text-white" : "border-white/15 text-white/70 hover:border-white/40"
-              }`}
-            >
-              {cat.title}
-            </button>
-          ))}
-        </div>
-        <div className="mt-6 max-w-2xl">
-          <Input
-            placeholder="Search delivery, payment, referral questions..."
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-        </div>
-      </header>
+    <div className="space-y-4 pb-24">
+      {/* Header */}
+      <div>
+        <h1 className="text-xl font-bold text-white">Help Center</h1>
+        <p className="mt-1 text-xs text-white/40">Find answers to common questions</p>
+      </div>
 
-      <TopFaqCards cards={topCards} category={category} />
-
-      <section className="space-y-4 rounded-3xl border border-white/10 bg-night-950/70 p-6">
-        <p className="text-xs uppercase tracking-[0.35em] text-white/50">All questions</p>
-        {entries.length === 0 ? (
-          <p className="text-sm text-white/60">No results. Try a different keyword or browse the delivery/payment guides.</p>
-        ) : (
-          <div className="space-y-3">
-            {entries.map((entry) => (
-              <details key={entry.id} id={entry.id} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/80">
-                <summary className="cursor-pointer text-lg font-semibold text-white">{entry.question}</summary>
-                <p className="mt-2 text-sm text-white/70">{entry.answer}</p>
-              </details>
-            ))}
-          </div>
+      {/* Search */}
+      <div className="relative">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+        <input
+          ref={inputRef}
+          type="text"
+          placeholder="Search questions..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="w-full rounded-xl border border-white/10 bg-white/[0.04] pl-10 pr-10 py-3 text-base text-white outline-none placeholder:text-white/25 focus:border-emerald-400/40 transition"
+        />
+        {query && (
+          <button onClick={() => { setQuery(""); inputRef.current?.focus(); }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 active:text-white/60">✕</button>
         )}
-      </section>
+      </div>
 
-      <section className="rounded-3xl border border-white/10 bg-night-950/80 p-6 text-white">
-        <h2 className="text-2xl font-semibold">Still unsure?</h2>
-        <p className="mt-2 text-sm text-white/70">Share screenshots + Transfer ID with support. Delivery issues, payments, or referrals — one URL for all support flows.</p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Button asChild>
-            <Link href="/support">Contact support</Link>
-          </Button>
-          <Button asChild variant="secondary">
-            <Link href="/how-it-works">Getting started</Link>
-          </Button>
-          <Button asChild variant="ghost">
-            <Link href="/guide/payment">Payment guide</Link>
-          </Button>
-        </div>
-      </section>
-    </section>
-  );
-}
-
-type TopCardProps = {
-  cards: any[];
-  category: string;
-};
-
-function TopFaqCards({ cards, category }: TopCardProps) {
-  if (!cards.length) return null;
-  return (
-    <section className="space-y-4 rounded-[32px] border border-white/10 bg-card p-6 shadow-card">
-      <p className="text-xs uppercase tracking-[0.35em] text-white/50">Top {category === "all" ? "questions" : faqCategories.find((c) => c.id === category)?.title}</p>
-      <div className="grid gap-4 md:grid-cols-3">
-        {cards.map((card) => (
-          <div key={card.id} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/80">
-            <p className="text-lg font-semibold text-white">{card.question}</p>
-            <p className="mt-2 text-sm text-white/70">{card.answer.substring(0, 160)}...</p>
-            <Button asChild variant="ghost" size="sm" className="mt-3">
-              <a href={`#${card.id}`}>View answer</a>
-            </Button>
-          </div>
+      {/* Category tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 snap-x snap-mandatory">
+        {faqCategories.map((cat) => (
+          <button
+            key={cat.id}
+            onClick={() => handleCategoryChange(cat.id)}
+            className={`shrink-0 snap-start rounded-full px-3.5 py-1.5 text-xs font-medium transition whitespace-nowrap ${
+              category === cat.id
+                ? "bg-emerald-400/15 text-emerald-300 border border-emerald-400/30"
+                : "bg-white/[0.04] text-white/50 border border-white/8"
+            }`}
+          >
+            {cat.title}
+          </button>
         ))}
       </div>
-    </section>
+
+      {/* Results count */}
+      <p className="text-[10px] uppercase tracking-wider text-white/30">
+        {entries.length} {entries.length === 1 ? "question" : "questions"}
+        {query && ` matching "${query}"`}
+      </p>
+
+      {/* FAQ list — accordion */}
+      {entries.length === 0 ? (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-center">
+          <p className="text-3xl">🔍</p>
+          <p className="mt-2 text-sm font-medium text-white/60">No questions found</p>
+          <p className="mt-1 text-xs text-white/30">Try a different keyword or category</p>
+          <button onClick={() => { setQuery(""); handleCategoryChange("all"); }}
+            className="mt-3 rounded-xl border border-white/10 px-4 py-2 text-xs text-white/50 active:bg-white/5">
+            Reset
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {entries.map((entry) => {
+            const isOpen = openId === entry.id;
+            return (
+              <div key={entry.id} className="rounded-2xl border border-white/8 bg-white/[0.02] overflow-hidden">
+                <button
+                  onClick={() => setOpenId(isOpen ? null : entry.id)}
+                  className="flex w-full items-center justify-between px-4 py-3.5 text-left active:bg-white/[0.03]"
+                >
+                  <p className={`text-sm font-semibold pr-3 ${isOpen ? "text-emerald-300" : "text-white"}`}>
+                    {entry.question}
+                  </p>
+                  <span className={`shrink-0 text-white/30 transition-transform ${isOpen ? "rotate-180" : ""}`}>
+                    ▾
+                  </span>
+                </button>
+                {isOpen && (
+                  <div className="px-4 pb-4 pt-0">
+                    <div className="h-px bg-white/5 mb-3" />
+                    <p className="text-sm leading-relaxed text-white/60">{entry.answer}</p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Support CTA */}
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+        <div className="flex items-start gap-3">
+          <span className="text-2xl">💬</span>
+          <div className="flex-1">
+            <p className="text-sm font-bold text-white">Still need help?</p>
+            <p className="mt-0.5 text-xs text-white/40">Our team is available daily 09:00–21:00 GMT</p>
+          </div>
+        </div>
+        <div className="mt-3 flex gap-2">
+          <Link href="/support"
+            className="flex flex-1 min-h-[44px] items-center justify-center rounded-xl cta-gradient text-sm font-bold text-white active:scale-[0.98]">
+            Contact Support
+          </Link>
+          <Link href="/how-it-works"
+            className="flex flex-1 min-h-[44px] items-center justify-center rounded-xl border border-white/10 text-sm font-medium text-white/60 active:scale-[0.98]">
+            How It Works
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
