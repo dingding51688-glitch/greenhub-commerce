@@ -206,19 +206,65 @@ export default function CommissionHubPage() {
 
           {/* QR + Promo (collapsible) */}
           <ExpandableSection icon="🖼" title="QR Code & Promo Caption">
-            <div className="flex gap-3 items-start">
-              {summaryLink && (
-                <div className="shrink-0">
-                  <div ref={qrRef} className="rounded-lg bg-white p-2">
-                    <QRCode value={summaryLink} size={80} />
-                  </div>
+            {/* QR — centered, with save/share buttons */}
+            {summaryLink && (
+              <div className="flex flex-col items-center mb-3">
+                <div ref={qrRef} className="rounded-xl bg-white p-3">
+                  <QRCode value={summaryLink} size={140} />
                 </div>
-              )}
-              <div className="flex-1 min-w-0 text-[10px] text-white/50 leading-relaxed whitespace-pre-line line-clamp-6">
-                {PROMO_CAPTION}
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => {
+                      const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
+                      if (!canvas) return;
+                      const a = document.createElement("a");
+                      a.href = canvas.toDataURL("image/png");
+                      a.download = "greenhub-invite-qr.png";
+                      a.click();
+                    }}
+                    className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[10px] font-medium text-white/60 active:bg-white/[0.08]"
+                  >⬇ Save QR</button>
+                  <button
+                    onClick={async () => {
+                      const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
+                      if (!canvas) return;
+                      try {
+                        const blob = await new Promise<Blob | null>(r => canvas.toBlob(r, "image/png"));
+                        if (blob && navigator.share) {
+                          const file = new File([blob], "greenhub-invite-qr.png", { type: "image/png" });
+                          await navigator.share({ files: [file], title: "GreenHub Invite" });
+                        } else if (blob) {
+                          await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+                          alert("QR copied to clipboard!");
+                        }
+                      } catch {}
+                    }}
+                    className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[10px] font-medium text-white/60 active:bg-white/[0.08]"
+                  >📤 Share QR</button>
+                </div>
               </div>
+            )}
+
+            {/* Promo caption — full text */}
+            <div className="rounded-xl bg-white/5 p-3">
+              <p className="text-[11px] text-white/60 leading-relaxed whitespace-pre-line">{PROMO_CAPTION}</p>
+              <p className="mt-2 text-[11px] text-emerald-400 break-all">👉 {summaryLink}</p>
             </div>
+
+            {/* Copy + share buttons */}
             <CopyPromoButton summaryLink={summaryLink} />
+            <div className="flex gap-2 mt-2">
+              <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(PROMO_CAPTION + "\n\n👉 " + summaryLink)}`}
+                target="_blank" rel="noreferrer"
+                className="flex-1 flex items-center justify-center gap-1 rounded-lg border border-white/8 bg-white/[0.03] py-2 text-[10px] text-white/50 active:bg-white/[0.06]">
+                📱 WhatsApp
+              </a>
+              <a href={`https://t.me/share/url?url=${encodeURIComponent(summaryLink)}&text=${encodeURIComponent(PROMO_CAPTION)}`}
+                target="_blank" rel="noreferrer"
+                className="flex-1 flex items-center justify-center gap-1 rounded-lg border border-white/8 bg-white/[0.03] py-2 text-[10px] text-white/50 active:bg-white/[0.06]">
+                ✈️ Telegram
+              </a>
+            </div>
           </ExpandableSection>
 
           {/* How it works */}
