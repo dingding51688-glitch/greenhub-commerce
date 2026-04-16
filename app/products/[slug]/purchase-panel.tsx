@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/providers/CartProvider";
 import type { ProductRecord, WeightOption } from "@/lib/types";
@@ -43,6 +43,7 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
   const [selectedId, setSelectedId] = useState(firstInStock?.id ?? options[0]?.id ?? null);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const selected = options.find((o) => o.id === selectedId) ?? options[0];
   const selectedSoldOut = selected?.stock === 0;
@@ -59,6 +60,7 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
       quantity: qty,
     });
     setAdded(true);
+    setTimeout(() => panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
   };
 
   const handleAddMore = () => {
@@ -82,7 +84,7 @@ export function ProductDetailPurchase({ product }: { product: ProductRecord }) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" ref={panelRef}>
       {/* ── Success toast ── */}
       {added && (
         <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 space-y-3 animate-in fade-in slide-in-from-top-2">
