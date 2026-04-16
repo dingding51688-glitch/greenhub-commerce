@@ -66,7 +66,10 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
                 </div>
               </div>
             ) : (
-              <LogoMark size={32} />
+              <div className="flex items-center gap-3">
+                <LogoMark size={28} />
+                <p className="text-xs text-white/40">Sign in to get started</p>
+              </div>
             )}
             <button onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white" aria-label="Close">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
