@@ -14,7 +14,7 @@ import type { WalletBalanceResponse } from "@/lib/types";
 const phoneRegex = /^\+?[0-9]{7,15}$/;
 const postcodeRegex = /^[A-Za-z0-9\s]{4,9}$/;
 const inputCls =
-  "w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/20 focus:border-white/25";
+  "w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-base text-white outline-none placeholder:text-white/25 focus:border-emerald-400/40 transition";
 
 const profileSchema = z.object({
   fullName: z.string().nonempty(),

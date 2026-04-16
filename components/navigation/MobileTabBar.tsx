@@ -40,10 +40,13 @@ const tabs = [
     badge: "cart" as const,
   },
   {
-    label: "Earn",
-    href: "/account/commission",
-    icon: (_active: boolean) => (
-      <span className="text-[20px] font-bold leading-none">£</span>
+    label: "Account",
+    href: "/account",
+    icon: (active: boolean) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
+        <circle cx="12" cy="8" r="4" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M4 20c1.5-3 4.5-4.5 8-4.5s6.5 1.5 8 4.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
     ),
     match: "prefix" as const,
   },

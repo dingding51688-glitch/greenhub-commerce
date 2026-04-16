@@ -1,0 +1,17 @@
+{
+  "name": "Green Hub 420",
+  "short_name": "GreenHub",
+  "description": "Buy weed online UK — premium cannabis delivered to InPost lockers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#10b981",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

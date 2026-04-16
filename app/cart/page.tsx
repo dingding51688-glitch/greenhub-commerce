@@ -38,7 +38,7 @@ export default function CartPage() {
           <h1 className="text-lg font-bold text-white">Cart</h1>
           <p className="text-[10px] text-white/40">{totalItems} {totalItems === 1 ? "item" : "items"}</p>
         </div>
-        <button onClick={clearCart} className="rounded-lg border border-red-400/20 bg-red-400/5 px-2.5 py-1 text-[9px] font-medium text-red-300 active:bg-red-400/10">
+        <button onClick={() => { if (window.confirm("Clear all items from cart?")) clearCart(); }} className="rounded-lg border border-red-400/20 bg-red-400/5 px-2.5 py-1 text-[9px] font-medium text-red-300 active:bg-red-400/10">
           Clear all
         </button>
       </div>

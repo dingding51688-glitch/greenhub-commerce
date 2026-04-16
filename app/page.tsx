@@ -15,21 +15,17 @@ export default function HomePage() {
   return (
     <div className="space-y-5 pb-20 sm:space-y-10">
       {/* ── 1. Hero: Compact, action-oriented ── */}
-      <section className="relative isolate overflow-hidden rounded-2xl border border-white/10 px-5 py-8 sm:rounded-[40px] sm:px-12 sm:py-14">
+      <section className="relative isolate overflow-hidden rounded-2xl border border-white/10 px-4 py-5 sm:rounded-[40px] sm:px-12 sm:py-14">
         <div className="absolute inset-0 bg-hero-gradient" aria-hidden="true" />
         <div className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(circle at 20% -10%, rgba(19,168,107,0.45), transparent 55%)" }} aria-hidden="true" />
         <div className="relative z-10">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-emerald-400/80">
-            UK-Wide Delivery · InPost & Collection Points · Discreet
-          </p>
-          <h1 className="mt-3 text-[22px] font-bold leading-tight text-white sm:text-[42px]">
-            Order online.<br />
-            Pick up anonymously.
+          <h1 className="text-[20px] font-bold leading-tight text-white sm:text-[42px]">
+            Order online. Pick up anonymously.
           </h1>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-white/60">
-            Premium products delivered to your nearest InPost locker or collection point. No name, no ID — just your pickup code.
+          <p className="mt-2 max-w-md text-xs leading-relaxed text-white/50 sm:text-sm sm:mt-3">
+            Premium products delivered to InPost lockers & collection points. No name, no ID.
           </p>
-          <div className="mt-5 flex gap-2.5">
+          <div className="mt-3 flex gap-2.5 sm:mt-5">
             <Link
               href="/products"
               className="inline-flex min-h-[44px] items-center justify-center rounded-full cta-gradient px-6 text-sm font-semibold uppercase tracking-wider text-white shadow-cta"
@@ -43,15 +39,15 @@ export default function HomePage() {
               How It Works
             </Link>
           </div>
-          {/* Quick stats row */}
-          <div className="mt-6 flex gap-4 overflow-x-auto text-center sm:gap-8">
+          {/* Quick stats row - hidden on small mobile, shown on sm+ */}
+          <div className="mt-4 hidden sm:flex gap-8 text-center">
             {[
               { val: "16,000+", label: "Locker Locations" },
               { val: "Same Day", label: "Dispatch" },
               { val: "100%", label: "Anonymous" },
             ].map((s) => (
               <div key={s.label} className="shrink-0">
-                <p className="text-lg font-bold text-white sm:text-xl">{s.val}</p>
+                <p className="text-xl font-bold text-white">{s.val}</p>
                 <p className="text-[9px] uppercase tracking-wider text-white/40">{s.label}</p>
               </div>
             ))}

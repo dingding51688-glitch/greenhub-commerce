@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import useSWR from "swr";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/ProductCard";
 import Button from "@/components/ui/button";
@@ -48,15 +48,21 @@ export default function ProductsPage() {
 
   const key = `/api/products?${requestParams.toString()}`;
   const { data, isLoading } = useSWR<ProductsResponse>(key, swrFetcher);
+  const [sortBy, setSortBy] = useState<"newest" | "price-low" | "price-high">("newest");
+
   const products = useMemo(() => {
     const list = data?.data ?? [];
-    // In-stock products first — check weightOptions stock, not just inStock flag
-    return [...list].sort((a, b) => {
+    // In-stock products first
+    const sorted = [...list].sort((a, b) => {
       const aHasStock = a.inStock !== false && (a.weightOptions ?? []).some((o) => (o.stock ?? 1) > 0) ? 1 : 0;
       const bHasStock = b.inStock !== false && (b.weightOptions ?? []).some((o) => (o.stock ?? 1) > 0) ? 1 : 0;
-      return bHasStock - aHasStock;
+      if (aHasStock !== bHasStock) return bHasStock - aHasStock;
+      if (sortBy === "price-low") return (a.priceFrom ?? 0) - (b.priceFrom ?? 0);
+      if (sortBy === "price-high") return (b.priceFrom ?? 0) - (a.priceFrom ?? 0);
+      return 0; // newest = default API order
     });
-  }, [data]);
+    return sorted;
+  }, [data, sortBy]);
 
   const handleCategoryChange = (value: ProductCategoryKey) => {
     const next = new URLSearchParams(searchParams.toString());
@@ -99,9 +105,20 @@ export default function ProductsPage() {
         <p className="mt-1 text-xs text-white/40 sm:text-sm">{hero.description}</p>
       </div>
 
-      {/* Product count */}
+      {/* Product count + sort */}
       {!isLoading && products.length > 0 && (
-        <p className="text-[10px] uppercase tracking-wider text-white/30">{products.length} products</p>
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] uppercase tracking-wider text-white/30">{products.length} products</p>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="rounded-lg border border-white/10 bg-transparent px-2 py-1 text-[10px] text-white/50 outline-none"
+          >
+            <option value="newest" className="bg-black">Newest</option>
+            <option value="price-low" className="bg-black">Price: Low → High</option>
+            <option value="price-high" className="bg-black">Price: High → Low</option>
+          </select>
+        </div>
       )}
 
       {/* Loading */}

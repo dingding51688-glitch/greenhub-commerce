@@ -4,7 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { CartProvider } from "@/components/providers/CartProvider";
 import { NotificationProvider } from "@/components/providers/NotificationProvider";
-import { DesktopHeader, MobileTabBar } from "@/components/navigation";
+import { DesktopHeader, MobileTabBar, Footer } from "@/components/navigation";
 import { ReferralCapture } from "@/components/ReferralCapture";
 import { ReferralTrackingProvider } from "@/components/providers/ReferralTrackingProvider";
 import PageTracker from "@/components/tracking/PageTracker";
@@ -71,6 +71,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="theme-color" content="#050505" />
+      </head>
       <body className="text-white" suppressHydrationWarning>
         <AgeGate>
           <AuthProvider>
@@ -82,6 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <div className="min-h-screen flex flex-col">
                   <DesktopHeader />
                   <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 pb-24 sm:pb-8">{children}</main>
+                  <div className="hidden sm:block"><Footer /></div>
                   <MobileTabBar />
                 </div>
                 </ReferralTrackingProvider>
