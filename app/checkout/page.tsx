@@ -193,9 +193,27 @@ export default function CheckoutPage() {
         </div>
       )}
 
+      {/* Mobile: single column, items first */}
+      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)} noValidate>
+        {/* Order summary — show at top on mobile */}
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 lg:hidden">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] uppercase tracking-wider text-white/40">Items · {totalItems}</p>
+            <Link href="/cart" className="text-[9px] text-white/25 hover:text-white/40">Edit</Link>
+          </div>
+          <div className="space-y-2">
+            {items.map((item) => <LineItem key={`${item.productId}::${item.weight}`} item={item} />)}
+          </div>
+          <div className="mt-3 space-y-1 border-t border-white/5 pt-2">
+            <div className="flex justify-between text-xs"><span className="text-white/40">Subtotal</span><span>{GBP.format(subtotal)}</span></div>
+            <div className="flex justify-between text-xs"><span className="text-white/40">Delivery</span><span className="text-white/70">{GBP.format(deliveryFee)}</span></div>
+            <div className="flex justify-between pt-1 border-t border-white/5"><span className="text-sm font-bold">Total</span><span className="text-lg font-bold text-emerald-300">{GBP.format(grandTotal)}</span></div>
+          </div>
+        </div>
+
       <div className="grid gap-4 lg:grid-cols-[1fr,320px]">
         {/* Left: form */}
-        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)} noValidate>
+        <div className="space-y-4">
           {/* Delivery */}
           <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
             <p className="text-[10px] uppercase tracking-wider text-white/40 mb-3">📍 Delivery</p>
@@ -214,74 +232,54 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Wallet payment */}
-          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-3">💳 Payment</p>
-
-            {/* Balance card */}
-            <div className="rounded-xl border border-emerald-400/15 bg-emerald-400/[0.03] p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[9px] text-white/30">Wallet Balance</p>
-                  <p className="text-xl font-bold text-white">{GBP.format(balance)}</p>
-                </div>
-                <span className="rounded-full bg-emerald-400/10 px-2 py-0.5 text-[9px] font-bold text-emerald-300">Wallet</span>
-              </div>
-              <div className="mt-2 flex gap-3 text-[10px]">
+          {/* Wallet payment — compact on mobile */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-3 sm:p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] uppercase tracking-wider text-white/40">💳 Payment</p>
+              <div className="flex items-center gap-2 text-[10px]">
                 <span className="text-white/40">💰 {GBP.format(available)}</span>
-                <span className="text-emerald-300/60">🎁 {GBP.format(bonus)}</span>
+                {bonus > 0 && <span className="text-emerald-300/60">🎁 {GBP.format(bonus)}</span>}
               </div>
             </div>
 
-            {/* Breakdown */}
-            {!shortfall && grandTotal > 0 && (
-              <div className="mt-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 space-y-1">
-                <p className="text-[8px] uppercase tracking-wider text-white/25">Breakdown</p>
-                {bonusUsed > 0 && (
-                  <div className="flex justify-between text-xs">
-                    <span className="text-emerald-300">🎁 Bonus</span>
-                    <span className="text-emerald-300">−{GBP.format(bonusUsed)}</span>
-                  </div>
-                )}
-                {availableUsed > 0 && (
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/50">💰 Balance</span>
-                    <span className="text-white/70">−{GBP.format(availableUsed)}</span>
-                  </div>
-                )}
+            {/* Balance + breakdown compact */}
+            <div className="mt-2 flex items-center justify-between rounded-xl border border-emerald-400/15 bg-emerald-400/[0.03] px-3 py-2">
+              <div>
+                <p className="text-[8px] text-white/30">Wallet</p>
+                <p className="text-lg font-bold text-white">{GBP.format(balance)}</p>
               </div>
-            )}
+              {!shortfall && grandTotal > 0 && (
+                <div className="text-right text-[10px]">
+                  {bonusUsed > 0 && <p className="text-emerald-300">🎁 −{GBP.format(bonusUsed)}</p>}
+                  {availableUsed > 0 && <p className="text-white/50">💰 −{GBP.format(availableUsed)}</p>}
+                </div>
+              )}
+            </div>
 
             {/* Insufficient */}
             {shortfall && (
-              <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/5 p-3">
-                <p className="text-xs font-bold text-amber-200">Insufficient balance</p>
-                <p className="mt-0.5 text-[10px] text-amber-200/60">
-                  Need {GBP.format(grandTotal)}, have {GBP.format(balance)} — short {GBP.format(grandTotal - balance)}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => router.push("/wallet/topup")}
-                  className="mt-2 flex w-full min-h-[36px] items-center justify-center rounded-lg border border-amber-400/30 text-xs font-bold text-amber-200"
-                >
-                  Top Up Wallet
-                </button>
+              <div className="mt-2 rounded-xl border border-amber-400/20 bg-amber-400/5 p-2.5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold text-amber-200">Insufficient balance</p>
+                    <p className="text-[10px] text-amber-200/60">Short {GBP.format(grandTotal - balance)}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => router.push("/wallet/topup")}
+                    className="rounded-lg border border-amber-400/30 px-3 py-1.5 text-[10px] font-bold text-amber-200"
+                  >
+                    Top Up
+                  </button>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={submitting || shortfall}
-            className="flex w-full min-h-[52px] items-center justify-center rounded-xl cta-gradient text-base font-bold text-white disabled:opacity-40"
-          >
-            {submitting ? "Placing order…" : shortfall ? "Top up first" : `Pay ${GBP.format(grandTotal)}`}
-          </button>
-        </form>
+        </div>
 
-        {/* Right: summary */}
-        <div className="space-y-3">
+        {/* Right: summary — desktop only (mobile shows at top) */}
+        <div className="hidden lg:block space-y-3">
           <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[10px] uppercase tracking-wider text-white/40">Items · {totalItems}</p>
@@ -318,6 +316,30 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      {/* Submit — always at bottom */}
+      <div className="sticky bottom-16 sm:bottom-0 z-10">
+        <div className="rounded-2xl border border-white/10 bg-[#0a0b0e]/95 backdrop-blur-lg p-3">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <p className="text-[10px] text-white/30">Total</p>
+              <p className="text-lg font-bold text-emerald-300">{GBP.format(grandTotal)}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-[10px] text-white/30">Wallet</p>
+              <p className="text-sm font-medium text-white/60">{GBP.format(balance)}</p>
+            </div>
+          </div>
+          <button
+            type="submit"
+            disabled={submitting || shortfall}
+            className="flex w-full min-h-[48px] items-center justify-center rounded-xl cta-gradient text-sm font-bold text-white disabled:opacity-40"
+          >
+            {submitting ? "Placing order…" : shortfall ? "Top up first" : `Pay ${GBP.format(grandTotal)}`}
+          </button>
+        </div>
+      </div>
+      </form>
     </div>
   );
 }
