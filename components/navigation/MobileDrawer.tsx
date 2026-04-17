@@ -156,6 +156,13 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
               <NavRow icon="💬" label="Support" href="/support" onClick={go} active={pathname === "/support"} />
               <NavRow icon="❓" label="FAQ" href="/faq" onClick={go} active={pathname === "/faq"} />
             </div>
+            {/* Telegram channel */}
+            <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
+              className="mt-2 flex w-full items-center gap-3 rounded-xl border border-blue-400/15 bg-blue-400/5 px-3 py-2.5 active:bg-blue-400/10 transition">
+              <span className="text-base">✈️</span>
+              <span className="text-sm font-medium text-blue-300">Telegram Channel</span>
+              <span className="ml-auto text-[9px] font-semibold text-blue-300/50">JOIN</span>
+            </a>
           </div>
         </div>
 

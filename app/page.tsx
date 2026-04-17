@@ -125,7 +125,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── 7. Support CTA ── */}
+      {/* ── 7. Telegram Channel ── */}
+      <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
+        className="relative flex items-center gap-3 overflow-hidden rounded-2xl border border-blue-400/25 bg-gradient-to-r from-blue-500/15 via-blue-400/8 to-transparent px-4 py-4 active:scale-[0.98] transition">
+        <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-400/10 blur-2xl" />
+        <span className="relative text-2xl">✈️</span>
+        <div className="relative flex-1 min-w-0">
+          <p className="text-sm font-bold text-white">Join us on Telegram</p>
+          <p className="mt-0.5 text-[10px] text-blue-300/60">New drops · Exclusive deals · Giveaways</p>
+        </div>
+        <span className="relative rounded-full bg-blue-400/20 px-3 py-1 text-xs font-bold text-blue-300">Join</span>
+      </a>
+
+      {/* ── 8. Support CTA ── */}
       <section className="rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-5 sm:rounded-3xl sm:px-8 sm:py-8 sm:text-center">
         <h2 className="text-base font-bold text-white sm:text-xl">Need help ordering?</h2>
         <p className="mt-1 text-xs text-white/50 sm:text-sm">Support available daily 09:00–21:00 GMT</p>

@@ -92,9 +92,9 @@ export const footerColumns: FooterColumn[] = [
 ];
 
 export const socialLinks: NavItem[] = [
-  { label: "Instagram", href: "https://instagram.com/greenhub" },
-  { label: "Telegram", href: "https://t.me/greenhub" },
-  { label: "Email", href: "mailto:hi@greenhub.co.uk" }
+  { label: "Instagram", href: "https://instagram.com/greenhub420" },
+  { label: "Telegram", href: "https://t.me/greenhub420" },
+  { label: "Email", href: "mailto:support@greenhub420.co.uk" }
 ];
 
 export const footerContact = {

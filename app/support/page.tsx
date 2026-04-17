@@ -80,12 +80,24 @@ export default function SupportPage() {
         <p className="mt-1 text-xs text-white/40">Available 09:00–21:00 GMT daily</p>
       </div>
 
+      {/* Telegram channel banner */}
+      <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
+        className="relative flex items-center gap-3 overflow-hidden rounded-2xl border border-blue-400/25 bg-gradient-to-r from-blue-500/15 via-blue-400/10 to-transparent px-4 py-3.5 active:scale-[0.98] transition">
+        <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-blue-400/10 blur-2xl" />
+        <span className="relative text-2xl">✈️</span>
+        <div className="relative flex-1 min-w-0">
+          <p className="text-sm font-bold text-white">Join our Telegram</p>
+          <p className="text-[10px] text-blue-300/60">Exclusive deals, new drops &amp; updates</p>
+        </div>
+        <span className="relative rounded-full bg-blue-400/20 px-2.5 py-1 text-[10px] font-bold text-blue-300">Join</span>
+      </a>
+
       {/* Quick contact */}
       <div className="grid grid-cols-2 gap-2">
         <a href="https://t.me/chineseinbelfast1" target="_blank" rel="noopener noreferrer"
           className="flex flex-col items-center gap-1.5 rounded-2xl border border-blue-400/20 bg-blue-400/5 py-4 transition hover:bg-blue-400/10">
           <span className="text-2xl">💬</span>
-          <p className="text-xs font-bold text-blue-300">Telegram</p>
+          <p className="text-xs font-bold text-blue-300">Telegram DM</p>
           <p className="text-[9px] text-blue-300/50">Fastest response</p>
         </a>
         <a href="mailto:support@greenhub420.co.uk"
