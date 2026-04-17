@@ -100,11 +100,11 @@ export default function SupportPage() {
           <p className="text-xs font-bold text-blue-300">Telegram DM</p>
           <p className="text-[9px] text-blue-300/50">Fastest response</p>
         </a>
-        <a href="mailto:support@greenhub420.co.uk"
+        <a href="https://t.me/greenhub420_support_bot" target="_blank" rel="noopener noreferrer"
           className="flex flex-col items-center gap-1.5 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 py-4 transition hover:bg-emerald-400/10">
-          <span className="text-2xl">📧</span>
-          <p className="text-xs font-bold text-emerald-300">Email</p>
-          <p className="text-[9px] text-emerald-300/50">support@greenhub420.co.uk</p>
+          <span className="text-2xl">🤖</span>
+          <p className="text-xs font-bold text-emerald-300">24h Bot</p>
+          <p className="text-[9px] text-emerald-300/50">Telegram auto-support</p>
         </a>
       </div>
 
@@ -112,8 +112,8 @@ export default function SupportPage() {
       <div className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">
         <span className="text-lg">⚡</span>
         <div>
-          <p className="text-xs font-semibold text-white">Average response: 30 minutes</p>
-          <p className="text-[10px] text-white/30">During support hours · Telegram is fastest</p>
+          <p className="text-xs font-semibold text-white">24/7 Telegram support</p>
+          <p className="text-[10px] text-white/30">Bot replies instantly · Live agent during business hours</p>
         </div>
       </div>
 
