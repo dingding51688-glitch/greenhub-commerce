@@ -161,6 +161,7 @@ export default function CommissionHubPage() {
   const { notifications } = useNotifications();
   const [copyToast, setCopyToast] = useState<string | null>(null);
   const [promoCopied, setPromoCopied] = useState<number | null>(null);
+  const [showTools, setShowTools] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const qrRef = useRef<HTMLDivElement>(null);
 
@@ -322,70 +323,74 @@ export default function CommissionHubPage() {
         </div>
       </div>
 
-      {/* ── QR Code — always visible ── */}
-      {summaryLink && (
-        <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-          <p className="text-sm font-bold text-white mb-3">🖼 Your QR Code</p>
-          <div className="flex flex-col items-center">
-            <div ref={qrRef} className="rounded-xl bg-white p-3">
-              <QRCode value={summaryLink} size={160} />
-            </div>
-            <div className="flex gap-2 mt-3">
-              <button
-                onClick={() => {
-                  const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
-                  if (!canvas) return;
-                  const a = document.createElement("a");
-                  a.href = canvas.toDataURL("image/png");
-                  a.download = "greenhub-invite-qr.png";
-                  a.click();
-                }}
-                className="rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-xs font-semibold text-white/70 active:bg-white/[0.1] min-h-[44px]"
-              >
-                ⬇ Save QR
-              </button>
-              <button
-                onClick={async () => {
-                  const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
-                  if (!canvas) return;
-                  try {
-                    const blob = await new Promise<Blob | null>(r => canvas.toBlob(r, "image/png"));
-                    if (blob && navigator.share) {
-                      const file = new File([blob], "greenhub-invite-qr.png", { type: "image/png" });
-                      await navigator.share({ files: [file], title: "GreenHub Invite" });
-                    } else if (blob) {
-                      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-                      alert("QR copied to clipboard!");
-                    }
-                  } catch {}
-                }}
-                className="rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-xs font-semibold text-white/70 active:bg-white/[0.1] min-h-[44px]"
-              >
-                📤 Share QR
-              </button>
+      {/* ── QR & Promo — collapsible for mobile ── */}
+      <div className="rounded-2xl border border-white/8 bg-white/[0.02] overflow-hidden">
+        <button onClick={() => setShowTools(!showTools)}
+          className="flex w-full items-center justify-between px-4 py-3 active:bg-white/[0.03]">
+          <span className="text-sm font-semibold text-white/70">🔧 Sharing Tools</span>
+          <span className={`text-xs text-white/30 transition-transform ${showTools ? "rotate-180" : ""}`}>▾</span>
+        </button>
+        {showTools && (
+          <div className="px-4 pb-4 space-y-4">
+            {/* QR Code */}
+            {summaryLink && (
+              <div>
+                <p className="text-xs font-bold text-white/50 mb-2">QR Code</p>
+                <div className="flex items-center gap-4">
+                  <div ref={qrRef} className="shrink-0 rounded-lg bg-white p-2">
+                    <QRCode value={summaryLink} size={80} />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={() => {
+                        const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
+                        if (!canvas) return;
+                        const a = document.createElement("a");
+                        a.href = canvas.toDataURL("image/png");
+                        a.download = "greenhub-invite-qr.png";
+                        a.click();
+                      }}
+                      className="rounded-lg border border-white/10 bg-white/[0.05] px-3 py-2 text-[11px] font-medium text-white/60 active:bg-white/[0.1] min-h-[36px]"
+                    >⬇ Save</button>
+                    <button
+                      onClick={async () => {
+                        const canvas = qrRef.current?.querySelector("canvas") as HTMLCanvasElement | null;
+                        if (!canvas) return;
+                        try {
+                          const blob = await new Promise<Blob | null>(r => canvas.toBlob(r, "image/png"));
+                          if (blob && navigator.share) {
+                            const file = new File([blob], "greenhub-invite-qr.png", { type: "image/png" });
+                            await navigator.share({ files: [file], title: "GreenHub Invite" });
+                          } else if (blob) {
+                            await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+                          }
+                        } catch {}
+                      }}
+                      className="rounded-lg border border-white/10 bg-white/[0.05] px-3 py-2 text-[11px] font-medium text-white/60 active:bg-white/[0.1] min-h-[36px]"
+                    >📤 Share</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Promo templates */}
+            <div>
+              <p className="text-xs font-bold text-white/50 mb-2">Quick Messages</p>
+              <p className="text-[10px] text-white/30 mb-2">Tap to copy with your link</p>
+              <div className="space-y-1.5">
+                {PROMO_TEMPLATES.map((tmpl, i) => (
+                  <button key={i} onClick={() => handlePromoCopy(i)}
+                    className="w-full text-left rounded-xl border border-white/6 bg-white/[0.02] px-3 py-2.5 active:bg-white/[0.06] transition">
+                    <p className="text-[11px] text-white/60 leading-relaxed">{tmpl}</p>
+                    <p className="text-[9px] text-emerald-400 mt-1 font-semibold">
+                      {promoCopied === i ? "✓ Copied!" : "📋 Tap to copy"}
+                    </p>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* ── Promo Templates — always visible ── */}
-      <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-        <p className="text-sm font-bold text-white mb-3">✍️ Quick Promo Messages</p>
-        <p className="text-[11px] text-white/40 mb-3">Tap to copy with your link attached</p>
-        <div className="space-y-2">
-          {PROMO_TEMPLATES.map((tmpl, i) => (
-            <button
-              key={i}
-              onClick={() => handlePromoCopy(i)}
-              className="w-full text-left rounded-xl border border-white/8 bg-white/[0.03] p-3 active:bg-white/[0.08] transition"
-            >
-              <p className="text-[12px] text-white/70 leading-relaxed">{tmpl}</p>
-              <p className="text-[10px] text-emerald-400 mt-1.5 font-semibold">
-                {promoCopied === i ? "✓ Copied!" : "📋 Tap to copy"}
-              </p>
-            </button>
-          ))}
-        </div>
+        )}
       </div>
 
       {/* ── Tabs: Overview / Friends / History ── */}
