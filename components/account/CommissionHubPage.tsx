@@ -573,7 +573,7 @@ function LeaderboardTab() {
         if (!res.ok) throw new Error("Failed to load leaderboard");
         const data = await res.json();
         if (!cancelled) {
-          setEntries(data.leaderboard ?? data.entries ?? data ?? []);
+          setEntries(data.data ?? data.leaderboard ?? data.entries ?? []);
         }
       } catch (e: any) {
         if (!cancelled) setError(e.message ?? "Failed to load");
