@@ -71,8 +71,12 @@ type Tab = "overview" | "friends" | "history" | "leaderboard";
 /* ─── Leaderboard entry type ─── */
 interface LeaderboardEntry {
   rank: number;
-  handle: string;
-  earnings: number;
+  handle?: string;
+  userAlias?: string;
+  earnings?: number;
+  lifetimeCommission?: number;
+  lastMonthCommission?: number;
+  ordersDriven?: number;
   friends: number;
   isMe?: boolean;
 }
@@ -632,16 +636,16 @@ function LeaderboardTab() {
                 <p className={`text-[13px] font-semibold truncate ${
                   entry.isMe ? "text-emerald-300" : "text-white"
                 }`}>
-                  {entry.handle || "Anonymous"}
+                  {entry.userAlias || entry.handle || "Anonymous"}
                   {entry.isMe && <span className="text-[10px] text-emerald-400/60 ml-1">(you)</span>}
                 </p>
-                {entry.friends != null && (
-                  <p className="text-[10px] text-white/25">{entry.friends} friends</p>
+                {entry.ordersDriven != null || entry.friends != null && (
+                  <p className="text-[10px] text-white/25">{entry.ordersDriven ?? entry.friends} orders</p>
                 )}
               </div>
             </div>
             <span className="shrink-0 text-[14px] font-bold text-emerald-300">
-              {GBP.format(entry.earnings ?? 0)}
+              {GBP.format(entry.lifetimeCommission ?? entry.earnings ?? 0)}
             </span>
           </div>
         );
