@@ -93,20 +93,15 @@ export default function SupportPage() {
       </a>
 
       {/* Quick contact */}
-      <div className="grid grid-cols-2 gap-2">
-        <a href="https://t.me/chineseinbelfast1" target="_blank" rel="noopener noreferrer"
-          className="flex flex-col items-center gap-1.5 rounded-2xl border border-blue-400/20 bg-blue-400/5 py-4 transition hover:bg-blue-400/10">
-          <span className="text-2xl">💬</span>
-          <p className="text-xs font-bold text-blue-300">Telegram DM</p>
-          <p className="text-[9px] text-blue-300/50">Fastest response</p>
-        </a>
-        <a href="https://t.me/greenhub247_bot" target="_blank" rel="noopener noreferrer"
-          className="flex flex-col items-center gap-1.5 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 py-4 transition hover:bg-emerald-400/10">
-          <span className="text-2xl">🤖</span>
-          <p className="text-xs font-bold text-emerald-300">24h Bot</p>
-          <p className="text-[9px] text-emerald-300/50">Telegram auto-support</p>
-        </a>
-      </div>
+      <a href="https://t.me/greenhub247_bot" target="_blank" rel="noopener noreferrer"
+        className="flex items-center gap-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 px-4 py-4 active:scale-[0.98] transition">
+        <span className="text-3xl">🤖</span>
+        <div className="flex-1">
+          <p className="text-sm font-bold text-white">24/7 Support Bot</p>
+          <p className="text-[10px] text-emerald-300/60">Instant FAQ answers + live agent handoff</p>
+        </div>
+        <span className="rounded-full bg-emerald-400/20 px-3 py-1 text-xs font-bold text-emerald-300">Open</span>
+      </a>
 
       {/* Response time */}
       <div className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">
