@@ -46,7 +46,7 @@ export default function WalletPage() {
     useSWR<WalletBalanceResponse>(token ? "/api/wallet/balance" : null, swrFetcher, { refreshInterval: 60_000 });
   const { data: cpData } = useSWR(token ? "/api/account/profile" : null, swrFetcher);
   const { data: txData, error: txErr, isLoading: txLoad, mutate: refreshTx } =
-    useSWR<WalletTransactionsResponse>(token ? "/api/wallet/transactions?page=1&pageSize=20" : null, swrFetcher, { refreshInterval: 90_000 });
+    useSWR<WalletTransactionsResponse>(token ? "/api/wallet/transactions?page=1&pageSize=100" : null, swrFetcher, { refreshInterval: 90_000 });
 
   const transactions = txData?.data ?? [];
   const transferHandle = (cpData as any)?.data?.attributes?.transferHandle;
