@@ -100,7 +100,7 @@ export default function SupportPage() {
           <p className="text-xs font-bold text-blue-300">Telegram DM</p>
           <p className="text-[9px] text-blue-300/50">Fastest response</p>
         </a>
-        <a href="https://t.me/greenhub420_support_bot" target="_blank" rel="noopener noreferrer"
+        <a href="https://t.me/greenhub247_bot" target="_blank" rel="noopener noreferrer"
           className="flex flex-col items-center gap-1.5 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 py-4 transition hover:bg-emerald-400/10">
           <span className="text-2xl">🤖</span>
           <p className="text-xs font-bold text-emerald-300">24h Bot</p>
