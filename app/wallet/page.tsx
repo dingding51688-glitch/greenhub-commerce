@@ -26,10 +26,21 @@ function formatUserId(raw?: string | null): string | null {
   return clean ? `GH-${clean.slice(-8).padStart(8, "0")}` : null;
 }
 
+type TxFilter = "all" | "topup" | "orders" | "earnings" | "transfers";
+
+const TX_FILTERS: { id: TxFilter; label: string; types: string[] }[] = [
+  { id: "all", label: "All", types: [] },
+  { id: "topup", label: "💰 Top Up", types: ["topup"] },
+  { id: "orders", label: "🛒 Orders", types: ["purchase"] },
+  { id: "earnings", label: "🤝 Earnings", types: ["commission", "referral_click_bonus", "bonus"] },
+  { id: "transfers", label: "💳 Transfers", types: ["transfer_in", "transfer_out", "withdrawal", "withdrawal_reversal"] },
+];
+
 export default function WalletPage() {
   const router = useRouter();
   const { token, profile } = useAuth();
   const [copyToast, setCopyToast] = useState(false);
+  const [txFilter, setTxFilter] = useState<TxFilter>("all");
 
   const { data: bal, error: balErr, isLoading: balLoad, mutate: refreshBal } =
     useSWR<WalletBalanceResponse>(token ? "/api/wallet/balance" : null, swrFetcher, { refreshInterval: 60_000 });
@@ -111,24 +122,50 @@ export default function WalletPage() {
           <button onClick={() => refreshTx()} className="text-[10px] text-white/40 hover:text-white/60">Refresh</button>
         </div>
 
-        {txLoad ? (
-          <div className="space-y-1.5">
-            {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-xl" />)}
-          </div>
-        ) : txErr ? (
-          <StateMessage variant="error" title="Unable to load transactions" body={txErr.message} actionLabel="Retry" onAction={() => refreshTx()} />
-        ) : transactions.length === 0 ? (
-          <div className="rounded-2xl border border-white/8 bg-white/[0.02] px-4 py-8 text-center">
-            <p className="text-2xl">📭</p>
-            <p className="mt-2 text-sm text-white/40">No transactions yet</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-white/5 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
-            {transactions.map((tx) => (
-              <TxRow key={tx.id} tx={tx} onNavigate={(href) => router.push(href)} />
-            ))}
-          </div>
-        )}
+        {/* Filter tabs */}
+        <div className="flex gap-1.5 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory mb-2">
+          {TX_FILTERS.map((f) => {
+            const count = f.id === "all" ? transactions.length : transactions.filter(tx => f.types.includes(tx.type)).length;
+            return (
+              <button
+                key={f.id}
+                onClick={() => setTxFilter(f.id)}
+                className={`shrink-0 snap-start rounded-full px-3 py-1.5 text-[11px] font-medium transition whitespace-nowrap ${
+                  txFilter === f.id
+                    ? "bg-emerald-400/15 text-emerald-300 border border-emerald-400/30"
+                    : "bg-white/[0.04] text-white/40 border border-white/8"
+                }`}
+              >
+                {f.label}{count > 0 ? ` (${count})` : ""}
+              </button>
+            );
+          })}
+        </div>
+
+        {(() => {
+          const activeFilter = TX_FILTERS.find(f => f.id === txFilter)!;
+          const filtered = txFilter === "all" ? transactions : transactions.filter(tx => activeFilter.types.includes(tx.type));
+
+          if (txLoad) return (
+            <div className="space-y-1.5">
+              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-xl" />)}
+            </div>
+          );
+          if (txErr) return <StateMessage variant="error" title="Unable to load transactions" body={txErr.message} actionLabel="Retry" onAction={() => refreshTx()} />;
+          if (filtered.length === 0) return (
+            <div className="rounded-2xl border border-white/8 bg-white/[0.02] px-4 py-8 text-center">
+              <p className="text-2xl">📭</p>
+              <p className="mt-2 text-sm text-white/40">{txFilter === "all" ? "No transactions yet" : `No ${activeFilter.label.replace(/[^a-zA-Z ]/g, "").trim().toLowerCase()} transactions`}</p>
+            </div>
+          );
+          return (
+            <div className="divide-y divide-white/5 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
+              {filtered.map((tx) => (
+                <TxRow key={tx.id} tx={tx} onNavigate={(href) => router.push(href)} />
+              ))}
+            </div>
+          );
+        })()}
       </div>
 
       {/* ── Footer Links ── */}
