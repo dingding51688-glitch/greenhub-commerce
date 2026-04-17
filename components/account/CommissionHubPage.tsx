@@ -639,8 +639,8 @@ function LeaderboardTab() {
                   {entry.userAlias || entry.handle || "Anonymous"}
                   {entry.isMe && <span className="text-[10px] text-emerald-400/60 ml-1">(you)</span>}
                 </p>
-                {entry.ordersDriven != null || entry.friends != null && (
-                  <p className="text-[10px] text-white/25">{entry.ordersDriven ?? entry.friends} orders</p>
+                {(entry.ordersDriven != null || entry.friends != null) && (
+                  <p className="text-[10px] text-white/30">{entry.ordersDriven ?? entry.friends} orders · This month: {GBP.format(entry.lastMonthCommission ?? 0)}</p>
                 )}
               </div>
             </div>
