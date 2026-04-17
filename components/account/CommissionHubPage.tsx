@@ -24,6 +24,25 @@ const QRCode = dynamic(
 
 const GBP = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
 
+/* ─── useCountUp hook ─── */
+function useCountUp(target: number, duration = 1000) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (target === 0) { setValue(0); return; }
+    const start = Date.now();
+    const step = () => {
+      const elapsed = Date.now() - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutExpo
+      const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      setValue(eased * target);
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [target, duration]);
+  return value;
+}
+
 /* Tiers */
 const TIERS = [
   { name: "Bronze", emoji: "🥉", min: 0, rate: 15, color: "text-amber-400" },
@@ -46,8 +65,17 @@ const PROMO_TEMPLATES = [
   "💨 Top shelf flower, edibles & more. Delivered to your door (well, locker) 👉",
 ];
 
-/* ─── Tab type ─── */
-type Tab = "overview" | "friends" | "history";
+/* ─── Tab type (now 4 tabs) ─── */
+type Tab = "overview" | "friends" | "history" | "leaderboard";
+
+/* ─── Leaderboard entry type ─── */
+interface LeaderboardEntry {
+  rank: number;
+  handle: string;
+  earnings: number;
+  friends: number;
+  isMe?: boolean;
+}
 
 /* ─── Earnings Calculator (shared between logged-in and guest) ─── */
 function EarningsCalculator({ rate }: { rate: number }) {
@@ -250,14 +278,19 @@ export default function CommissionHubPage() {
         </div>
       ) : (
         <>
-          {/* ── Hero: big earnings display ── */}
-          <div className="rounded-2xl bg-gradient-to-br from-emerald-600/20 via-emerald-500/5 to-transparent border border-emerald-400/15 p-4">
+          {/* ── MERGED Hero: Earnings + Share in one emerald card ── */}
+          <div className="rounded-2xl bg-gradient-to-br from-emerald-600/20 via-emerald-500/10 to-transparent border border-emerald-400/20 p-4">
+            {/* Top: Earnings + Tier */}
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-white/40">Total Earned</p>
-                <p className="text-3xl font-extrabold text-white mt-0.5">{GBP.format(lifetimeCommission)}</p>
+                <AnimatedCurrency value={lifetimeCommission} className="text-3xl font-extrabold text-white mt-0.5" />
                 {monthlyCommission > 0 && (
-                  <p className="text-sm text-emerald-400 font-semibold mt-1">+{GBP.format(monthlyCommission)} this month</p>
+                  <div className="flex items-center gap-1 mt-1">
+                    <span className="text-sm text-emerald-400 font-semibold">+</span>
+                    <AnimatedCurrency value={monthlyCommission} className="text-sm text-emerald-400 font-semibold" />
+                    <span className="text-sm text-emerald-400 font-semibold">this month</span>
+                  </div>
                 )}
               </div>
               <div className="flex flex-col items-end gap-1">
@@ -276,52 +309,53 @@ export default function CommissionHubPage() {
               <MiniStat icon="🛒" label="Orders" value={String(orderCount)} />
               <MiniStat icon="✅" label="Qualified" value={String(qualifiedFriends)} />
             </div>
+
+            {/* Divider */}
+            <div className="my-3 border-t border-white/5" />
+
+            {/* Bottom: Share link + buttons */}
+            <p className="text-sm font-bold text-white mb-3">📤 Share & Earn</p>
+
+            {/* Link display + copy */}
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex-1 min-w-0 truncate rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 font-mono text-[12px] text-white/70" style={{ fontSize: "16px" }}>
+                {summaryLink || "Link pending…"}
+              </div>
+              <button
+                onClick={handleCopy}
+                disabled={!summaryLink}
+                className="shrink-0 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-bold text-white active:bg-emerald-600 transition min-h-[44px]"
+              >
+                {copyToast || "📋 Copy"}
+              </button>
+            </div>
+
+            {/* Big share buttons */}
+            <div className="grid grid-cols-2 gap-2">
+              {whatsappShare && (
+                <a
+                  href={whatsappShare}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366]/20 border border-[#25D366]/30 py-3 text-sm font-bold text-[#25D366] active:bg-[#25D366]/30 transition min-h-[48px]"
+                >
+                  📱 WhatsApp
+                </a>
+              )}
+              {telegramShare && (
+                <a
+                  href={telegramShare}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-[#0088cc]/20 border border-[#0088cc]/30 py-3 text-sm font-bold text-[#0088cc] active:bg-[#0088cc]/30 transition min-h-[48px]"
+                >
+                  ✈️ Telegram
+                </a>
+              )}
+            </div>
           </div>
         </>
       )}
-
-      {/* ── Share & Earn CTA — always visible, big and bold ── */}
-      <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4">
-        <p className="text-sm font-bold text-white mb-3">📤 Share & Earn</p>
-
-        {/* Link display + copy */}
-        <div className="flex items-center gap-2 mb-3">
-          <div className="flex-1 min-w-0 truncate rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 font-mono text-[12px] text-white/70" style={{ fontSize: "16px" }}>
-            {summaryLink || "Link pending…"}
-          </div>
-          <button
-            onClick={handleCopy}
-            disabled={!summaryLink}
-            className="shrink-0 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-bold text-white active:bg-emerald-600 transition min-h-[44px]"
-          >
-            {copyToast || "📋 Copy"}
-          </button>
-        </div>
-
-        {/* Big share buttons */}
-        <div className="grid grid-cols-2 gap-2">
-          {whatsappShare && (
-            <a
-              href={whatsappShare}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366]/20 border border-[#25D366]/30 py-3 text-sm font-bold text-[#25D366] active:bg-[#25D366]/30 transition min-h-[48px]"
-            >
-              📱 WhatsApp
-            </a>
-          )}
-          {telegramShare && (
-            <a
-              href={telegramShare}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#0088cc]/20 border border-[#0088cc]/30 py-3 text-sm font-bold text-[#0088cc] active:bg-[#0088cc]/30 transition min-h-[48px]"
-            >
-              ✈️ Telegram
-            </a>
-          )}
-        </div>
-      </div>
 
       {/* ── QR & Promo — collapsible for mobile ── */}
       <div className="rounded-2xl border border-white/8 bg-white/[0.02] overflow-hidden">
@@ -393,19 +427,25 @@ export default function CommissionHubPage() {
         )}
       </div>
 
-      {/* ── Tabs: Overview / Friends / History ── */}
+      {/* ── Tabs: Overview / Friends / History / Leaderboard (4 tabs) ── */}
       {!isNewUser && (
         <>
           <div className="flex rounded-xl border border-white/8 bg-white/[0.02] p-0.5">
-            {(["overview", "friends", "history"] as Tab[]).map(tab => (
+            {(["overview", "friends", "history", "leaderboard"] as Tab[]).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 rounded-lg py-2.5 text-[12px] font-semibold transition min-h-[44px] ${
+                className={`flex-1 rounded-lg py-2.5 text-[11px] font-semibold transition min-h-[44px] ${
                   activeTab === tab ? "bg-white/10 text-white" : "text-white/30"
                 }`}
               >
-                {tab === "overview" ? "📊 Overview" : tab === "friends" ? `👥 Friends (${totalFriends})` : `💰 History (${history.length})`}
+                {tab === "overview"
+                  ? "📊 Overview"
+                  : tab === "friends"
+                  ? `👥 Friends`
+                  : tab === "history"
+                  ? `💰 History`
+                  : "🏆 Top"}
               </button>
             ))}
           </div>
@@ -418,48 +458,6 @@ export default function CommissionHubPage() {
 
               {/* Earnings Calculator */}
               <EarningsCalculator rate={currentRate} />
-
-              {/* How it works */}
-              <ExpandableSection icon="❓" title="How It Works">
-                <div className="space-y-2">
-                  {[
-                    { icon: "📤", title: "Share", desc: "Send your invite link to friends" },
-                    { icon: "🛒", title: "They Shop", desc: "Friends sign up and place orders" },
-                    { icon: "💰", title: "You Earn", desc: `Earn ${currentRate}% of every order` },
-                  ].map(s => (
-                    <div key={s.title} className="flex items-center gap-2.5">
-                      <span className="text-lg">{s.icon}</span>
-                      <div>
-                        <p className="text-[13px] font-semibold text-white">{s.title}</p>
-                        <p className="text-[11px] text-white/40">{s.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ExpandableSection>
-
-              {/* Commission rules */}
-              <ExpandableSection icon="💎" title="Commission Rules">
-                <div className="space-y-1.5 text-[11px] text-white/60 leading-relaxed">
-                  <p>1. Friends sign up via your link → you earn <span className="text-emerald-300 font-semibold">15–25%</span> commission on their orders.</p>
-                  <p>2. Commission is credited to your wallet <span className="text-white/80 font-semibold">instantly</span>.</p>
-                  <p>3. You earn on <span className="text-white/80 font-semibold">every order</span> they place — lifetime tracking.</p>
-                  <p>4. 🥉 15% → 🥈 20% (100+ friends) → 🥇 25% (200+ friends).</p>
-                  <p>5. Earnings never expire. Withdraw anytime.</p>
-                </div>
-              </ExpandableSection>
-
-              {/* Leaderboard entry */}
-              <Link
-                href="/referral/leaderboard"
-                className="flex items-center justify-between rounded-2xl border border-yellow-400/20 bg-yellow-500/10 p-4 active:bg-yellow-500/15 transition"
-              >
-                <div>
-                  <p className="text-sm font-bold text-white">🏆 Leaderboard</p>
-                  <p className="text-[11px] text-white/40 mt-0.5">See top earners & your ranking</p>
-                </div>
-                <span className="text-white/30 text-xl">›</span>
-              </Link>
             </div>
           )}
 
@@ -482,6 +480,10 @@ export default function CommissionHubPage() {
               ))}
             </div>
           )}
+
+          {activeTab === "leaderboard" && (
+            <LeaderboardTab />
+          )}
         </>
       )}
 
@@ -491,6 +493,12 @@ export default function CommissionHubPage() {
       </p>
     </section>
   );
+}
+
+/* ─── Animated Currency Display ─── */
+function AnimatedCurrency({ value, className }: { value: number; className?: string }) {
+  const animatedValue = useCountUp(value, 1200);
+  return <p className={className}>{GBP.format(animatedValue)}</p>;
 }
 
 /* ─── Mini stat ─── */
@@ -546,17 +554,98 @@ function TierCard({ tierInfo, qualifiedFriends, totalFriends, currentRate }: {
   );
 }
 
-/* ─── Expandable section ─── */
-function ExpandableSection({ icon, title, children }: { icon: string; title: string; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
+/* ─── Leaderboard Tab (inline, fetches from API) ─── */
+function LeaderboardTab() {
+  const { token } = useAuth();
+  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchLeaderboard() {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await fetch("/api/referral/leaderboard", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (!res.ok) throw new Error("Failed to load leaderboard");
+        const data = await res.json();
+        if (!cancelled) {
+          setEntries(data.leaderboard ?? data.entries ?? data ?? []);
+        }
+      } catch (e: any) {
+        if (!cancelled) setError(e.message ?? "Failed to load");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    fetchLeaderboard();
+    return () => { cancelled = true; };
+  }, [token]);
+
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-xs text-white/30 animate-pulse">Loading leaderboard…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-xs text-white/30">{error}</p>
+      </div>
+    );
+  }
+
+  if (entries.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-3xl mb-2">🏆</p>
+        <p className="text-xs text-white/30">No leaderboard data yet. Be the first!</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="rounded-2xl border border-white/8 bg-white/[0.02]">
-      <button onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between px-4 py-3 text-left min-h-[44px]">
-        <span className="text-[13px] font-semibold text-white/60">{icon} {title}</span>
-        <span className={`text-[11px] text-white/30 transition-transform ${open ? "rotate-180" : ""}`}>▼</span>
-      </button>
-      {open && <div className="px-4 pb-4">{children}</div>}
+    <div className="space-y-1">
+      {entries.map((entry, i) => {
+        const rank = entry.rank ?? i + 1;
+        const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `#${rank}`;
+        return (
+          <div
+            key={entry.handle ?? i}
+            className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2.5 ${
+              entry.isMe
+                ? "border-emerald-400/30 bg-emerald-500/10"
+                : "border-white/5 bg-white/[0.02]"
+            }`}
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className={`text-base font-bold shrink-0 w-8 text-center ${
+                rank <= 3 ? "text-lg" : "text-xs text-white/30"
+              }`}>{medal}</span>
+              <div className="min-w-0">
+                <p className={`text-[13px] font-semibold truncate ${
+                  entry.isMe ? "text-emerald-300" : "text-white"
+                }`}>
+                  {entry.handle || "Anonymous"}
+                  {entry.isMe && <span className="text-[10px] text-emerald-400/60 ml-1">(you)</span>}
+                </p>
+                {entry.friends != null && (
+                  <p className="text-[10px] text-white/25">{entry.friends} friends</p>
+                )}
+              </div>
+            </div>
+            <span className="shrink-0 text-[14px] font-bold text-emerald-300">
+              {GBP.format(entry.earnings ?? 0)}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }
