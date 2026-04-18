@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import useSWRInfinite from "swr/infinite";
 import { useAuth } from "@/components/providers/AuthProvider";
+import useSWR from "swr";
 import type { OrderRecord } from "@/lib/types";
 import { listMyOrders } from "@/lib/orders-api";
 
@@ -94,6 +95,16 @@ export default function OrdersPage() {
   const { token } = useAuth();
   const [filterId, setFilterId] = useState<string>("all");
 
+  // Fetch reviewed order IDs
+  const { data: reviewData } = useSWR(
+    token ? "my-reviews" : null,
+    () => fetch("/api/strapi/reviews/mine", { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then(d => new Set((d?.data || []).map((r: any) => r.orderId).filter(Boolean)))
+      .catch(() => new Set()),
+  );
+  const reviewedOrderIds: Set<number> = reviewData || new Set();
+
   const { data, error, size, setSize, isValidating, mutate } = useSWRInfinite(
     (i, prev) => {
       if (!token) return null;
@@ -180,7 +191,7 @@ export default function OrdersPage() {
       ) : (
         <div className="space-y-2.5">
           {filtered.map((order) => (
-            <OrderCard key={order.reference} order={order} />
+            <OrderCard key={order.reference} order={order} reviewedOrderIds={reviewedOrderIds} />
           ))}
           {hasMore && (
             <button
@@ -197,12 +208,12 @@ export default function OrdersPage() {
   );
 }
 
-function OrderCard({ order }: { order: OrderRecord }) {
+function OrderCard({ order, reviewedOrderIds }: { order: OrderRecord; reviewedOrderIds: Set<number> }) {
   const cfg = STATUS_CFG[order.status] || DEFAULT_CFG;
   const items = order.items || [];
   const firstItem = items[0];
   const extraCount = Math.max(0, items.length - 1);
-  const showReview = order.status === "completed" || order.status === "delivered";
+  const showReview = (order.status === "completed" || order.status === "delivered") && !reviewedOrderIds.has(order.id);
 
   return (
     <Link
@@ -238,11 +249,15 @@ function OrderCard({ order }: { order: OrderRecord }) {
             {firstItem?.title || "Order"}{extraCount > 0 ? ` +${extraCount}` : ""}
           </p>
         </div>
-        {showReview && (
+        {showReview ? (
           <span className="shrink-0 inline-flex items-center gap-0.5 rounded-full border border-amber-400/20 bg-amber-400/10 px-2 py-0.5 text-[10px] font-semibold text-amber-200">
             ⭐ Review
           </span>
-        )}
+        ) : (order.status === "completed" || order.status === "delivered") && reviewedOrderIds.has(order.id) ? (
+          <span className="shrink-0 inline-flex items-center gap-0.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+            ✅ Reviewed
+          </span>
+        ) : null}
       </div>
     </Link>
   );
