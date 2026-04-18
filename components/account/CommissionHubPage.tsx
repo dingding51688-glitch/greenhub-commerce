@@ -707,11 +707,14 @@ function FriendRow({ c }: { c: any }) {
 
 /* ─── History row ─── */
 function HistoryRow({ row }: { row: CommissionTransaction }) {
-  const label = row.sourceInvitee ? `${row.sourceInvitee}'s order` : row.description || "Commission";
+  const label = row.sourceInvitee ? `${row.sourceInvitee}'s order` : row.type || "Commission";
   return (
     <div className="flex items-center justify-between gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2.5">
       <div className="min-w-0 flex-1">
         <p className="text-[13px] font-medium text-white truncate">{label}</p>
+        {row.description && (
+          <p className="text-[10px] text-white/40 truncate">{row.description}</p>
+        )}
         <p className="text-[10px] text-white/20">
           {row.createdAt ? new Date(row.createdAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}
         </p>
