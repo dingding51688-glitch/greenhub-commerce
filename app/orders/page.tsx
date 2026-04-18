@@ -100,10 +100,10 @@ export default function OrdersPage() {
     token ? "my-reviews" : null,
     () => fetch("/api/strapi/reviews/mine", { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
-      .then(d => new Set((d?.data || []).map((r: any) => r.orderId).filter(Boolean)))
-      .catch(() => new Set()),
+      .then(d => new Set<number>((d?.data || []).map((r: any) => r.orderId as number).filter(Boolean)))
+      .catch(() => new Set<number>()),
   );
-  const reviewedOrderIds: Set<number> = reviewData || new Set();
+  const reviewedOrderIds: Set<number> = reviewData || new Set<number>();
 
   const { data, error, size, setSize, isValidating, mutate } = useSWRInfinite(
     (i, prev) => {
