@@ -253,22 +253,42 @@ export default function OrderDetailPage({ params }: { params: { reference: strin
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="text-[13px] font-bold text-white">{GBP.format(item.lineTotal)}</p>
-                  {showReview && item.productId && (
-                    (isReviewed(item.productId) || reviewedIds.has(item.productId)) ? (
-                      <p className="text-[8px] text-emerald-400">✅ Reviewed</p>
-                    ) : (
-                      <button
-                        onClick={() => setReviewItem({ productId: item.productId, title: item.title || "Product" })}
-                        className="text-[8px] text-amber-200 active:text-amber-100">
-                        ⭐ Review
-                      </button>
-                    )
-                  )}
                 </div>
               </div>
             );
           })}
         </div>
+
+        {/* Review Section */}
+        {showReview && (
+          <div className="mt-3 space-y-2">
+            {order.items?.filter((item: any) => item.productId).map((item: any) => {
+              const reviewed = isReviewed(item.productId) || reviewedIds.has(item.productId);
+              return (
+                <div key={item.productId} className="flex items-center justify-between rounded-xl border border-white/8 bg-white/[0.03] px-4 py-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-lg">{reviewed ? "✅" : "⭐"}</span>
+                    <div className="min-w-0">
+                      <p className="text-[12px] font-semibold text-white truncate">{item.title || "Product"}</p>
+                      <p className="text-[10px] text-white/30">{reviewed ? "Thanks for your review!" : "How was this product?"}</p>
+                    </div>
+                  </div>
+                  {reviewed ? (
+                    <span className="shrink-0 rounded-full bg-emerald-500/15 border border-emerald-500/20 px-3 py-1.5 text-[11px] font-bold text-emerald-300">
+                      Reviewed
+                    </span>
+                  ) : (
+                    <button
+                      onClick={(e) => { e.preventDefault(); setReviewItem({ productId: item.productId, title: item.title || "Product" }); }}
+                      className="shrink-0 rounded-full bg-amber-500/15 border border-amber-500/20 px-4 py-1.5 text-[11px] font-bold text-amber-200 active:bg-amber-500/25 min-h-[36px]">
+                      ⭐ Leave Review
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Totals */}
         <div className="border-t border-white/5 pt-2 mt-2 space-y-0.5">
