@@ -36,5 +36,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Fallback: no product pages in sitemap
   }
 
-  return [...staticPages, ...productPages];
+  // Blog list page
+  const blogListPage = [
+    { url: `${BASE}/blog`, changeFrequency: "daily" as const, priority: 0.8 },
+  ];
+
+  // Dynamic blog posts
+  let blogPages: MetadataRoute.Sitemap = [];
+  try {
+    const strapiUrl = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
+    const res = await fetch(
+      `${strapiUrl}/api/blogs?pagination[pageSize]=200&fields[0]=slug&fields[1]=updatedAt`,
+      { next: { revalidate: 3600 } }
+    );
+    const data = await res.json();
+    blogPages = (data.data ?? []).map((b: any) => ({
+      url: `${BASE}/blog/${b.slug}`,
+      lastModified: b.updatedAt ? new Date(b.updatedAt) : new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.75,
+    }));
+  } catch {
+    // Fallback: no blog pages in sitemap
+  }
+
+  return [...staticPages, ...productPages, ...blogListPage, ...blogPages];
 }

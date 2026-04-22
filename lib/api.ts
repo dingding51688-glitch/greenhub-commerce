@@ -17,7 +17,7 @@ const withDevCustomerId = (path: string) => {
   }
 };
 
-const PUBLIC_ENDPOINT_PREFIXES = ["/api/products", "/api/collections"];
+const PUBLIC_ENDPOINT_PREFIXES = ["/api/products", "/api/collections", "/api/blogs"];
 
 /**
  * Next.js internal API routes — requests to these paths go directly to
