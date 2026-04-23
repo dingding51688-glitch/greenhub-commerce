@@ -173,7 +173,7 @@ async function HotProducts() {
   let products: ProductRecord[] = [];
   try {
     const data = await serverFetch<ProductsResponse>(
-      "/api/products?populate=coverImage,featuredImage,weightOptions&pagination[pageSize]=8&sort=rating:desc"
+      "/api/products?populate=*&pagination[pageSize]=12&sort=rating:desc"
     );
     products = data.data?.filter((p) => (p.priceFrom ?? 0) > 0).slice(0, 6) ?? [];
   } catch {
