@@ -143,6 +143,7 @@ export function ReviewSection({ productId }: { productId: number }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(5);
 
   useEffect(() => {
     fetch(`/api/strapi/reviews/product/${productId}`)
@@ -305,52 +306,75 @@ export function ReviewSection({ productId }: { productId: number }) {
           <p className="text-white/20 text-xs mt-1">Be the first to share your experience!</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {reviews.map((r) => (
-            <div key={r.id} className="bg-[#1C1C1E] rounded-xl p-4 border border-white/5">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs text-emerald-400 font-bold">
-                    {r.displayName?.charAt(0)?.toUpperCase() || "?"}
+        <>
+          <div className="space-y-3">
+            {reviews.slice(0, visibleCount).map((r) => (
+              <div key={r.id} className="bg-[#1C1C1E] rounded-xl p-4 border border-white/5">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs text-emerald-400 font-bold">
+                      {r.displayName?.charAt(0)?.toUpperCase() || "?"}
+                    </div>
+                    <span className="text-white font-medium text-sm">{r.displayName}</span>
+                    <Stars rating={r.rating} />
                   </div>
-                  <span className="text-white font-medium text-sm">{r.displayName}</span>
-                  <Stars rating={r.rating} />
+                  <span className="text-white/25 text-[10px]">
+                    <TimeAgo date={r.createdAt} />
+                  </span>
                 </div>
-                <span className="text-white/25 text-[10px]">
-                  <TimeAgo date={r.createdAt} />
-                </span>
+
+                {/* Tags */}
+                {r.tags && r.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {r.tags.map((tag) => (
+                      <span key={tag} className="px-2 py-0.5 rounded-full bg-white/5 text-white/40 text-[10px]">
+                        {TAG_LABELS[tag] || tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Images */}
+                {r.images && r.images.length > 0 && (
+                  <div className="flex gap-2 mb-2">
+                    {r.images.map((img) => {
+                      const CMS = process.env.NEXT_PUBLIC_AUTH_BASE_URL || "https://cms.greenhub420.co.uk";
+                      const src = (img.thumbnail || img.url).startsWith("http") ? (img.thumbnail || img.url) : `${CMS}${img.thumbnail || img.url}`;
+                      return (
+                        <a key={img.id} href={img.url.startsWith("http") ? img.url : `${CMS}${img.url}`} target="_blank" rel="noopener noreferrer">
+                          <img src={src} alt="Review photo" className="w-16 h-16 rounded-lg object-cover border border-white/10 hover:border-emerald-500/30 transition-colors" />
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {r.comment && <p className="text-white/60 text-sm leading-relaxed">{r.comment}</p>}
               </div>
+            ))}
+          </div>
 
-              {/* Tags */}
-              {r.tags && r.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {r.tags.map((tag) => (
-                    <span key={tag} className="px-2 py-0.5 rounded-full bg-white/5 text-white/40 text-[10px]">
-                      {TAG_LABELS[tag] || tag}
-                    </span>
-                  ))}
-                </div>
+          {/* Show More / Show Less */}
+          {reviews.length > 5 && (
+            <div className="mt-4 flex justify-center">
+              {visibleCount < reviews.length ? (
+                <button
+                  onClick={() => setVisibleCount((prev) => Math.min(prev + 10, reviews.length))}
+                  className="rounded-full border border-white/10 bg-white/[0.03] px-6 py-2.5 text-sm font-medium text-white/50 transition hover:border-white/20 hover:text-white/70 active:scale-[0.97]"
+                >
+                  Show More ({reviews.length - visibleCount} remaining)
+                </button>
+              ) : (
+                <button
+                  onClick={() => setVisibleCount(5)}
+                  className="rounded-full border border-white/10 bg-white/[0.03] px-6 py-2.5 text-sm font-medium text-white/50 transition hover:border-white/20 hover:text-white/70 active:scale-[0.97]"
+                >
+                  Show Less
+                </button>
               )}
-
-              {/* Images */}
-              {r.images && r.images.length > 0 && (
-                <div className="flex gap-2 mb-2">
-                  {r.images.map((img) => {
-                    const CMS = process.env.NEXT_PUBLIC_AUTH_BASE_URL || "https://cms.greenhub420.co.uk";
-                    const src = (img.thumbnail || img.url).startsWith("http") ? (img.thumbnail || img.url) : `${CMS}${img.thumbnail || img.url}`;
-                    return (
-                      <a key={img.id} href={img.url.startsWith("http") ? img.url : `${CMS}${img.url}`} target="_blank" rel="noopener noreferrer">
-                        <img src={src} alt="Review photo" className="w-16 h-16 rounded-lg object-cover border border-white/10 hover:border-emerald-500/30 transition-colors" />
-                      </a>
-                    );
-                  })}
-                </div>
-              )}
-
-              {r.comment && <p className="text-white/60 text-sm leading-relaxed">{r.comment}</p>}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );
