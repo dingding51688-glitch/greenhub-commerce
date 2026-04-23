@@ -1,18 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
+import Image from "next/image";
 
 const REVIEW_TAGS = [
-  { id: "potent", label: "🔥 Potent", emoji: "🔥" },
-  { id: "great-taste", label: "😍 Great Taste", emoji: "😍" },
-  { id: "fast-delivery", label: "🚀 Fast Delivery", emoji: "🚀" },
-  { id: "no-smell", label: "👃 No Smell", emoji: "👃" },
-  { id: "good-value", label: "💰 Good Value", emoji: "💰" },
-  { id: "smooth", label: "🌊 Smooth", emoji: "🌊" },
-  { id: "nice-buds", label: "🌿 Nice Buds", emoji: "🌿" },
-  { id: "strong-high", label: "💫 Strong High", emoji: "💫" },
+  { id: "potent", label: "🔥 Potent" },
+  { id: "great-taste", label: "😍 Great Taste" },
+  { id: "fast-delivery", label: "🚀 Fast Delivery" },
+  { id: "no-smell", label: "👃 No Smell" },
+  { id: "good-value", label: "💰 Good Value" },
+  { id: "smooth", label: "🌊 Smooth" },
+  { id: "nice-buds", label: "🌿 Nice Buds" },
+  { id: "strong-high", label: "💫 Strong High" },
 ];
+
+const MAX_IMAGES = 3;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 function StarPicker({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   return (
@@ -39,6 +43,12 @@ const ratingLabels: Record<number, string> = {
   1: "Poor 👎",
 };
 
+interface UploadedImage {
+  id: number;
+  url: string;
+  preview: string;
+}
+
 interface ReviewModalProps {
   productId: number;
   productName: string;
@@ -52,13 +62,75 @@ export function ReviewModal({ productId, productName, orderId, onClose, onSucces
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [images, setImages] = useState<UploadedImage[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const toggleTag = (tagId: string) => {
     setSelectedTags((prev) =>
       prev.includes(tagId) ? prev.filter((t) => t !== tagId) : [...prev, tagId]
     );
+  };
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || !token) return;
+
+    const remaining = MAX_IMAGES - images.length;
+    if (remaining <= 0) { setError(`Maximum ${MAX_IMAGES} images`); return; }
+
+    const toUpload = Array.from(files).slice(0, remaining);
+    setUploading(true);
+    setError("");
+
+    for (const file of toUpload) {
+      if (file.size > MAX_FILE_SIZE) {
+        setError("Each image must be under 5MB");
+        continue;
+      }
+      if (!file.type.startsWith("image/")) {
+        setError("Only images are allowed");
+        continue;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append("files", file);
+
+        const res = await fetch("/api/strapi/upload", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
+
+        if (!res.ok) {
+          setError("Failed to upload image");
+          continue;
+        }
+
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const uploaded = data[0];
+          setImages((prev) => [...prev, {
+            id: uploaded.id,
+            url: uploaded.url,
+            preview: uploaded.formats?.thumbnail?.url || uploaded.url,
+          }]);
+        }
+      } catch {
+        setError("Upload failed");
+      }
+    }
+
+    setUploading(false);
+    // Reset file input
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removeImage = (id: number) => {
+    setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
   const handleSubmit = async () => {
@@ -69,7 +141,14 @@ export function ReviewModal({ productId, productName, orderId, onClose, onSucces
       const res = await fetch("/api/strapi/reviews/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ productId, rating, comment, orderId, tags: selectedTags }),
+        body: JSON.stringify({
+          productId,
+          rating,
+          comment,
+          orderId,
+          tags: selectedTags,
+          imageIds: images.map((img) => img.id),
+        }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data?.error?.message || data?.message || "Failed to submit"); return; }
@@ -88,7 +167,6 @@ export function ReviewModal({ productId, productName, orderId, onClose, onSucces
         className="relative w-full max-w-md rounded-t-2xl sm:rounded-2xl bg-[#1a1a1e] border border-white/10 p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
         <button onClick={onClose} className="absolute top-3 right-4 text-white/40 hover:text-white text-xl">✕</button>
 
         {/* Header */}
@@ -128,6 +206,55 @@ export function ReviewModal({ productId, productName, orderId, onClose, onSucces
           </div>
         </div>
 
+        {/* Photo Upload */}
+        <div className="mb-4">
+          <p className="text-xs text-white/40 mb-2 text-center">Add photos (optional)</p>
+          <div className="flex gap-2 justify-center items-center">
+            {images.map((img) => (
+              <div key={img.id} className="relative w-16 h-16 rounded-lg overflow-hidden border border-white/10">
+                <Image
+                  src={img.preview.startsWith("http") ? img.preview : `${process.env.NEXT_PUBLIC_AUTH_BASE_URL || "https://cms.greenhub420.co.uk"}${img.preview}`}
+                  alt="Review"
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+                <button
+                  onClick={() => removeImage(img.id)}
+                  className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            {images.length < MAX_IMAGES && (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="w-16 h-16 rounded-lg border-2 border-dashed border-white/15 hover:border-emerald-500/40 flex flex-col items-center justify-center text-white/30 hover:text-emerald-400 transition-colors"
+              >
+                {uploading ? (
+                  <span className="text-xs animate-pulse">...</span>
+                ) : (
+                  <>
+                    <span className="text-xl leading-none">📷</span>
+                    <span className="text-[9px] mt-0.5">{images.length}/{MAX_IMAGES}</span>
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleImageSelect}
+          />
+        </div>
+
         {/* Comment */}
         <div className="mb-4">
           <textarea
@@ -144,10 +271,9 @@ export function ReviewModal({ productId, productName, orderId, onClose, onSucces
 
         {error && <p className="text-red-400 text-sm mb-3 text-center">{error}</p>}
 
-        {/* Submit */}
         <button
           onClick={handleSubmit}
-          disabled={submitting}
+          disabled={submitting || uploading}
           className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 disabled:opacity-50 text-white font-bold text-sm transition-all"
         >
           {submitting ? "Submitting..." : "Submit Review ⭐"}

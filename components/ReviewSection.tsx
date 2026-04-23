@@ -25,11 +25,18 @@ const REVIEW_TAGS = [
   { id: "strong-high", label: "💫 Strong High" },
 ];
 
+interface ReviewImage {
+  id: number;
+  url: string;
+  thumbnail: string;
+}
+
 interface Review {
   id: number;
   rating: number;
   comment: string;
   tags: string[];
+  images: ReviewImage[];
   displayName: string;
   createdAt: string;
 }
@@ -322,6 +329,21 @@ export function ReviewSection({ productId }: { productId: number }) {
                       {TAG_LABELS[tag] || tag}
                     </span>
                   ))}
+                </div>
+              )}
+
+              {/* Images */}
+              {r.images && r.images.length > 0 && (
+                <div className="flex gap-2 mb-2">
+                  {r.images.map((img) => {
+                    const CMS = process.env.NEXT_PUBLIC_AUTH_BASE_URL || "https://cms.greenhub420.co.uk";
+                    const src = (img.thumbnail || img.url).startsWith("http") ? (img.thumbnail || img.url) : `${CMS}${img.thumbnail || img.url}`;
+                    return (
+                      <a key={img.id} href={img.url.startsWith("http") ? img.url : `${CMS}${img.url}`} target="_blank" rel="noopener noreferrer">
+                        <img src={src} alt="Review photo" className="w-16 h-16 rounded-lg object-cover border border-white/10 hover:border-emerald-500/30 transition-colors" />
+                      </a>
+                    );
+                  })}
                 </div>
               )}
 
