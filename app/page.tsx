@@ -261,12 +261,18 @@ async function HotProducts() {
 
 /* ── Recent Reviews Section ── */
 async function RecentReviews() {
-  let reviews: Array<{ rating: number; comment: string; displayName: string; productTitle: string }> = [];
+  let reviews: Array<{ rating: number; comment: string; displayName: string; productTitle: string; slug: string }> = [];
 
-  // Product IDs and names to fetch reviews from
-  const productMap: Record<number, string> = {
-    1: "Stardawg", 2: "Amnesia Haze", 3: "Gumbo", 4: "Lemon Cherry Gelato",
-    5: "Candy Runtz", 7: "THC Premium Hash", 8: "Apple Tart", 18: "Baby Yoda",
+  // Product IDs → name + slug
+  const productMap: Record<number, { name: string; slug: string }> = {
+    1: { name: "Stardawg", slug: "stardawg" },
+    2: { name: "Amnesia Haze", slug: "amnesia-haze" },
+    3: { name: "Gumbo", slug: "gumbo" },
+    4: { name: "Lemon Cherry Gelato", slug: "lemon-cherry-gelato" },
+    5: { name: "Candy Runtz", slug: "candy-runtz" },
+    7: { name: "THC Premium Hash", slug: "thc-premium-hash" },
+    8: { name: "Apple Tart", slug: "apple-tart" },
+    18: { name: "Baby Yoda", slug: "baby-yoda" },
   };
 
   try {
@@ -283,11 +289,13 @@ async function RecentReviews() {
       if (result.status === "fulfilled" && result.value?.data) {
         for (const r of result.value.data) {
           if (r.comment && r.comment.trim().length > 2) {
+            const prod = productMap[Number(productIds[i])];
             reviews.push({
               rating: r.rating,
               comment: r.comment,
               displayName: r.displayName || "Customer",
-              productTitle: productMap[Number(productIds[i])] || "Product",
+              productTitle: prod?.name || "Product",
+              slug: prod?.slug || "",
             });
           }
         }
@@ -308,7 +316,7 @@ async function RecentReviews() {
       </div>
       <div className="flex gap-2.5 overflow-x-auto pb-2 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:overflow-visible">
         {reviews.map((r, i) => (
-          <div key={i} className="w-[70vw] shrink-0 snap-start rounded-xl border border-white/8 bg-white/[0.02] p-3.5 sm:w-auto">
+          <Link key={i} href={`/products/${r.slug}`} className="w-[70vw] shrink-0 snap-start rounded-xl border border-white/8 bg-white/[0.02] p-3.5 sm:w-auto active:scale-[0.97] transition">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs text-emerald-400 font-bold">
                 {r.displayName?.charAt(0)?.toUpperCase() || "?"}
@@ -324,7 +332,7 @@ async function RecentReviews() {
               </span>
             </div>
             <p className="text-[11px] text-white/50 leading-relaxed line-clamp-2">{r.comment}</p>
-          </div>
+          </Link>
         ))}
       </div>
     </section>
