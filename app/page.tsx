@@ -86,48 +86,62 @@ export default async function HomePage() {
       {/* ── 3. 🔥 Hot Products — NEW ── */}
       <HotProducts />
 
-      {/* ── 4. How It Works — compact ── */}
+      {/* ── 4. How It Works — sci-fi ── */}
       <div className="flex gap-2 overflow-x-auto pb-1 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:overflow-visible">
         {[
-          { icon: "🛒", title: "Order", desc: "Browse, pick your weight & pay with wallet" },
-          { icon: "📦", title: "We Ship", desc: "Same-day dispatch to your chosen locker" },
-          { icon: "🔓", title: "Collect", desc: "Enter code, grab parcel — 30 seconds" },
+          { icon: "🛒", title: "Order", desc: "Browse, pick your weight & pay with wallet", glow: "bg-emerald-400/8", border: "border-emerald-400/10", num: "01" },
+          { icon: "📦", title: "We Ship", desc: "Same-day dispatch to your chosen locker", glow: "bg-cyan-400/8", border: "border-cyan-400/10", num: "02" },
+          { icon: "🔓", title: "Collect", desc: "Enter code, grab parcel — 30 seconds", glow: "bg-purple-400/8", border: "border-purple-400/10", num: "03" },
         ].map((step) => (
-          <div key={step.title} className="w-[45vw] shrink-0 snap-start rounded-2xl border border-white/10 bg-white/[0.02] p-3.5 sm:w-auto sm:p-4">
-            <span className="text-xl">{step.icon}</span>
-            <h3 className="mt-1.5 text-xs font-bold text-white sm:text-sm">{step.title}</h3>
-            <p className="mt-0.5 text-[10px] leading-relaxed text-white/45 sm:text-xs">{step.desc}</p>
+          <div key={step.title} className={`relative isolate overflow-hidden w-[45vw] shrink-0 snap-start rounded-2xl border ${step.border} bg-white/[0.01] p-3.5 sm:w-auto sm:p-4`}>
+            <div className={`absolute -top-4 -right-4 h-14 w-14 ${step.glow} rounded-full blur-xl`} aria-hidden="true" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{step.icon}</span>
+                <span className="text-[10px] font-mono text-white/15">{step.num}</span>
+              </div>
+              <h3 className="mt-1.5 text-xs font-bold text-white sm:text-sm">{step.title}</h3>
+              <p className="mt-0.5 text-[10px] leading-relaxed text-white/40 sm:text-xs">{step.desc}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* ── 5. Trust Bar ── */}
+      {/* ── 5. Trust Bar — sci-fi ── */}
       <div className="grid grid-cols-4 gap-2">
         {[
-          { icon: "🔒", text: "Encrypted" },
-          { icon: "📍", text: "16,000+" },
-          { icon: "⚡", text: "Same Day" },
-          { icon: "🎯", text: "No ID" },
+          { icon: "🔒", text: "Encrypted", color: "text-emerald-400/60" },
+          { icon: "📍", text: "16,000+", color: "text-cyan-400/60" },
+          { icon: "⚡", text: "Same Day", color: "text-amber-400/60" },
+          { icon: "🎯", text: "No ID", color: "text-purple-400/60" },
         ].map((t) => (
-          <div key={t.text} className="rounded-xl border border-white/8 bg-white/[0.02] py-2.5 text-center">
-            <span className="text-lg">{t.icon}</span>
-            <p className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-white/50">{t.text}</p>
+          <div key={t.text} className="relative isolate overflow-hidden rounded-xl border border-white/6 bg-white/[0.01] py-2.5 text-center">
+            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent" aria-hidden="true" />
+            <div className="relative z-10">
+              <span className="text-lg">{t.icon}</span>
+              <p className={`mt-0.5 text-[9px] font-bold uppercase tracking-wider ${t.color}`}>{t.text}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* ── 6. Earn Hub Promo ── */}
-      <section className="rounded-2xl border border-purple-400/20 bg-gradient-to-br from-purple-500/10 to-transparent px-5 py-5 sm:rounded-3xl sm:px-8 sm:py-8">
-        <div className="flex items-start gap-4">
-          <span className="text-3xl">💰</span>
+      {/* ── 6. Earn Hub Promo — sci-fi ── */}
+      <section className="relative isolate overflow-hidden rounded-2xl border border-purple-400/15 px-5 py-5 sm:rounded-3xl sm:px-8 sm:py-8">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-[#0d0d0d] to-pink-500/5" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
+        <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-purple-400/10 blur-3xl" aria-hidden="true" />
+        <div className="relative z-10 flex items-start gap-4">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-400/15">
+            <span className="text-2xl">💰</span>
+          </div>
           <div className="flex-1">
             <h2 className="text-base font-bold text-white sm:text-xl">Earn 15–25% commission</h2>
-            <p className="mt-1 text-xs leading-relaxed text-white/55 sm:text-sm">
-              Share your referral link with friends. Every time they order, you earn commission — credited instantly to your wallet.
+            <p className="mt-1 text-xs leading-relaxed text-white/40 sm:text-sm">
+              Share your referral link. Every order from friends = instant commission to your wallet.
             </p>
             <Link
               href="/account/commission"
-              className="mt-3 inline-flex min-h-[36px] items-center justify-center rounded-full bg-purple-500 px-5 text-xs font-semibold text-white transition hover:bg-purple-400"
+              className="mt-3 inline-flex min-h-[36px] items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-5 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 active:scale-[0.97] transition"
             >
               Open Earn Hub →
             </Link>
@@ -138,34 +152,45 @@ export default async function HomePage() {
       {/* ── 7. Customer Reviews ── */}
       <RecentReviews />
 
-      {/* ── 8. Payment Methods ── */}
-      <section className="rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-4 sm:rounded-3xl sm:px-8 sm:py-6">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">We accept</p>
-        <div className="mt-3 flex gap-3">
-          {[
-            { icon: "🏦", name: "Bank Transfer", tag: "5 min" },
-            { icon: "💳", name: "Wallet", tag: "Instant" },
-            { icon: "₮", name: "USDT", tag: "Crypto" },
-          ].map((m) => (
-            <div key={m.name} className="flex-1 rounded-xl border border-white/8 bg-white/[0.02] px-3 py-2.5 text-center">
-              <span className="text-lg">{m.icon}</span>
-              <p className="mt-1 text-[10px] font-semibold text-white/70">{m.name}</p>
-              <p className="text-[9px] text-emerald-400/70">{m.tag}</p>
-            </div>
-          ))}
+      {/* ── 8. Payment Methods — sci-fi ── */}
+      <section className="relative isolate overflow-hidden rounded-2xl border border-white/8 px-4 py-4 sm:rounded-3xl sm:px-8 sm:py-6">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0d0d0d] to-[#0a0d1a]" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
+        <div className="relative z-10">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/30">Secure Payments</p>
+          <div className="mt-3 flex gap-2.5">
+            {[
+              { icon: "🏦", name: "Bank Transfer", tag: "5 min", glow: "bg-blue-400/8", border: "border-blue-400/10" },
+              { icon: "💳", name: "Wallet", tag: "Instant", glow: "bg-emerald-400/8", border: "border-emerald-400/10" },
+              { icon: "₮", name: "USDT", tag: "Crypto", glow: "bg-purple-400/8", border: "border-purple-400/10" },
+            ].map((m) => (
+              <div key={m.name} className={`relative isolate overflow-hidden flex-1 rounded-xl border ${m.border} bg-white/[0.01] px-3 py-2.5 text-center`}>
+                <div className={`absolute -top-3 -right-3 h-10 w-10 ${m.glow} rounded-full blur-xl`} aria-hidden="true" />
+                <div className="relative z-10">
+                  <span className="text-lg">{m.icon}</span>
+                  <p className="mt-1 text-[10px] font-semibold text-white/60">{m.name}</p>
+                  <p className="text-[9px] font-medium text-emerald-400/70">{m.tag}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── 9. Telegram ── */}
+      {/* ── 9. Telegram — sci-fi ── */}
       <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
-        className="relative flex items-center gap-3 overflow-hidden rounded-2xl border border-blue-400/25 bg-gradient-to-r from-blue-500/15 via-blue-400/8 to-transparent px-4 py-4 active:scale-[0.98] transition">
-        <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-400/10 blur-2xl" />
-        <span className="relative text-2xl">✈️</span>
-        <div className="relative flex-1 min-w-0">
-          <p className="text-sm font-bold text-white">Join us on Telegram</p>
-          <p className="mt-0.5 text-[10px] text-blue-300/60">New drops · Exclusive deals · Giveaways</p>
+        className="relative isolate flex items-center gap-3 overflow-hidden rounded-2xl border border-blue-400/15 px-4 py-4 active:scale-[0.98] transition">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-blue-400/5 to-transparent" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
+        <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-400/8 blur-2xl" aria-hidden="true" />
+        <div className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-400/15">
+          <span className="text-xl">✈️</span>
         </div>
-        <span className="relative rounded-full bg-blue-400/20 px-3 py-1 text-xs font-bold text-blue-300">Join</span>
+        <div className="relative z-10 flex-1 min-w-0">
+          <p className="text-sm font-bold text-white">Join us on Telegram</p>
+          <p className="mt-0.5 text-[10px] text-blue-300/50">New drops · Exclusive deals · Giveaways</p>
+        </div>
+        <span className="relative z-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-400 px-3.5 py-1.5 text-[10px] font-bold text-white shadow-lg shadow-blue-500/15">Join</span>
       </a>
 
       {/* ── 10. AI Support CTA — sci-fi style ── */}
@@ -316,22 +341,25 @@ async function RecentReviews() {
       </div>
       <div className="flex gap-2.5 overflow-x-auto pb-2 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:overflow-visible">
         {reviews.map((r, i) => (
-          <Link key={i} href={`/products/${r.slug}`} className="w-[70vw] shrink-0 snap-start rounded-xl border border-white/8 bg-white/[0.02] p-3.5 sm:w-auto active:scale-[0.97] transition">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs text-emerald-400 font-bold">
-                {r.displayName?.charAt(0)?.toUpperCase() || "?"}
+          <Link key={i} href={`/products/${r.slug}`} className="relative isolate overflow-hidden w-[70vw] shrink-0 snap-start rounded-xl border border-amber-400/8 bg-white/[0.01] p-3.5 sm:w-auto active:scale-[0.97] transition">
+            <div className="absolute -top-4 -right-4 h-12 w-12 rounded-full bg-yellow-400/5 blur-xl" aria-hidden="true" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400/20 to-cyan-400/10 flex items-center justify-center text-xs text-emerald-400 font-bold ring-1 ring-emerald-400/20">
+                  {r.displayName?.charAt(0)?.toUpperCase() || "?"}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-white truncate">{r.displayName}</p>
+                  <p className="text-[9px] text-white/25 truncate">{r.productTitle}</p>
+                </div>
+                <span className="text-xs">
+                  {[1,2,3,4,5].map((s) => (
+                    <span key={s} className={s <= r.rating ? "text-yellow-400" : "text-white/10"}>★</span>
+                  ))}
+                </span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-white truncate">{r.displayName}</p>
-                <p className="text-[9px] text-white/30 truncate">{r.productTitle}</p>
-              </div>
-              <span className="text-xs">
-                {[1,2,3,4,5].map((s) => (
-                  <span key={s} className={s <= r.rating ? "text-yellow-400" : "text-white/15"}>★</span>
-                ))}
-              </span>
+              <p className="text-[11px] text-white/45 leading-relaxed line-clamp-2">{r.comment}</p>
             </div>
-            <p className="text-[11px] text-white/50 leading-relaxed line-clamp-2">{r.comment}</p>
           </Link>
         ))}
       </div>
