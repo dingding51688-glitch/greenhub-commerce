@@ -112,7 +112,7 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
                     <span className="relative text-base">{a.emoji}</span>
                     <span className="relative text-[9px] font-medium text-white/40">{a.label}</span>
                     {a.badge && (
-                      <span className="absolute -right-0.5 -top-0.5 min-w-[14px] rounded-full bg-rose-500 px-1 text-[8px] font-bold leading-[14px] text-white text-center">{a.badge}</span>
+                      <span className="absolute -right-1 -top-1 min-w-[18px] h-[18px] rounded-full bg-rose-500 px-1 text-[10px] font-bold leading-[18px] text-white text-center shadow-lg">{a.badge}</span>
                     )}
                   </button>
                 ))}
