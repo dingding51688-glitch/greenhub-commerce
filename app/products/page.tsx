@@ -79,17 +79,35 @@ export default function ProductsPage() {
 
   return (
     <div className="space-y-4 pb-24 sm:space-y-6 sm:pb-20">
+      {/* ── Page header with sci-fi style ── */}
+      <section className="relative isolate overflow-hidden rounded-2xl border border-emerald-400/10 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-8">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1a12] via-[#0d0d0d] to-[#0a0d1a]" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
+        <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-emerald-400/8 blur-3xl animate-pulse" aria-hidden="true" />
+
+        <div className="relative z-10">
+          <h1 className="text-lg font-bold text-white sm:text-2xl">
+            {hero.title === "All Products" ? (
+              <>All <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Products</span></>
+            ) : (
+              <>{hero.title.split(" ")[0]} <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">{hero.title.split(" ").slice(1).join(" ") || hero.title}</span></>
+            )}
+          </h1>
+          <p className="mt-1 text-xs text-white/35 sm:text-sm">{hero.description}</p>
+        </div>
+      </section>
+
       {/* Category tabs - horizontal scroll on mobile */}
-      <div className="flex gap-2 overflow-x-auto pb-1 snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
+      <div className="flex gap-1.5 overflow-x-auto pb-1 snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
         {CATEGORY_TABS.map((tab) => (
           <button
             key={tab}
             type="button"
             className={clsx(
-              "flex shrink-0 snap-start items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition whitespace-nowrap",
+              "flex shrink-0 snap-start items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-semibold transition whitespace-nowrap",
               category === tab
-                ? "bg-emerald-400/15 text-emerald-300 border border-emerald-400/30"
-                : "bg-white/[0.04] text-white/50 border border-white/8 hover:text-white/80"
+                ? "bg-gradient-to-r from-emerald-400/15 to-cyan-400/10 text-emerald-300 border border-emerald-400/25 shadow-sm shadow-emerald-400/10"
+                : "bg-white/[0.03] text-white/40 border border-white/6 hover:text-white/70 hover:border-white/12"
             )}
             onClick={() => handleCategoryChange(tab)}
           >
@@ -99,24 +117,21 @@ export default function ProductsPage() {
         ))}
       </div>
 
-      {/* Category header */}
-      <div>
-        <h1 className="text-lg font-bold text-white sm:text-2xl">{hero.title}</h1>
-        <p className="mt-1 text-xs text-white/40 sm:text-sm">{hero.description}</p>
-      </div>
-
       {/* Product count + sort */}
       {!isLoading && products.length > 0 && (
         <div className="flex items-center justify-between">
-          <p className="text-[10px] uppercase tracking-wider text-white/30">{products.length} products</p>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-5 items-center rounded-md bg-emerald-400/10 px-2 text-[10px] font-bold text-emerald-400">{products.length}</span>
+            <p className="text-[10px] uppercase tracking-wider text-white/25">products</p>
+          </div>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="rounded-lg border border-white/10 bg-transparent px-2 py-1 text-[10px] text-white/50 outline-none"
+            className="rounded-lg border border-white/8 bg-white/[0.03] px-2.5 py-1.5 text-[10px] text-white/50 outline-none transition hover:border-white/15"
           >
-            <option value="newest" className="bg-black">Newest</option>
-            <option value="price-low" className="bg-black">Price: Low → High</option>
-            <option value="price-high" className="bg-black">Price: High → Low</option>
+            <option value="newest" className="bg-[#0d0d0d]">Newest</option>
+            <option value="price-low" className="bg-[#0d0d0d]">Price: Low → High</option>
+            <option value="price-high" className="bg-[#0d0d0d]">Price: High → Low</option>
           </select>
         </div>
       )}
@@ -132,10 +147,13 @@ export default function ProductsPage() {
 
       {/* Empty */}
       {!isLoading && products.length === 0 && (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8 text-center">
-          <p className="text-2xl">🔍</p>
-          <p className="mt-2 text-sm font-medium text-white/60">No products in this category yet</p>
-          <p className="mt-1 text-xs text-white/30">Check back soon or browse another category</p>
+        <div className="relative isolate overflow-hidden rounded-2xl border border-white/8 p-8 text-center">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent" aria-hidden="true" />
+          <div className="relative z-10">
+            <p className="text-3xl">🔍</p>
+            <p className="mt-3 text-sm font-medium text-white/60">No products in this category yet</p>
+            <p className="mt-1 text-xs text-white/30">Check back soon or browse another category</p>
+          </div>
         </div>
       )}
 
@@ -148,14 +166,23 @@ export default function ProductsPage() {
         </div>
       )}
 
-      {/* Support CTA */}
-      <div className="rounded-2xl border border-white/8 bg-white/[0.02] px-4 py-4 sm:px-6">
-        <p className="text-sm font-semibold text-white">Need help choosing?</p>
-        <p className="mt-1 text-xs text-white/40">Message our team and we&apos;ll recommend the best products for you.</p>
-        <Button asChild variant="ghost" size="sm" className="mt-2">
-          <a href="/support">Contact support</a>
-        </Button>
-      </div>
+      {/* Support CTA - sci-fi style */}
+      <section className="relative isolate overflow-hidden rounded-2xl border border-cyan-400/15 px-4 py-4 sm:px-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/[0.05] via-transparent to-blue-500/[0.05]" aria-hidden="true" />
+        <div className="absolute -top-6 -right-6 h-16 w-16 rounded-full bg-cyan-400/8 blur-2xl" aria-hidden="true" />
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10">
+            <span className="text-lg">🤖</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-white">Need help choosing?</p>
+            <p className="mt-0.5 text-[10px] text-white/35">Our AI assistant can recommend the perfect product</p>
+          </div>
+          <a href="/support" className="shrink-0 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 px-4 py-2 text-[10px] font-semibold text-white shadow-lg shadow-cyan-500/15 active:scale-[0.95] transition">
+            Chat
+          </a>
+        </div>
+      </section>
     </div>
   );
 }
