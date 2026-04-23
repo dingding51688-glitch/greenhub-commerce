@@ -16,35 +16,64 @@ function strapiMedia(path?: string | null): string | undefined {
 export default async function HomePage() {
   return (
     <div className="space-y-5 pb-20 sm:space-y-10">
-      {/* ── 1. Hero ── */}
-      <section className="relative isolate overflow-hidden rounded-2xl border border-white/10 px-4 py-5 sm:rounded-[40px] sm:px-12 sm:py-14">
-        <div className="absolute inset-0 bg-hero-gradient" aria-hidden="true" />
-        <div className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(circle at 20% -10%, rgba(19,168,107,0.45), transparent 55%)" }} aria-hidden="true" />
+      {/* ── 1. Hero — Sci-fi style ── */}
+      <section className="relative isolate overflow-hidden rounded-2xl border border-emerald-400/15 px-4 py-6 sm:rounded-[40px] sm:px-12 sm:py-14">
+        {/* Layered sci-fi background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1a12] via-[#0d0d0d] to-[#0a0d1a]" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(ellipse at 30% -20%, rgba(16,185,129,0.4), transparent 60%)" }} aria-hidden="true" />
+        <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 120%, rgba(6,182,212,0.3), transparent 50%)" }} aria-hidden="true" />
+        {/* Grid overlay */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
+        {/* Floating orbs */}
+        <div className="absolute -top-8 -right-8 h-28 w-28 rounded-full bg-emerald-400/8 blur-3xl animate-pulse" aria-hidden="true" />
+        <div className="absolute -bottom-6 -left-10 h-20 w-20 rounded-full bg-cyan-400/8 blur-2xl" aria-hidden="true" />
+
         <div className="relative z-10">
-          <h1 className="text-[20px] font-bold leading-tight text-white sm:text-[42px]">
-            Order online. Pick up anonymously.
+          {/* Status badge */}
+          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/5 px-3 py-1">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            </span>
+            <span className="text-[10px] font-medium text-emerald-400">Delivering across the UK</span>
+          </div>
+
+          <h1 className="text-[22px] font-bold leading-tight text-white sm:text-[42px]">
+            Order online.<br />
+            <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Pick up anonymously.</span>
           </h1>
-          <p className="mt-2 max-w-md text-xs leading-relaxed text-white/50 sm:text-sm sm:mt-3">
-            Premium products delivered to InPost lockers &amp; collection points. No name, no ID.
+          <p className="mt-2 max-w-md text-xs leading-relaxed text-white/45 sm:text-sm sm:mt-3">
+            Premium products delivered to 16,000+ InPost lockers &amp; collection points. No name, no ID.
           </p>
-          <div className="mt-3 flex gap-2.5 sm:mt-5">
+
+          <div className="mt-4 flex gap-2.5 sm:mt-5">
             <Link
               href="/products"
-              className="inline-flex min-h-[44px] items-center justify-center rounded-full cta-gradient px-6 text-sm font-semibold uppercase tracking-wider text-white shadow-cta"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 px-6 text-sm font-semibold uppercase tracking-wider text-black shadow-lg shadow-emerald-500/25 active:scale-[0.97] transition"
             >
               Shop Now
             </Link>
+            <Link
+              href="/how-it-works"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/15 bg-white/[0.03] px-6 text-sm font-semibold uppercase tracking-wider text-white/70 active:scale-[0.97] transition"
+            >
+              How It Works
+            </Link>
           </div>
-          {/* Stats — visible on mobile too now */}
-          <div className="mt-4 flex gap-4 sm:gap-8">
+
+          {/* Stats row */}
+          <div className="mt-5 flex gap-3 sm:gap-8">
             {[
-              { val: "16,000+", label: "Lockers" },
-              { val: "Same Day", label: "Dispatch" },
-              { val: "100%", label: "Discreet" },
+              { val: "16,000+", label: "Lockers", icon: "📍" },
+              { val: "Same Day", label: "Dispatch", icon: "⚡" },
+              { val: "100%", label: "Anonymous", icon: "🔒" },
             ].map((s) => (
-              <div key={s.label} className="shrink-0 text-center">
-                <p className="text-sm font-bold text-white sm:text-xl">{s.val}</p>
-                <p className="text-[8px] uppercase tracking-wider text-white/40 sm:text-[9px]">{s.label}</p>
+              <div key={s.label} className="flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2">
+                <span className="text-sm">{s.icon}</span>
+                <div>
+                  <p className="text-xs font-bold text-white sm:text-sm">{s.val}</p>
+                  <p className="text-[8px] uppercase tracking-wider text-white/30 sm:text-[9px]">{s.label}</p>
+                </div>
               </div>
             ))}
           </div>
