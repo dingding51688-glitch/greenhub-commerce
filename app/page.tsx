@@ -150,7 +150,7 @@ export default async function HomePage() {
             <span className="text-2xl">🎰</span>
             <h3 className="text-base font-bold text-white">Daily £100 Lottery</h3>
           </div>
-          <p className="text-xs text-gray-400 leading-relaxed mb-3">Join our Telegram group for a chance to win £100 bonus every day at 8PM. Register, enter your Wallet ID, and you could be tonight&apos;s winner!</p>
+          <p className="text-xs text-gray-400 leading-relaxed mb-3">Join our Telegram group, bind your Wallet ID to get <b className="text-amber-300">£5 bonus</b> instantly + enter the daily £100 draw at 8PM!</p>
           
           <div className="flex items-center gap-3 mb-4">
             <div className="flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5">

@@ -116,7 +116,7 @@ export default function WalletPage() {
             <a href="https://t.me/+CPvB4XJ1Rzg4NDZk" target="_blank" rel="noopener noreferrer"
               className="mt-2.5 flex items-center gap-2 rounded-lg border border-amber-400/10 bg-amber-400/[0.03] px-2.5 py-2 transition hover:border-amber-400/20">
               <span className="text-sm">🎰</span>
-              <span className="text-[10px] text-amber-300/70">Use your Wallet ID to join the daily £100 lottery on Telegram!</span>
+              <span className="text-[10px] text-amber-300/70">Bind your Wallet ID on Telegram → get £5 bonus + daily £100 lottery!</span>
               <span className="ml-auto text-[10px] text-amber-400 font-semibold shrink-0">Join →</span>
             </a>
 
