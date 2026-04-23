@@ -220,7 +220,7 @@ function WeightPriceGrid({ product, outOfStock }: { product: ProductRecord; outO
   };
 
   return (
-    <div className={`mt-auto grid grid-cols-2 gap-1 pt-2 ${outOfStock ? "opacity-30" : ""}`}>
+    <div className={`mt-auto grid grid-cols-2 gap-1.5 pt-2 ${outOfStock ? "opacity-30" : ""}`}>
       {product.weightOptions!.slice(0, 4).map((opt) => {
         const up = computeUnitPrice(opt);
         const isSelected = selectedId === opt.id;
@@ -232,25 +232,25 @@ function WeightPriceGrid({ product, outOfStock }: { product: ProductRecord; outO
             type="button"
             disabled={outOfStock || optSoldOut}
             onClick={(e) => handleClick(opt, e)}
-            className={`relative rounded-lg border px-1.5 py-1.5 text-center transition ${
+            className={`relative overflow-hidden rounded-xl border px-2 py-2 text-center transition ${
               optSoldOut
                 ? "border-white/5 bg-white/[0.01] opacity-40"
                 : isAdded
                   ? "border-emerald-400/40 bg-emerald-400/20"
                   : isSelected
                     ? "border-emerald-400/40 bg-emerald-400/15 ring-1 ring-emerald-400/30"
-                    : "border-emerald-400/15 bg-emerald-400/[0.04] hover:border-emerald-400/30 hover:bg-emerald-400/10 active:scale-95"
+                    : "border-white/10 bg-gradient-to-br from-white/[0.04] to-white/[0.01] hover:border-emerald-400/25 hover:from-emerald-400/10 hover:to-emerald-400/[0.02] active:scale-95"
             }`}
           >
             {opt.featured && !isAdded && !isSelected && !optSoldOut && (
-              <span className="absolute -top-1.5 right-1 rounded-full bg-emerald-400/25 px-1 text-[6px] font-bold uppercase text-emerald-300">
+              <span className="absolute -top-0.5 right-0.5 rounded-full bg-emerald-400/20 px-1.5 py-0.5 text-[6px] font-bold uppercase text-emerald-300">
                 Popular
               </span>
             )}
             {optSoldOut ? (
               <>
-                <p className="text-[9px] text-white/30">{opt.label}</p>
-                <p className="text-[10px] font-bold text-red-400/60">Sold Out</p>
+                <p className="text-[10px] font-semibold text-white/25">{opt.label}</p>
+                <p className="text-[10px] font-bold text-red-400/70">Sold Out</p>
               </>
             ) : isAdded ? (
               <p className="py-1 text-xs font-bold text-emerald-300">✓ Added</p>
@@ -258,9 +258,9 @@ function WeightPriceGrid({ product, outOfStock }: { product: ProductRecord; outO
               <p className="py-1 text-xs font-bold text-emerald-300">Tap to add 🛒</p>
             ) : (
               <>
-                <p className="text-[9px] text-white/40">{opt.label}</p>
-                <p className="text-sm font-bold text-white">£{opt.price.toFixed(0)}</p>
-                {up && <p className="text-[8px] text-white/25">{up}</p>}
+                <p className="text-[10px] font-bold text-emerald-400/70">{opt.label}</p>
+                <p className="text-base font-extrabold text-white">£{opt.price.toFixed(0)}</p>
+                {up && <p className="text-[9px] font-medium text-white/30">{up}</p>}
               </>
             )}
           </button>
