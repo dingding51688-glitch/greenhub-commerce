@@ -16,7 +16,7 @@ const FAQ = [
 const SUPPORT_FEATURES = [
   { icon: "🤖", title: "AI-Powered", desc: "Get instant answers to any question, 24 hours a day" },
   { icon: "📦", title: "Order Tracking", desc: "Share your order reference and get live status updates" },
-  { icon: "🌐", title: "Multilingual", desc: "We speak English and Chinese — type in your language" },
+  { icon: "🌐", title: "Multilingual", desc: "Type in any language — we'll reply in yours" },
   { icon: "👤", title: "Human Backup", desc: "Complex issues are handed to a real agent seamlessly" },
 ];
 
