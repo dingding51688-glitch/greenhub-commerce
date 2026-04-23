@@ -118,46 +118,69 @@ export default function AccountPage() {
 
   return (
     <div className="space-y-4 pb-24 sm:space-y-6 sm:pb-20">
-      {/* ── Header card ── */}
-      <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-emerald-900/20 to-transparent p-4">
-        <div className="flex items-center gap-3">
-          {/* Avatar */}
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-400/15 text-xl font-bold text-emerald-300">
-            {displayName.charAt(0).toUpperCase()}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-base font-bold text-white">{displayName}</p>
-            <div className="flex items-center gap-2">
-              <CopyBadge text={displayId} />
-              {attrs?.emailVerifiedAt ? (
-                <span className="rounded-full bg-emerald-400/15 px-1.5 py-0.5 text-[8px] font-bold text-emerald-300">✓ Verified</span>
-              ) : (
-                <span className="rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[8px] font-bold text-amber-300">Unverified</span>
-              )}
+      {/* ── Header card — holographic ID ── */}
+      <div className="relative isolate overflow-hidden rounded-2xl border border-emerald-400/15 p-4">
+        {/* Sci-fi bg layers */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1a12] via-[#0d0d0d] to-[#0a0d1a]" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "30px 30px" }} aria-hidden="true" />
+        <div className="absolute -top-8 -right-8 h-28 w-28 rounded-full bg-emerald-400/8 blur-3xl animate-pulse" aria-hidden="true" />
+        <div className="absolute -bottom-6 -left-6 h-20 w-20 rounded-full bg-cyan-400/6 blur-2xl" aria-hidden="true" />
+
+        <div className="relative z-10">
+          <div className="flex items-center gap-3">
+            {/* Avatar with glow ring */}
+            <div className="relative">
+              <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400/20 to-cyan-400/10 text-xl font-bold text-emerald-300 ring-2 ring-emerald-400/30 ring-offset-2 ring-offset-[#0d0d0d]">
+                {displayName.charAt(0).toUpperCase()}
+              </div>
+              <span className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-emerald-400 border-2 border-[#0d0d0d]" />
+              </span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-base font-bold text-white">{displayName}</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <CopyBadge text={displayId} />
+                {attrs?.emailVerifiedAt ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/10 px-2 py-0.5 text-[8px] font-bold text-emerald-400">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" /> Verified
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-amber-400/10 px-2 py-0.5 text-[8px] font-bold text-amber-400">Unverified</span>
+                )}
+              </div>
             </div>
           </div>
-          {/* Balance */}
-          <div className="text-right">
-            <p className="text-[9px] text-white/30">Balance</p>
-            <p className="text-lg font-bold text-emerald-300">£{balance.toFixed(2)}</p>
+
+          {/* Balance display */}
+          <div className="mt-3 rounded-xl border border-white/5 bg-white/[0.02] px-3.5 py-2.5 flex items-center justify-between">
+            <div>
+              <p className="text-[9px] uppercase tracking-widest text-white/25">Available Balance</p>
+              <p className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">£{balance.toFixed(2)}</p>
+            </div>
+            <Link href="/wallet" className="rounded-full bg-emerald-400/10 px-3 py-1.5 text-[10px] font-semibold text-emerald-400 transition hover:bg-emerald-400/20">
+              Top Up →
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* ── Quick actions 2x2 ── */}
-      <div className="grid grid-cols-2 gap-2">
+      {/* ── Quick actions 2x2 — glowing tiles ── */}
+      <div className="grid grid-cols-2 gap-2.5">
         {[
-          { icon: "💰", label: "Wallet", desc: "Balance & history", href: "/wallet" },
-          { icon: "📦", label: "Orders", desc: "Track deliveries", href: "/orders" },
-          { icon: "🤝", label: "Earn Hub", desc: "Invite & earn", href: "/account/commission" },
-          { icon: "🔔", label: "Notifications", desc: "Alerts & updates", href: "/account/notifications" },
+          { icon: "💰", label: "Wallet", desc: "Balance & history", href: "/wallet", glow: "bg-amber-400/8", border: "border-amber-400/10 hover:border-amber-400/25" },
+          { icon: "📦", label: "Orders", desc: "Track deliveries", href: "/orders", glow: "bg-blue-400/8", border: "border-blue-400/10 hover:border-blue-400/25" },
+          { icon: "🤝", label: "Earn Hub", desc: "Invite & earn", href: "/account/commission", glow: "bg-purple-400/8", border: "border-purple-400/10 hover:border-purple-400/25" },
+          { icon: "🔔", label: "Notifications", desc: "Alerts & updates", href: "/account/notifications", glow: "bg-cyan-400/8", border: "border-cyan-400/10 hover:border-cyan-400/25" },
         ].map((item) => (
           <Link key={item.href} href={item.href}
-            className="flex items-center gap-2.5 rounded-xl border border-white/8 bg-white/[0.02] p-3 transition hover:bg-white/[0.04]">
-            <span className="text-xl">{item.icon}</span>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-white">{item.label}</p>
-              <p className="truncate text-[9px] text-white/30">{item.desc}</p>
+            className={`relative isolate overflow-hidden rounded-xl border ${item.border} bg-white/[0.02] p-3.5 transition active:scale-[0.97]`}>
+            <div className={`absolute -top-4 -right-4 h-16 w-16 ${item.glow} rounded-full blur-2xl`} aria-hidden="true" />
+            <div className="relative z-10">
+              <span className="text-xl">{item.icon}</span>
+              <p className="mt-1.5 text-xs font-bold text-white">{item.label}</p>
+              <p className="mt-0.5 text-[9px] text-white/30">{item.desc}</p>
             </div>
           </Link>
         ))}
@@ -182,49 +205,36 @@ export default function AccountPage() {
         userEmail={userEmail || undefined}
       />
 
-      {/* ── Account actions ── */}
-      <div className="space-y-1.5">
-        <Link href="/account/security"
-          className="flex items-center justify-between rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 transition hover:bg-white/[0.04]">
-          <div className="flex items-center gap-3">
-            <span className="text-base">🔒</span>
-            <div>
-              <p className="text-sm font-medium text-white">Security</p>
-              <p className="text-[10px] text-white/30">Change email or password</p>
+      {/* ── Account actions — terminal style ── */}
+      <div className="rounded-xl border border-white/8 bg-white/[0.01] overflow-hidden divide-y divide-white/5">
+        {[
+          { icon: "🔒", label: "Security", desc: "Change email or password", href: "/account/security", color: "text-amber-400" },
+          { icon: "💬", label: "Support", desc: "24/7 AI chat support", href: "/support", color: "text-cyan-400" },
+          { icon: "📖", label: "How It Works", desc: "Ordering, delivery & payment", href: "/how-it-works", color: "text-emerald-400" },
+        ].map((item) => (
+          <Link key={item.href} href={item.href}
+            className="flex items-center justify-between px-4 py-3.5 transition hover:bg-white/[0.03] active:bg-white/[0.05]">
+            <div className="flex items-center gap-3">
+              <div className={`flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.04] text-sm ${item.color}`}>
+                {item.icon}
+              </div>
+              <div>
+                <p className="text-sm font-medium text-white">{item.label}</p>
+                <p className="text-[10px] text-white/25">{item.desc}</p>
+              </div>
             </div>
-          </div>
-          <span className="text-white/20">›</span>
-        </Link>
-        <Link href="/support"
-          className="flex items-center justify-between rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 transition hover:bg-white/[0.04]">
-          <div className="flex items-center gap-3">
-            <span className="text-base">💬</span>
-            <div>
-              <p className="text-sm font-medium text-white">Support</p>
-              <p className="text-[10px] text-white/30">Get help or submit a ticket</p>
-            </div>
-          </div>
-          <span className="text-white/20">›</span>
-        </Link>
-        <Link href="/how-it-works"
-          className="flex items-center justify-between rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 transition hover:bg-white/[0.04]">
-          <div className="flex items-center gap-3">
-            <span className="text-base">📖</span>
-            <div>
-              <p className="text-sm font-medium text-white">How It Works</p>
-              <p className="text-[10px] text-white/30">Ordering, delivery & payment</p>
-            </div>
-          </div>
-          <span className="text-white/20">›</span>
-        </Link>
+            <span className="text-white/15 text-sm">→</span>
+          </Link>
+        ))}
       </div>
 
-      {/* ── Sign out ── */}
+      {/* ── Sign out — danger zone ── */}
       <button
         onClick={() => { logout(); router.push("/login"); }}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-400/20 bg-red-400/5 py-3 text-sm font-medium text-red-300 transition hover:bg-red-400/10"
+        className="relative isolate overflow-hidden flex w-full items-center justify-center gap-2 rounded-xl border border-red-400/15 py-3.5 text-sm font-semibold text-red-400 transition hover:bg-red-400/10 active:scale-[0.98]"
       >
-        Sign Out
+        <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-transparent to-red-500/5" aria-hidden="true" />
+        <span className="relative z-10 flex items-center gap-2">⏻ Sign Out</span>
       </button>
     </div>
   );
@@ -347,16 +357,17 @@ function ProfileSection({
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+    <div className="relative isolate overflow-hidden rounded-2xl border border-white/8 p-4">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.03] to-transparent" aria-hidden="true" />
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center justify-between"
+        className="relative z-10 flex w-full items-center justify-between"
       >
-        <div className="flex items-center gap-2">
-          <span className="text-base">👤</span>
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-400/10 text-sm text-blue-400">👤</div>
           <p className="text-sm font-bold text-white">Profile Details</p>
         </div>
-        <span className={`text-white/30 transition ${expanded ? "rotate-180" : ""}`}>▾</span>
+        <span className={`text-white/25 transition text-xs ${expanded ? "rotate-180" : ""}`}>▼</span>
       </button>
 
       {expanded && (
@@ -409,8 +420,8 @@ function CopyBadge({ text }: { text: string }) {
   };
 
   return (
-    <button onClick={handleCopy} className="flex items-center gap-1 rounded-full bg-white/5 px-2 py-0.5 text-[9px] font-mono text-white/40 transition hover:text-white/60">
-      {text}
+    <button onClick={handleCopy} className="flex items-center gap-1.5 rounded-md bg-emerald-400/5 border border-emerald-400/10 px-2 py-0.5 text-[9px] font-mono text-emerald-400/60 transition hover:text-emerald-400/80 hover:border-emerald-400/20">
+      <span className="text-emerald-400/30">$</span>{text}
       <span className="text-[8px]">{copied ? "✓" : "📋"}</span>
     </button>
   );
