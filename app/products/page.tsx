@@ -79,24 +79,6 @@ export default function ProductsPage() {
 
   return (
     <div className="space-y-4 pb-24 sm:space-y-6 sm:pb-20">
-      {/* ── Page header with sci-fi style ── */}
-      <section className="relative isolate overflow-hidden rounded-2xl border border-emerald-400/10 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-8">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1a12] via-[#0d0d0d] to-[#0a0d1a]" aria-hidden="true" />
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
-        <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-emerald-400/8 blur-3xl animate-pulse" aria-hidden="true" />
-
-        <div className="relative z-10">
-          <h1 className="text-lg font-bold text-white sm:text-2xl">
-            {hero.title === "All Products" ? (
-              <>All <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Products</span></>
-            ) : (
-              <>{hero.title.split(" ")[0]} <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">{hero.title.split(" ").slice(1).join(" ") || hero.title}</span></>
-            )}
-          </h1>
-          <p className="mt-1 text-xs text-white/35 sm:text-sm">{hero.description}</p>
-        </div>
-      </section>
-
       {/* Category tabs - horizontal scroll on mobile */}
       <div className="flex gap-1.5 overflow-x-auto pb-1 snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
         {CATEGORY_TABS.map((tab) => (
@@ -117,24 +99,7 @@ export default function ProductsPage() {
         ))}
       </div>
 
-      {/* Product count + sort */}
-      {!isLoading && products.length > 0 && (
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex h-5 items-center rounded-md bg-emerald-400/10 px-2 text-[10px] font-bold text-emerald-400">{products.length}</span>
-            <p className="text-[10px] uppercase tracking-wider text-white/25">products</p>
-          </div>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="rounded-lg border border-white/8 bg-white/[0.03] px-2.5 py-1.5 text-[10px] text-white/50 outline-none transition hover:border-white/15"
-          >
-            <option value="newest" className="bg-[#0d0d0d]">Newest</option>
-            <option value="price-low" className="bg-[#0d0d0d]">Price: Low → High</option>
-            <option value="price-high" className="bg-[#0d0d0d]">Price: High → Low</option>
-          </select>
-        </div>
-      )}
+
 
       {/* Loading */}
       {isLoading && (
