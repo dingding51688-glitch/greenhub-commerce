@@ -34,12 +34,6 @@ export default async function HomePage() {
             >
               Shop Now
             </Link>
-            <Link
-              href="/guide"
-              className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/25 px-6 text-sm font-semibold uppercase tracking-wider text-white/80"
-            >
-              How It Works
-            </Link>
           </div>
           {/* Stats — visible on mobile too now */}
           <div className="mt-4 flex gap-4 sm:gap-8">
@@ -187,21 +181,13 @@ export default async function HomePage() {
             ))}
           </div>
 
-          {/* CTA buttons */}
-          <div className="flex gap-2.5">
-            <Link
-              href="/support"
-              className="inline-flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 active:scale-[0.97] transition sm:flex-none sm:px-8"
-            >
-              <span>💬</span> Chat with AI
-            </Link>
-            <Link
-              href="/guide"
-              className="inline-flex min-h-[44px] flex-1 items-center justify-center rounded-full border border-white/15 text-xs font-semibold uppercase tracking-wider text-white/60 sm:flex-none sm:px-6"
-            >
-              Ordering Guide
-            </Link>
-          </div>
+          {/* CTA button */}
+          <Link
+            href="/support"
+            className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 active:scale-[0.97] transition sm:w-auto sm:px-8"
+          >
+            <span>💬</span> Chat with AI
+          </Link>
         </div>
       </section>
     </div>
