@@ -7,6 +7,7 @@ import { ProductDetailPurchase } from "./purchase-panel";
 import { getProductListingMeta } from "@/data/fixtures/products";
 import { ProductCard } from "@/components/ProductCard";
 import { ReviewSection } from "@/components/ReviewSection";
+import { getProductFAQs } from "@/data/product-faqs";
 
 const CMS_BASE = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
 function strapiMedia(path?: string | null): string | undefined {
@@ -116,9 +117,24 @@ export default async function ProductPage({ params }: { params: { slug: string }
     };
   }
 
+  // FAQ data
+  const faqs = getProductFAQs(product.slug);
+
+  // FAQ JSON-LD schema
+  const faqJsonLd = faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: { "@type": "Answer", text: f.answer },
+    })),
+  } : null;
+
   return (
     <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+    {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
     <div className="space-y-6 pb-24 sm:space-y-10 sm:pb-20">
       {/* Breadcrumb */}
       <div className="flex items-center gap-1.5 text-xs text-neutral-500">
@@ -197,6 +213,26 @@ export default async function ProductPage({ params }: { params: { slug: string }
       <div id="reviews">
         <ReviewSection productId={product.id} />
       </div>
+
+      {/* FAQ Section */}
+      {faqs.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-lg font-bold text-white mb-4">Frequently Asked Questions</h3>
+          <div className="space-y-3">
+            {faqs.map((faq, i) => (
+              <details key={i} className="group bg-[#1C1C1E] rounded-xl border border-white/5 overflow-hidden">
+                <summary className="flex items-center justify-between p-4 cursor-pointer text-white text-sm font-medium hover:bg-white/[0.02] transition-colors">
+                  <span className="pr-4">{faq.question}</span>
+                  <span className="text-white/30 group-open:rotate-180 transition-transform text-xs">▼</span>
+                </summary>
+                <div className="px-4 pb-4 text-white/60 text-sm leading-relaxed">
+                  {faq.answer}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Related Products */}
       {related.length > 0 && (
