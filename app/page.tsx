@@ -3,6 +3,8 @@ import { ProductCategoryCard } from "@/components/sections";
 import { featuredCollectionsContent } from "@/data/fixtures/marketing";
 import { serverFetch } from "@/lib/server-api";
 import { UserStatusBar } from "@/components/home/UserStatusBar";
+import { ProductCard } from "@/components/ProductCard";
+import type { ProductRecord, ProductsResponse } from "@/lib/types";
 
 const CMS_BASE = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
 function strapiMedia(path?: string | null): string | undefined {
@@ -11,10 +13,10 @@ function strapiMedia(path?: string | null): string | undefined {
   return `${CMS_BASE}${path}`;
 }
 
-export default function HomePage() {
+export default async function HomePage() {
   return (
     <div className="space-y-5 pb-20 sm:space-y-10">
-      {/* ── 1. Hero: Compact, action-oriented ── */}
+      {/* ── 1. Hero ── */}
       <section className="relative isolate overflow-hidden rounded-2xl border border-white/10 px-4 py-5 sm:rounded-[40px] sm:px-12 sm:py-14">
         <div className="absolute inset-0 bg-hero-gradient" aria-hidden="true" />
         <div className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(circle at 20% -10%, rgba(19,168,107,0.45), transparent 55%)" }} aria-hidden="true" />
@@ -23,7 +25,7 @@ export default function HomePage() {
             Order online. Pick up anonymously.
           </h1>
           <p className="mt-2 max-w-md text-xs leading-relaxed text-white/50 sm:text-sm sm:mt-3">
-            Premium products delivered to InPost lockers & collection points. No name, no ID.
+            Premium products delivered to InPost lockers &amp; collection points. No name, no ID.
           </p>
           <div className="mt-3 flex gap-2.5 sm:mt-5">
             <Link
@@ -33,22 +35,22 @@ export default function HomePage() {
               Shop Now
             </Link>
             <Link
-              href="/how-it-works"
+              href="/guide"
               className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/25 px-6 text-sm font-semibold uppercase tracking-wider text-white/80"
             >
               How It Works
             </Link>
           </div>
-          {/* Quick stats row - hidden on small mobile, shown on sm+ */}
-          <div className="mt-4 hidden sm:flex gap-8 text-center">
+          {/* Stats — visible on mobile too now */}
+          <div className="mt-4 flex gap-4 sm:gap-8">
             {[
-              { val: "16,000+", label: "Locker Locations" },
+              { val: "16,000+", label: "Lockers" },
               { val: "Same Day", label: "Dispatch" },
-              { val: "100%", label: "Anonymous" },
+              { val: "100%", label: "Discreet" },
             ].map((s) => (
-              <div key={s.label} className="shrink-0">
-                <p className="text-xl font-bold text-white">{s.val}</p>
-                <p className="text-[9px] uppercase tracking-wider text-white/40">{s.label}</p>
+              <div key={s.label} className="shrink-0 text-center">
+                <p className="text-sm font-bold text-white sm:text-xl">{s.val}</p>
+                <p className="text-[8px] uppercase tracking-wider text-white/40 sm:text-[9px]">{s.label}</p>
               </div>
             ))}
           </div>
@@ -58,22 +60,25 @@ export default function HomePage() {
       {/* ── 2. Category Cards ── */}
       <FeaturedCollections />
 
-      {/* ── 3. Quick Order Flow (3 steps, horizontal on mobile) ── */}
-      <section className="flex gap-2.5 overflow-x-auto pb-1 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:overflow-visible">
+      {/* ── 3. 🔥 Hot Products — NEW ── */}
+      <HotProducts />
+
+      {/* ── 4. How It Works — compact ── */}
+      <div className="flex gap-2 overflow-x-auto pb-1 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:overflow-visible">
         {[
-          { icon: "🛒", title: "Order", desc: "Browse products, pick your weight & pay with wallet balance", color: "emerald" },
-          { icon: "📦", title: "We Ship", desc: "Dispatched same day to your chosen InPost locker or shop", color: "amber" },
-          { icon: "🔓", title: "Collect", desc: "Enter your code at the locker, grab your parcel — done in 30 seconds", color: "purple" },
+          { icon: "🛒", title: "Order", desc: "Browse, pick your weight & pay with wallet" },
+          { icon: "📦", title: "We Ship", desc: "Same-day dispatch to your chosen locker" },
+          { icon: "🔓", title: "Collect", desc: "Enter code, grab parcel — 30 seconds" },
         ].map((step) => (
-          <div key={step.title} className="w-[65vw] shrink-0 snap-start rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:w-auto">
-            <span className="text-2xl">{step.icon}</span>
-            <h3 className="mt-2 text-sm font-bold text-white">{step.title}</h3>
-            <p className="mt-1 text-xs leading-relaxed text-white/50">{step.desc}</p>
+          <div key={step.title} className="w-[45vw] shrink-0 snap-start rounded-2xl border border-white/10 bg-white/[0.02] p-3.5 sm:w-auto sm:p-4">
+            <span className="text-xl">{step.icon}</span>
+            <h3 className="mt-1.5 text-xs font-bold text-white sm:text-sm">{step.title}</h3>
+            <p className="mt-0.5 text-[10px] leading-relaxed text-white/45 sm:text-xs">{step.desc}</p>
           </div>
         ))}
-      </section>
+      </div>
 
-      {/* ── 4. Trust Bar ── */}
+      {/* ── 5. Trust Bar ── */}
       <div className="grid grid-cols-4 gap-2">
         {[
           { icon: "🔒", text: "Encrypted" },
@@ -88,7 +93,7 @@ export default function HomePage() {
         ))}
       </div>
 
-      {/* ── 5. Earn Hub Promo ── */}
+      {/* ── 6. Earn Hub Promo ── */}
       <section className="rounded-2xl border border-purple-400/20 bg-gradient-to-br from-purple-500/10 to-transparent px-5 py-5 sm:rounded-3xl sm:px-8 sm:py-8">
         <div className="flex items-start gap-4">
           <span className="text-3xl">💰</span>
@@ -107,7 +112,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── 6. Payment Methods (compact) ── */}
+      {/* ── 7. Customer Reviews ── */}
+      <RecentReviews />
+
+      {/* ── 8. Payment Methods ── */}
       <section className="rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-4 sm:rounded-3xl sm:px-8 sm:py-6">
         <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/40">We accept</p>
         <div className="mt-3 flex gap-3">
@@ -125,7 +133,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── 7. Telegram Channel ── */}
+      {/* ── 9. Telegram ── */}
       <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
         className="relative flex items-center gap-3 overflow-hidden rounded-2xl border border-blue-400/25 bg-gradient-to-r from-blue-500/15 via-blue-400/8 to-transparent px-4 py-4 active:scale-[0.98] transition">
         <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-400/10 blur-2xl" />
@@ -137,13 +145,13 @@ export default function HomePage() {
         <span className="relative rounded-full bg-blue-400/20 px-3 py-1 text-xs font-bold text-blue-300">Join</span>
       </a>
 
-      {/* ── 8. Support CTA ── */}
+      {/* ── 10. Support CTA — updated for 24/7 AI ── */}
       <section className="rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-5 sm:rounded-3xl sm:px-8 sm:py-8 sm:text-center">
-        <h2 className="text-base font-bold text-white sm:text-xl">Need help ordering?</h2>
-        <p className="mt-1 text-xs text-white/50 sm:text-sm">Support available daily 09:00–21:00 GMT</p>
+        <h2 className="text-base font-bold text-white sm:text-xl">Need help?</h2>
+        <p className="mt-1 text-xs text-white/50 sm:text-sm">24/7 AI support + human agents on standby</p>
         <div className="mt-4 flex gap-2.5 sm:justify-center">
           <Link
-            href="/how-it-works"
+            href="/guide"
             className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded-full border border-white/20 text-xs font-semibold uppercase tracking-wider text-white/70 sm:flex-none sm:px-6"
           >
             Ordering Guide
@@ -152,11 +160,119 @@ export default function HomePage() {
             href="/support"
             className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded-full cta-gradient text-xs font-semibold uppercase tracking-wider text-white sm:flex-none sm:px-6"
           >
-            Contact Support
+            Get Support
           </Link>
         </div>
       </section>
     </div>
+  );
+}
+
+/* ── Hot Products Section ── */
+async function HotProducts() {
+  let products: ProductRecord[] = [];
+  try {
+    const data = await serverFetch<ProductsResponse>(
+      "/api/products?populate=coverImage,featuredImage,weightOptions&pagination[pageSize]=8&sort=rating:desc"
+    );
+    products = data.data?.filter((p) => (p.priceFrom ?? 0) > 0).slice(0, 6) ?? [];
+  } catch {
+    return null;
+  }
+
+  if (products.length === 0) return null;
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="text-base font-bold text-white sm:text-lg">🔥 Popular Right Now</h2>
+          <p className="text-[10px] text-white/35 mt-0.5">Top picks from our customers</p>
+        </div>
+        <Link href="/products" className="text-[10px] font-medium text-emerald-400 hover:text-emerald-300">
+          View All →
+        </Link>
+      </div>
+      <div className="flex gap-2.5 overflow-x-auto pb-2 snap-x snap-mandatory sm:grid sm:grid-cols-3 lg:grid-cols-4 sm:overflow-visible">
+        {products.map((product) => (
+          <div key={product.documentId} className="w-[42vw] shrink-0 snap-start sm:w-auto">
+            <ProductCard product={product} variant="compact" />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ── Recent Reviews Section ── */
+async function RecentReviews() {
+  let reviews: Array<{ rating: number; comment: string; displayName: string; productTitle: string }> = [];
+
+  // Product IDs and names to fetch reviews from
+  const productMap: Record<number, string> = {
+    1: "Stardawg", 2: "Amnesia Haze", 3: "Gumbo", 4: "Lemon Cherry Gelato",
+    5: "Candy Runtz", 7: "THC Premium Hash", 8: "Apple Tart", 18: "Baby Yoda",
+  };
+
+  try {
+    const strapiUrl = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
+    // Fetch reviews from a few products in parallel
+    const productIds = Object.keys(productMap);
+    const results = await Promise.allSettled(
+      productIds.map((id) =>
+        fetch(`${strapiUrl}/api/reviews/product/${id}`, { next: { revalidate: 300 } }).then((r) => r.json())
+      )
+    );
+    for (let i = 0; i < results.length; i++) {
+      const result = results[i];
+      if (result.status === "fulfilled" && result.value?.data) {
+        for (const r of result.value.data) {
+          if (r.comment && r.comment.trim().length > 2) {
+            reviews.push({
+              rating: r.rating,
+              comment: r.comment,
+              displayName: r.displayName || "Customer",
+              productTitle: productMap[Number(productIds[i])] || "Product",
+            });
+          }
+        }
+      }
+    }
+    // Sort by most recent, limit to 6
+    reviews = reviews.slice(0, 6);
+  } catch {
+    // Silent fail
+  }
+
+  if (reviews.length === 0) return null;
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-base font-bold text-white sm:text-lg">⭐ Customer Reviews</h2>
+      </div>
+      <div className="flex gap-2.5 overflow-x-auto pb-2 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:overflow-visible">
+        {reviews.map((r, i) => (
+          <div key={i} className="w-[70vw] shrink-0 snap-start rounded-xl border border-white/8 bg-white/[0.02] p-3.5 sm:w-auto">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs text-emerald-400 font-bold">
+                {r.displayName?.charAt(0)?.toUpperCase() || "?"}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-white truncate">{r.displayName}</p>
+                <p className="text-[9px] text-white/30 truncate">{r.productTitle}</p>
+              </div>
+              <span className="text-xs">
+                {[1,2,3,4,5].map((s) => (
+                  <span key={s} className={s <= r.rating ? "text-yellow-400" : "text-white/15"}>★</span>
+                ))}
+              </span>
+            </div>
+            <p className="text-[11px] text-white/50 leading-relaxed line-clamp-2">{r.comment}</p>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
