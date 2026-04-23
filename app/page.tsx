@@ -86,46 +86,7 @@ export default async function HomePage() {
       {/* ── 3. 🔥 Hot Products — NEW ── */}
       <HotProducts />
 
-      {/* ── 4. How It Works — sci-fi ── */}
-      <div className="flex gap-2 overflow-x-auto pb-1 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:overflow-visible">
-        {[
-          { icon: "🛒", title: "Order", desc: "Browse, pick your weight & pay with wallet", glow: "bg-emerald-400/8", border: "border-emerald-400/10", num: "01" },
-          { icon: "📦", title: "We Ship", desc: "Same-day dispatch to your chosen locker", glow: "bg-cyan-400/8", border: "border-cyan-400/10", num: "02" },
-          { icon: "🔓", title: "Collect", desc: "Enter code, grab parcel — 30 seconds", glow: "bg-purple-400/8", border: "border-purple-400/10", num: "03" },
-        ].map((step) => (
-          <div key={step.title} className={`relative isolate overflow-hidden w-[45vw] shrink-0 snap-start rounded-2xl border ${step.border} bg-white/[0.01] p-3.5 sm:w-auto sm:p-4`}>
-            <div className={`absolute -top-4 -right-4 h-14 w-14 ${step.glow} rounded-full blur-xl`} aria-hidden="true" />
-            <div className="relative z-10">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">{step.icon}</span>
-                <span className="text-[10px] font-mono text-white/15">{step.num}</span>
-              </div>
-              <h3 className="mt-1.5 text-xs font-bold text-white sm:text-sm">{step.title}</h3>
-              <p className="mt-0.5 text-[10px] leading-relaxed text-white/40 sm:text-xs">{step.desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* ── 5. Trust Bar — sci-fi ── */}
-      <div className="grid grid-cols-4 gap-2">
-        {[
-          { icon: "🔒", text: "Encrypted", color: "text-emerald-400/60" },
-          { icon: "📍", text: "16,000+", color: "text-cyan-400/60" },
-          { icon: "⚡", text: "Same Day", color: "text-amber-400/60" },
-          { icon: "🎯", text: "No ID", color: "text-purple-400/60" },
-        ].map((t) => (
-          <div key={t.text} className="relative isolate overflow-hidden rounded-xl border border-white/6 bg-white/[0.01] py-2.5 text-center">
-            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent" aria-hidden="true" />
-            <div className="relative z-10">
-              <span className="text-lg">{t.icon}</span>
-              <p className={`mt-0.5 text-[9px] font-bold uppercase tracking-wider ${t.color}`}>{t.text}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* ── 6. Earn Hub Promo — sci-fi ── */}
+      {/* ── 4. Earn Hub Promo — sci-fi ── */}
       <section className="relative isolate overflow-hidden rounded-2xl border border-purple-400/15 px-5 py-5 sm:rounded-3xl sm:px-8 sm:py-8">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-[#0d0d0d] to-pink-500/5" aria-hidden="true" />
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
