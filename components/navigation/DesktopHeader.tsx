@@ -175,8 +175,8 @@ export function DesktopHeader() {
             )}
           </nav>
           <div className="flex items-center gap-2">
-            {/* ── Mobile: auth buttons or avatar ── */}
-            <span className="flex sm:hidden items-center gap-1.5">
+            {/* ── Mobile: avatar or Sign In ── */}
+            <span className="flex sm:hidden items-center">
               {isAuthenticated ? (
                 <Link href="/account" className="relative flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400/20 to-cyan-400/10 text-xs font-bold text-emerald-300 ring-1 ring-emerald-400/20">
                   {displayName.charAt(0).toUpperCase() || "?"}
@@ -186,23 +186,13 @@ export function DesktopHeader() {
                   </span>
                 </Link>
               ) : (
-                <>
-                  <Link href="/login" className="flex items-center gap-1 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] px-2.5 py-1.5 active:scale-[0.95] transition">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-emerald-400">
-                      <circle cx="12" cy="8" r="4" />
-                      <path d="M4 20c1.5-3 4.5-4.5 8-4.5s6.5 1.5 8 4.5" strokeLinecap="round" />
-                    </svg>
-                    <span className="text-[10px] font-bold text-emerald-400">Sign In</span>
-                  </Link>
-                  <Link href="/register" className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 active:scale-[0.95] transition">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/50">
-                      <circle cx="12" cy="8" r="4" />
-                      <path d="M4 20c1.5-3 4.5-4.5 8-4.5s6.5 1.5 8 4.5" strokeLinecap="round" />
-                      <path d="M18 6v4M20 8h-4" strokeLinecap="round" />
-                    </svg>
-                    <span className="text-[10px] font-medium text-white/50">Register</span>
-                  </Link>
-                </>
+                <Link href="/login" className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-emerald-500/15 to-emerald-400/5 border border-emerald-400/20 pl-2 pr-3 py-1.5 active:scale-[0.95] transition">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-emerald-400">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 20c1.5-3 4.5-4.5 8-4.5s6.5 1.5 8 4.5" strokeLinecap="round" />
+                  </svg>
+                  <span className="text-[11px] font-semibold text-emerald-400 whitespace-nowrap">Sign In</span>
+                </Link>
               )}
             </span>
             {/* ── Desktop icons ── */}
