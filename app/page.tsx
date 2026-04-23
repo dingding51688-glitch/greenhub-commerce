@@ -145,23 +145,63 @@ export default async function HomePage() {
         <span className="relative rounded-full bg-blue-400/20 px-3 py-1 text-xs font-bold text-blue-300">Join</span>
       </a>
 
-      {/* ── 10. Support CTA — updated for 24/7 AI ── */}
-      <section className="rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-5 sm:rounded-3xl sm:px-8 sm:py-8 sm:text-center">
-        <h2 className="text-base font-bold text-white sm:text-xl">Need help?</h2>
-        <p className="mt-1 text-xs text-white/50 sm:text-sm">24/7 AI support + human agents on standby</p>
-        <div className="mt-4 flex gap-2.5 sm:justify-center">
-          <Link
-            href="/guide"
-            className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded-full border border-white/20 text-xs font-semibold uppercase tracking-wider text-white/70 sm:flex-none sm:px-6"
-          >
-            Ordering Guide
-          </Link>
-          <Link
-            href="/support"
-            className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded-full cta-gradient text-xs font-semibold uppercase tracking-wider text-white sm:flex-none sm:px-6"
-          >
-            Get Support
-          </Link>
+      {/* ── 10. AI Support CTA — sci-fi style ── */}
+      <section className="relative isolate overflow-hidden rounded-2xl border border-cyan-400/20 px-5 py-6 sm:rounded-3xl sm:px-8 sm:py-8">
+        {/* Animated glow background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-blue-600/5 to-purple-600/10" aria-hidden="true" />
+        <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-cyan-400/10 blur-3xl" aria-hidden="true" />
+        <div className="absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-blue-500/10 blur-2xl" aria-hidden="true" />
+
+        <div className="relative z-10">
+          {/* AI Bot avatar + status */}
+          <div className="flex items-center gap-3 mb-3">
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                <span className="text-lg">🤖</span>
+              </div>
+              {/* Pulsing online dot */}
+              <span className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-emerald-400 border-2 border-[#0a0a0a]" />
+              </span>
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white sm:text-lg">AI Support Agent</h2>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                <span className="text-[10px] font-medium text-emerald-400">Online — responds in seconds</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature pills */}
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {[
+              { icon: "⚡", text: "Instant replies" },
+              { icon: "🌐", text: "24/7 available" },
+              { icon: "🔒", text: "Private & secure" },
+            ].map((f) => (
+              <span key={f.text} className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] text-white/50">
+                <span>{f.icon}</span> {f.text}
+              </span>
+            ))}
+          </div>
+
+          {/* CTA buttons */}
+          <div className="flex gap-2.5">
+            <Link
+              href="/support"
+              className="inline-flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 active:scale-[0.97] transition sm:flex-none sm:px-8"
+            >
+              <span>💬</span> Chat with AI
+            </Link>
+            <Link
+              href="/guide"
+              className="inline-flex min-h-[44px] flex-1 items-center justify-center rounded-full border border-white/15 text-xs font-semibold uppercase tracking-wider text-white/60 sm:flex-none sm:px-6"
+            >
+              Ordering Guide
+            </Link>
+          </div>
         </div>
       </section>
     </div>
