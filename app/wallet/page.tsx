@@ -78,52 +78,69 @@ export default function WalletPage() {
       ) : balErr ? (
         <StateMessage variant="error" title="Unable to load balance" body={balErr.message} actionLabel="Retry" onAction={() => refreshBal()} />
       ) : bal ? (
-        <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-[#0a1f14] via-[#050505] to-[#0a0a0a] p-5 sm:rounded-3xl sm:p-6">
-          <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl" />
+        <div className="relative isolate overflow-hidden rounded-2xl border border-emerald-400/15 p-5 sm:rounded-3xl sm:p-6">
+          {/* Sci-fi background layers */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0a1a12] via-[#0d0d0d] to-[#0a0d1a]" aria-hidden="true" />
+          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "30px 30px" }} aria-hidden="true" />
+          <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-emerald-400/10 blur-3xl animate-pulse" aria-hidden="true" />
+          <div className="absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-cyan-400/8 blur-2xl" aria-hidden="true" />
 
-          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/50">Available balance</p>
-          <p className="mt-2 text-4xl font-extrabold text-white">{GBP.format(bal.transferableBalance ?? 0)}</p>
-
-          <div className="mt-2 flex gap-4 text-xs">
-            <span className="text-white/40">🎁 Bonus: <span className="text-emerald-300">{GBP.format(bal.bonusBalance ?? 0)}</span></span>
-          </div>
-
-          {/* User ID */}
-          {userId && (
-            <button onClick={handleCopyId} className="mt-3 flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2">
-              <div>
-                <p className="text-[9px] uppercase tracking-wider text-white/40">User ID</p>
-                <p className="font-mono text-sm font-semibold text-white">{userId}</p>
-              </div>
-              <span className={`text-[10px] font-semibold ${copyToast ? "text-emerald-300" : "text-white/40"}`}>
-                {copyToast ? "Copied!" : "Copy"}
+          <div className="relative z-10">
+            {/* Status badge */}
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/5 px-2.5 py-0.5 mb-3">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
               </span>
-            </button>
-          )}
+              <span className="text-[9px] font-medium text-emerald-400">Wallet Active</span>
+            </div>
 
-          {/* Action buttons */}
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            <Link href="/wallet/topup" className="flex min-h-[44px] flex-col items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-400/10 py-2.5 transition active:bg-emerald-400/20">
-              <span className="text-lg">💰</span>
-              <span className="text-[10px] font-semibold text-emerald-300">Top Up</span>
-            </Link>
-            <Link href="/wallet/transfer" className="flex min-h-[44px] flex-col items-center justify-center rounded-xl border border-blue-400/20 bg-blue-400/10 py-2.5 transition active:bg-blue-400/20">
-              <span className="text-lg">↗️</span>
-              <span className="text-[10px] font-semibold text-blue-300">Transfer</span>
-            </Link>
-            <Link href="/wallet/withdraw" className="flex min-h-[44px] flex-col items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10 py-2.5 transition active:bg-amber-400/20">
-              <span className="text-lg">💳</span>
-              <span className="text-[10px] font-semibold text-amber-300">Withdraw</span>
-            </Link>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-white/30">Available Balance</p>
+            <p className="mt-1 text-4xl font-extrabold bg-gradient-to-r from-white via-emerald-200 to-emerald-400 bg-clip-text text-transparent">{GBP.format(bal.transferableBalance ?? 0)}</p>
+
+            <div className="mt-2 flex gap-4 text-xs">
+              <span className="text-white/35">🎁 Bonus: <span className="text-emerald-400/80">{GBP.format(bal.bonusBalance ?? 0)}</span></span>
+            </div>
+
+            {/* User ID - terminal style */}
+            {userId && (
+              <button onClick={handleCopyId} className="mt-3 flex w-full items-center justify-between rounded-xl border border-emerald-400/10 bg-emerald-400/[0.03] px-3 py-2.5 transition hover:border-emerald-400/20">
+                <div>
+                  <p className="text-[8px] uppercase tracking-widest text-white/25">Wallet ID</p>
+                  <p className="font-mono text-sm font-semibold text-emerald-400/80"><span className="text-emerald-400/30">$ </span>{userId}</p>
+                </div>
+                <span className={`rounded-md px-2 py-0.5 text-[9px] font-semibold ${copyToast ? "bg-emerald-400/15 text-emerald-400" : "bg-white/5 text-white/30"}`}>
+                  {copyToast ? "✓ Copied" : "Copy"}
+                </span>
+              </button>
+            )}
+
+            {/* Action buttons */}
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              {[
+                { href: "/wallet/topup", icon: "💰", label: "Top Up", glow: "bg-emerald-400/8", border: "border-emerald-400/20", text: "text-emerald-400" },
+                { href: "/wallet/transfer", icon: "↗️", label: "Transfer", glow: "bg-blue-400/8", border: "border-blue-400/20", text: "text-blue-400" },
+                { href: "/wallet/withdraw", icon: "💳", label: "Withdraw", glow: "bg-amber-400/8", border: "border-amber-400/20", text: "text-amber-400" },
+              ].map((a) => (
+                <Link key={a.href} href={a.href} className={`relative isolate overflow-hidden flex min-h-[44px] flex-col items-center justify-center rounded-xl border ${a.border} bg-white/[0.02] py-2.5 transition active:scale-[0.95]`}>
+                  <div className={`absolute -top-4 -right-4 h-12 w-12 ${a.glow} rounded-full blur-xl`} aria-hidden="true" />
+                  <span className="relative text-lg">{a.icon}</span>
+                  <span className={`relative text-[10px] font-semibold ${a.text}`}>{a.label}</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       ) : null}
 
       {/* ── Recent Activity ── */}
       <div>
-        <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-white">Recent Activity</h2>
-          <button onClick={() => refreshTx()} className="text-[10px] text-white/40 hover:text-white/60">Refresh</button>
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-bold text-white">Recent Activity</h2>
+            <p className="text-[9px] text-white/25 mt-0.5">Transaction history</p>
+          </div>
+          <button onClick={() => refreshTx()} className="rounded-lg bg-white/[0.04] border border-white/8 px-2.5 py-1 text-[10px] text-white/40 hover:text-white/60 hover:border-white/15 transition">Refresh</button>
         </div>
 
         {/* Filter tabs */}
@@ -134,8 +151,8 @@ export default function WalletPage() {
               onClick={() => setTxFilter(f.id)}
               className={`shrink-0 snap-start rounded-full px-3 py-1.5 text-[11px] font-medium transition whitespace-nowrap ${
                 txFilter === f.id
-                  ? "bg-emerald-400/15 text-emerald-300 border border-emerald-400/30"
-                  : "bg-white/[0.04] text-white/40 border border-white/8"
+                  ? "bg-gradient-to-r from-emerald-400/15 to-cyan-400/10 text-emerald-300 border border-emerald-400/25"
+                  : "bg-white/[0.03] text-white/35 border border-white/6 hover:border-white/12"
               }`}
             >
               {f.label}
@@ -155,7 +172,7 @@ export default function WalletPage() {
             <p className="mt-2 text-sm text-white/40">{txFilter === "all" ? "No transactions yet" : "No transactions in this category"}</p>
           </div>
         ) : (
-          <div className="divide-y divide-white/5 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
+          <div className="divide-y divide-white/5 overflow-hidden rounded-2xl border border-white/8 bg-white/[0.01]">
             {transactions.map((tx) => (
               <TxRow key={tx.id} tx={tx} onNavigate={(href) => router.push(href)} />
             ))}
@@ -165,8 +182,8 @@ export default function WalletPage() {
 
       {/* ── Footer Links ── */}
       <div className="flex gap-3 text-xs">
-        <Link href="/wallet/withdraw/history" className="text-white/50 underline">Withdrawal history</Link>
-        <Link href="/account" className="text-white/30 hover:text-white/50">← Account</Link>
+        <Link href="/wallet/withdraw/history" className="rounded-lg border border-white/6 bg-white/[0.02] px-3 py-1.5 text-white/40 hover:text-white/60 hover:border-white/12 transition">Withdrawal history</Link>
+        <Link href="/account" className="rounded-lg border border-white/6 bg-white/[0.02] px-3 py-1.5 text-white/30 hover:text-white/50 hover:border-white/12 transition">← Account</Link>
       </div>
     </div>
   );
@@ -211,8 +228,10 @@ function TxRow({ tx, onNavigate }: { tx: WalletTransaction; onNavigate: (href: s
 
   return (
     <div>
-      <button onClick={handleClick} className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition hover:bg-white/[0.03] active:bg-white/[0.05]">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-sm">
+      <button onClick={handleClick} className="flex w-full items-center gap-3 px-3 py-3 text-left transition hover:bg-white/[0.03] active:bg-white/[0.05]">
+        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm ${
+          tx.amount >= 0 ? "bg-emerald-400/10" : "bg-red-400/8"
+        }`}>
           {TX_ICONS[tx.type] || "📄"}
         </span>
         <div className="min-w-0 flex-1">
