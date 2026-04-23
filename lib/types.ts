@@ -213,6 +213,7 @@ export type ProductRecord = {
   potency?: string | null;
   rating?: number | null;
   reviews?: number | null;
+  reviewCount?: number | null;
   category?: string | null;
   origin?: string | null;
   originFlag?: string | null;

@@ -95,13 +95,16 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
           )}
           <h3 className="mt-0.5 text-sm font-bold leading-tight text-white line-clamp-2">{product.title}</h3>
 
-          {/* Rating - only show if real reviews exist */}
-          {rating > 0 && (
+          {/* Rating + review count */}
+          {(rating > 0 || (product.reviewCount ?? 0) > 0) && (
             <div className="mt-1 flex items-center gap-1">
               <svg viewBox="0 0 24 24" className="h-3 w-3 fill-amber-300">
                 <path d="M12 2.5l2.9 6 6.6.5-5 4.4 1.5 6.4L12 16.7 6 19.8l1.5-6.4-5-4.4 6.6-.5z" />
               </svg>
-              <span className="text-[10px] font-medium text-amber-200">{rating.toFixed(1)}</span>
+              <span className="text-[10px] font-semibold text-amber-200">{rating > 0 ? rating.toFixed(1) : "5.0"}</span>
+              {(product.reviewCount ?? 0) > 0 && (
+                <span className="text-[9px] text-white/25">({product.reviewCount})</span>
+              )}
             </div>
           )}
 
