@@ -16,6 +16,7 @@ import { MobileDrawer } from "./MobileDrawer";
 import { LogoMark } from "./LogoMark";
 import { useNotifications } from "@/components/providers/NotificationProvider";
 import { useCart } from "@/components/providers/CartProvider";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 
 function IconLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
@@ -153,11 +154,14 @@ export function DesktopHeader() {
   const notificationBadge = unreadCount > 0 ? formatBadge(unreadCount) : undefined;
   const { totalItems } = useCart();
   const cartBadge = totalItems > 0 ? formatBadge(totalItems) : undefined;
+  const { token, profile } = useAuth();
+  const isAuthenticated = Boolean(token);
+  const displayName = profile?.fullName || profile?.username || profile?.email?.split("@")[0] || "";
 
   return (
     <>
       <header className="sticky top-0 z-30 border-b border-white/[0.06] backdrop-blur-xl bg-black/40">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3">
           <Link href="/" className="flex items-center">
             <LogoMark />
           </Link>
@@ -171,6 +175,37 @@ export function DesktopHeader() {
             )}
           </nav>
           <div className="flex items-center gap-2">
+            {/* ── Mobile: auth buttons or avatar ── */}
+            <span className="flex sm:hidden items-center gap-1.5">
+              {isAuthenticated ? (
+                <Link href="/account" className="relative flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400/20 to-cyan-400/10 text-xs font-bold text-emerald-300 ring-1 ring-emerald-400/20">
+                  {displayName.charAt(0).toUpperCase() || "?"}
+                  <span className="absolute -bottom-0.5 -right-0.5 flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400 border border-black" />
+                  </span>
+                </Link>
+              ) : (
+                <>
+                  <Link href="/login" className="flex items-center gap-1 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] px-2.5 py-1.5 active:scale-[0.95] transition">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-emerald-400">
+                      <circle cx="12" cy="8" r="4" />
+                      <path d="M4 20c1.5-3 4.5-4.5 8-4.5s6.5 1.5 8 4.5" strokeLinecap="round" />
+                    </svg>
+                    <span className="text-[10px] font-bold text-emerald-400">Sign In</span>
+                  </Link>
+                  <Link href="/register" className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 active:scale-[0.95] transition">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/50">
+                      <circle cx="12" cy="8" r="4" />
+                      <path d="M4 20c1.5-3 4.5-4.5 8-4.5s6.5 1.5 8 4.5" strokeLinecap="round" />
+                      <path d="M18 6v4M20 8h-4" strokeLinecap="round" />
+                    </svg>
+                    <span className="text-[10px] font-medium text-white/50">Register</span>
+                  </Link>
+                </>
+              )}
+            </span>
+            {/* ── Desktop icons ── */}
             <span className="hidden sm:flex items-center gap-2">
               <IconButton onClick={() => router.push("/account/notifications")} label="Notifications" badge={notificationBadge}>
                 <BellIcon className={iconStroke} />
