@@ -78,7 +78,7 @@ export default function WalletPage() {
       ) : balErr ? (
         <StateMessage variant="error" title="Unable to load balance" body={balErr.message} actionLabel="Retry" onAction={() => refreshBal()} />
       ) : bal ? (
-        <div className="relative isolate overflow-hidden rounded-2xl border border-emerald-400/15 p-5 sm:rounded-3xl sm:p-6">
+        <div className="relative isolate overflow-hidden rounded-2xl border border-emerald-400/15 px-4 py-4 sm:rounded-3xl sm:px-5 sm:py-5">
           {/* Sci-fi background layers */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#0a1a12] via-[#0d0d0d] to-[#0a0d1a]" aria-hidden="true" />
           <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "30px 30px" }} aria-hidden="true" />
@@ -95,19 +95,16 @@ export default function WalletPage() {
               <span className="text-[9px] font-medium text-emerald-400">Wallet Active</span>
             </div>
 
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-white/30">Available Balance</p>
-            <p className="mt-1 text-4xl font-extrabold bg-gradient-to-r from-white via-emerald-200 to-emerald-400 bg-clip-text text-transparent">{GBP.format(bal.transferableBalance ?? 0)}</p>
-
-            <div className="mt-2 flex gap-4 text-xs">
-              <span className="text-white/35">🎁 Bonus: <span className="text-emerald-400/80">{GBP.format(bal.bonusBalance ?? 0)}</span></span>
-            </div>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-white/30">Available Balance</p>
+            <p className="mt-0.5 text-[28px] font-extrabold bg-gradient-to-r from-white via-emerald-200 to-emerald-400 bg-clip-text text-transparent leading-tight">{GBP.format(bal.transferableBalance ?? 0)}</p>
+            <p className="mt-1 text-[10px] text-white/30">🎁 Bonus: <span className="text-emerald-400/70">{GBP.format(bal.bonusBalance ?? 0)}</span></p>
 
             {/* User ID - terminal style */}
             {userId && (
-              <button onClick={handleCopyId} className="mt-3 flex w-full items-center justify-between rounded-xl border border-emerald-400/10 bg-emerald-400/[0.03] px-3 py-2.5 transition hover:border-emerald-400/20">
+              <button onClick={handleCopyId} className="mt-2.5 flex w-full items-center justify-between rounded-lg border border-emerald-400/10 bg-emerald-400/[0.03] px-2.5 py-2 transition hover:border-emerald-400/20">
                 <div>
-                  <p className="text-[8px] uppercase tracking-widest text-white/25">Wallet ID</p>
-                  <p className="font-mono text-sm font-semibold text-emerald-400/80"><span className="text-emerald-400/30">$ </span>{userId}</p>
+                  <p className="text-[8px] uppercase tracking-widest text-white/20">Wallet ID</p>
+                  <p className="font-mono text-xs font-semibold text-emerald-400/80"><span className="text-emerald-400/30">$ </span>{userId}</p>
                 </div>
                 <span className={`rounded-md px-2 py-0.5 text-[9px] font-semibold ${copyToast ? "bg-emerald-400/15 text-emerald-400" : "bg-white/5 text-white/30"}`}>
                   {copyToast ? "✓ Copied" : "Copy"}
@@ -116,16 +113,16 @@ export default function WalletPage() {
             )}
 
             {/* Action buttons */}
-            <div className="mt-4 grid grid-cols-3 gap-2">
+            <div className="mt-3 grid grid-cols-3 gap-1.5">
               {[
-                { href: "/wallet/topup", icon: "💰", label: "Top Up", glow: "bg-emerald-400/8", border: "border-emerald-400/20", text: "text-emerald-400" },
-                { href: "/wallet/transfer", icon: "↗️", label: "Transfer", glow: "bg-blue-400/8", border: "border-blue-400/20", text: "text-blue-400" },
-                { href: "/wallet/withdraw", icon: "💳", label: "Withdraw", glow: "bg-amber-400/8", border: "border-amber-400/20", text: "text-amber-400" },
+                { href: "/wallet/topup", icon: "💰", label: "Top Up", glow: "bg-emerald-400/8", border: "border-emerald-400/15", text: "text-emerald-400" },
+                { href: "/wallet/transfer", icon: "↗️", label: "Transfer", glow: "bg-blue-400/8", border: "border-blue-400/15", text: "text-blue-400" },
+                { href: "/wallet/withdraw", icon: "💳", label: "Withdraw", glow: "bg-amber-400/8", border: "border-amber-400/15", text: "text-amber-400" },
               ].map((a) => (
-                <Link key={a.href} href={a.href} className={`relative isolate overflow-hidden flex min-h-[44px] flex-col items-center justify-center rounded-xl border ${a.border} bg-white/[0.02] py-2.5 transition active:scale-[0.95]`}>
-                  <div className={`absolute -top-4 -right-4 h-12 w-12 ${a.glow} rounded-full blur-xl`} aria-hidden="true" />
-                  <span className="relative text-lg">{a.icon}</span>
-                  <span className={`relative text-[10px] font-semibold ${a.text}`}>{a.label}</span>
+                <Link key={a.href} href={a.href} className={`relative isolate overflow-hidden flex min-h-[40px] flex-col items-center justify-center rounded-lg border ${a.border} bg-white/[0.02] py-2 transition active:scale-[0.95]`}>
+                  <div className={`absolute -top-3 -right-3 h-10 w-10 ${a.glow} rounded-full blur-xl`} aria-hidden="true" />
+                  <span className="relative text-base">{a.icon}</span>
+                  <span className={`relative text-[9px] font-semibold ${a.text}`}>{a.label}</span>
                 </Link>
               ))}
             </div>
