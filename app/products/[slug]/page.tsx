@@ -95,7 +95,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.title,
-    description: product.description || meta?.seoDescription || `Buy ${product.title} online in the UK with discreet InPost locker delivery.`,
+    description: product.description || (meta as any)?.seoDescription || `Buy ${product.title} online in the UK with discreet InPost locker delivery.`,
     ...(imageUrl && { image: imageUrl }),
     brand: { "@type": "Brand", name: "Green Hub 420" },
     offers: {
