@@ -90,7 +90,35 @@ export default async function ProductPage({ params }: { params: { slug: string }
   const reviews = reviewMeta.total;
   const origin = product.origin ?? meta?.origin ?? "🇬🇧 UK Verified";
 
+  // JSON-LD Product + AggregateRating schema for SEO
+  const jsonLd: Record<string, any> = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.title,
+    description: product.description || meta?.seoDescription || `Buy ${product.title} online in the UK with discreet InPost locker delivery.`,
+    ...(imageUrl && { image: imageUrl }),
+    brand: { "@type": "Brand", name: "Green Hub 420" },
+    offers: {
+      "@type": "Offer",
+      url: `https://www.greenhub420.co.uk/products/${product.slug}`,
+      priceCurrency: "GBP",
+      price: product.price ?? 0,
+      availability: "https://schema.org/InStock",
+    },
+  };
+  if (reviews > 0) {
+    jsonLd.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: rating,
+      reviewCount: reviews,
+      bestRating: 5,
+      worstRating: 1,
+    };
+  }
+
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     <div className="space-y-6 pb-24 sm:space-y-10 sm:pb-20">
       {/* Breadcrumb */}
       <div className="flex items-center gap-1.5 text-xs text-neutral-500">
@@ -185,5 +213,6 @@ export default async function ProductPage({ params }: { params: { slug: string }
         </div>
       )}
     </div>
+    </>
   );
 }
