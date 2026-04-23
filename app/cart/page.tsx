@@ -18,13 +18,50 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="space-y-4 text-center">
-          <p className="text-5xl">🛒</p>
-          <p className="text-lg font-bold text-white">Your cart is empty</p>
-          <p className="text-xs text-white/40">Browse our products and add something you like</p>
-          <Link href="/products" className="inline-flex min-h-[48px] items-center rounded-xl cta-gradient px-6 text-sm font-bold text-white">
+        <div className="relative isolate w-full max-w-sm mx-auto text-center px-6">
+          {/* Background effects */}
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute left-1/2 top-1/4 -translate-x-1/2 h-32 w-32 rounded-full bg-emerald-400/6 blur-3xl" />
+            <div className="absolute left-1/3 top-1/2 h-20 w-20 rounded-full bg-cyan-400/5 blur-2xl" />
+          </div>
+
+          {/* Animated cart icon */}
+          <div className="relative inline-flex mb-5">
+            <div className="absolute inset-0 rounded-2xl bg-emerald-400/10 blur-xl animate-pulse" />
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl border border-white/8 bg-gradient-to-br from-white/[0.04] to-white/[0.01]">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" className="text-emerald-400/60">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" strokeWidth="1.2" />
+                <path d="M3 6h18" stroke="currentColor" strokeWidth="1.2" />
+                <path d="M16 10a4 4 0 01-8 0" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+              </svg>
+            </div>
+          </div>
+
+          <h2 className="text-base font-bold text-white">Your cart is empty</h2>
+          <p className="mt-1.5 text-xs text-white/30 leading-relaxed">Browse our collection and find something you&apos;ll love</p>
+
+          <Link href="/products"
+            className="mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 px-6 text-sm font-bold text-black shadow-lg shadow-emerald-500/20 active:scale-[0.97] transition">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M4 7h16l-1.5 9a2 2 0 01-2 1.5H7.5a2 2 0 01-2-1.5L4 7z" />
+              <path d="M4 7l1-3h14l1 3" />
+            </svg>
             Browse Products
           </Link>
+
+          {/* Trust badges */}
+          <div className="mt-8 flex justify-center gap-3">
+            {[
+              { icon: "⚡", text: "Same Day" },
+              { icon: "🔒", text: "Discreet" },
+              { icon: "📦", text: "Tracked" },
+            ].map((b) => (
+              <div key={b.text} className="flex items-center gap-1 rounded-lg border border-white/6 bg-white/[0.02] px-2 py-1">
+                <span className="text-[10px]">{b.icon}</span>
+                <span className="text-[8px] font-semibold text-white/25 uppercase tracking-wider">{b.text}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -32,15 +69,19 @@ export default function CartPage() {
 
   return (
     <div className="pb-36">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <h1 className="text-lg font-bold text-white">Cart</h1>
-          <p className="text-[10px] text-white/40">{totalItems} {totalItems === 1 ? "item" : "items"}</p>
+      {/* Header — sci-fi */}
+      <div className="relative isolate overflow-hidden rounded-xl border border-white/6 bg-white/[0.01] mb-3 px-4 py-3">
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "30px 30px" }} aria-hidden="true" />
+        <div className="absolute -top-6 -right-6 h-16 w-16 rounded-full bg-emerald-400/8 blur-2xl" aria-hidden="true" />
+        <div className="relative z-10 flex items-center justify-between">
+          <div>
+            <h1 className="text-base font-bold text-white">Cart</h1>
+            <p className="text-[10px] text-white/30">{totalItems} {totalItems === 1 ? "item" : "items"}</p>
+          </div>
+          <button onClick={() => { if (window.confirm("Clear all items from cart?")) clearCart(); }} className="rounded-lg border border-red-400/15 bg-red-400/[0.04] px-2.5 py-1 text-[9px] font-medium text-red-300/60 active:bg-red-400/10 transition">
+            Clear all
+          </button>
         </div>
-        <button onClick={() => { if (window.confirm("Clear all items from cart?")) clearCart(); }} className="rounded-lg border border-red-400/20 bg-red-400/5 px-2.5 py-1 text-[9px] font-medium text-red-300 active:bg-red-400/10">
-          Clear all
-        </button>
       </div>
 
       <div className="grid gap-3 lg:grid-cols-[1fr,320px]">
@@ -49,8 +90,9 @@ export default function CartPage() {
           {items.map((item) => (
             <div
               key={`${item.productId}::${item.weight}`}
-              className="flex items-center gap-2.5 rounded-xl border border-white/6 bg-white/[0.02] px-2.5 py-2"
+              className="relative isolate overflow-hidden flex items-center gap-2.5 rounded-xl border border-white/6 bg-white/[0.01] px-2.5 py-2"
             >
+              <div className="absolute -top-4 -right-4 h-12 w-12 rounded-full bg-emerald-400/5 blur-xl" aria-hidden="true" />
               {/* Thumb — small */}
               <Link href={`/products/${item.slug}`} className="shrink-0">
                 {item.image ? (
@@ -151,8 +193,8 @@ export default function CartPage() {
         </Link>
       </div>
 
-      {/* Mobile sticky checkout */}
-      <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-white/10 bg-[#0a0b0e]/95 backdrop-blur-xl px-4 py-2.5 lg:hidden">
+      {/* Mobile sticky checkout — sci-fi */}
+      <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-emerald-400/10 bg-[#060606]/95 backdrop-blur-xl px-4 py-2.5 lg:hidden">
         <div className="flex items-center gap-3">
           <div className="flex-1">
             <p className="text-[9px] text-white/40">{totalItems} items</p>
@@ -160,7 +202,7 @@ export default function CartPage() {
           </div>
           <button
             onClick={() => router.push(token ? "/checkout" : "/login")}
-            className="flex min-h-[44px] flex-1 items-center justify-center rounded-xl cta-gradient text-sm font-bold text-white active:opacity-90"
+            className="flex min-h-[44px] flex-1 items-center justify-center rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-sm font-bold text-black shadow-lg shadow-emerald-500/20 active:scale-[0.97] transition"
           >
             {token ? "Checkout" : "Log in"}
           </button>

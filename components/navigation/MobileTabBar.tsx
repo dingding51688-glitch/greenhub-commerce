@@ -6,64 +6,67 @@ import clsx from "clsx";
 import { useCart } from "@/components/providers/CartProvider";
 import { useNotifications } from "@/components/providers/NotificationProvider";
 
+/* ── SVG Icons ── */
+
+function HomeIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 10.5L12 3l9 7.5" stroke="currentColor" />
+      {active ? (
+        <path d="M5 10.5V19a1 1 0 001 1h4v-4.5a2 2 0 014 0V20h4a1 1 0 001-1v-8.5" fill="currentColor" stroke="currentColor" />
+      ) : (
+        <path d="M5 10.5V19a1 1 0 001 1h4v-4.5a2 2 0 014 0V20h4a1 1 0 001-1v-8.5" stroke="currentColor" />
+      )}
+    </svg>
+  );
+}
+
+function ShopIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 7h16l-1.5 9a2 2 0 01-2 1.5H7.5a2 2 0 01-2-1.5L4 7z" stroke="currentColor" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.2 : 0} />
+      <path d="M4 7l1-3h14l1 3" stroke="currentColor" />
+      <line x1="12" y1="7" x2="12" y2="4" stroke="currentColor" />
+    </svg>
+  );
+}
+
+function CartIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.15 : 0} />
+      <path d="M3 6h18" stroke="currentColor" />
+      <path d="M16 10a4 4 0 01-8 0" stroke="currentColor" />
+    </svg>
+  );
+}
+
+function EarnIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.15 : 0} />
+      <path d="M12 8v4.5l3 1.5" stroke={active ? "#fff" : "currentColor"} />
+      <path d="M15 6l1.5-1.5M9 6L7.5 4.5" stroke="currentColor" />
+    </svg>
+  );
+}
+
+function WalletIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="5" width="20" height="14" rx="2.5" stroke="currentColor" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.15 : 0} />
+      <circle cx="16.5" cy="12" r="1.5" fill={active ? "#fff" : "currentColor"} />
+      <path d="M2 10h20" stroke="currentColor" />
+    </svg>
+  );
+}
+
 const tabs = [
-  {
-    label: "Home",
-    href: "/",
-    icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
-        <path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-5h-6v5H4a1 1 0 01-1-1V10.5z" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-    match: "exact" as const,
-  },
-  {
-    label: "Shop",
-    href: "/products",
-    icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M3 6h18M3 6l2 14h14l2-14M10 10v4M14 10v4" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-    match: "prefix" as const,
-  },
-  {
-    label: "Cart",
-    href: "/cart",
-    icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M6.5 8.5h11l1 11a1.5 1.5 0 01-1.5 1.5h-10a1.5 1.5 0 01-1.5-1.5l1-11z" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M9 8.5C9 6.567 10.567 5 12.5 5s3.5 1.567 3.5 3.5" strokeLinecap="round" />
-      </svg>
-    ),
-    match: "exact" as const,
-    badge: "cart" as const,
-  },
-  {
-    label: "Earn",
-    href: "/account/commission",
-    icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
-        <circle cx="12" cy="12" r="9" />
-        <path d="M12 7v5l3 3" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M8.5 14.5l-2 2M15.5 14.5l2 2" strokeLinecap="round" />
-      </svg>
-    ),
-    match: "prefix" as const,
-    accent: true as const,
-  },
-  {
-    label: "Wallet",
-    href: "/wallet",
-    icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <rect x="2" y="5" width="20" height="14" rx="2" />
-        <path d="M16 12h2" strokeLinecap="round" />
-        <path d="M2 10h20" />
-      </svg>
-    ),
-    match: "prefix" as const,
-  },
+  { label: "Home", href: "/", icon: HomeIcon, match: "exact" as const },
+  { label: "Shop", href: "/products", icon: ShopIcon, match: "prefix" as const },
+  { label: "Cart", href: "/cart", icon: CartIcon, match: "exact" as const, badge: "cart" as const },
+  { label: "Earn", href: "/account/commission", icon: EarnIcon, match: "prefix" as const, accent: true },
+  { label: "Wallet", href: "/wallet", icon: WalletIcon, match: "prefix" as const },
 ];
 
 export function MobileTabBar() {
@@ -83,38 +86,48 @@ export function MobileTabBar() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/6 bg-[#0a0a0a]/95 backdrop-blur-xl sm:hidden">
-      <div className="flex items-center justify-around py-1 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/6 sm:hidden">
+      <div className="absolute inset-0 bg-[#060606]/95 backdrop-blur-xl" />
+      <div className="relative flex items-center justify-around py-1 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
         {tabs.map((tab) => {
           const active = isActive(tab.href, tab.match);
-          const badge = getBadge((tab as any).badge);
-          const isAccent = (tab as any).accent;
+          const badge = getBadge(tab.badge);
+          const TabIcon = tab.icon;
+          const isAccent = tab.accent;
           return (
             <Link
               key={tab.label}
               href={tab.href}
               className={clsx(
-                "relative flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] transition",
+                "relative flex flex-col items-center gap-0.5 px-3 py-1.5 text-[10px] transition-colors",
                 active
                   ? isAccent ? "text-purple-400" : "text-emerald-400"
-                  : isAccent ? "text-purple-400/50" : "text-white/40"
+                  : isAccent ? "text-purple-300/40" : "text-white/35"
               )}
             >
               <span className="relative">
                 {active && (
                   <span className={clsx(
-                    "absolute -inset-1.5 rounded-full blur-md",
-                    isAccent ? "bg-purple-400/15" : "bg-emerald-400/15"
+                    "absolute -inset-2 rounded-full blur-lg opacity-60",
+                    isAccent ? "bg-purple-400/20" : "bg-emerald-400/20"
                   )} />
                 )}
-                <span className="relative">{tab.icon(active)}</span>
+                <span className="relative block">
+                  <TabIcon active={active} />
+                </span>
                 {badge && (
-                  <span className="absolute -right-2 -top-1 min-w-[14px] rounded-full bg-rose-500 px-1 text-[9px] font-bold leading-[14px] text-white text-center">
+                  <span className="absolute -right-2.5 -top-1.5 min-w-[15px] rounded-full bg-rose-500 px-1 text-[8px] font-bold leading-[15px] text-white text-center shadow-lg shadow-rose-500/30">
                     {badge}
                   </span>
                 )}
               </span>
               <span className={clsx("font-semibold", active && "tracking-wide")}>{tab.label}</span>
+              {active && (
+                <span className={clsx(
+                  "absolute -top-px left-1/2 -translate-x-1/2 h-[2px] w-6 rounded-full",
+                  isAccent ? "bg-purple-400" : "bg-emerald-400"
+                )} />
+              )}
             </Link>
           );
         })}
