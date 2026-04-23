@@ -40,15 +40,17 @@ const tabs = [
     badge: "cart" as const,
   },
   {
-    label: "Account",
-    href: "/account",
+    label: "Earn",
+    href: "/account/commission",
     icon: (active: boolean) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
-        <circle cx="12" cy="8" r="4" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M4 20c1.5-3 4.5-4.5 8-4.5s6.5 1.5 8 4.5" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 3" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M8.5 14.5l-2 2M15.5 14.5l2 2" strokeLinecap="round" />
       </svg>
     ),
     match: "prefix" as const,
+    accent: true as const,
   },
   {
     label: "Wallet",
@@ -81,29 +83,38 @@ export function MobileTabBar() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/90 backdrop-blur-xl sm:hidden">
-      <div className="flex items-center justify-around py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/6 bg-[#0a0a0a]/95 backdrop-blur-xl sm:hidden">
+      <div className="flex items-center justify-around py-1 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
         {tabs.map((tab) => {
           const active = isActive(tab.href, tab.match);
-          const badge = getBadge(tab.badge);
+          const badge = getBadge((tab as any).badge);
+          const isAccent = (tab as any).accent;
           return (
             <Link
               key={tab.label}
               href={tab.href}
               className={clsx(
-                "relative flex flex-col items-center gap-0.5 px-3 py-1 text-[10px]",
-                active ? "text-emerald-400" : "text-white/50"
+                "relative flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] transition",
+                active
+                  ? isAccent ? "text-purple-400" : "text-emerald-400"
+                  : isAccent ? "text-purple-400/50" : "text-white/40"
               )}
             >
               <span className="relative">
-                {tab.icon(active)}
+                {active && (
+                  <span className={clsx(
+                    "absolute -inset-1.5 rounded-full blur-md",
+                    isAccent ? "bg-purple-400/15" : "bg-emerald-400/15"
+                  )} />
+                )}
+                <span className="relative">{tab.icon(active)}</span>
                 {badge && (
                   <span className="absolute -right-2 -top-1 min-w-[14px] rounded-full bg-rose-500 px-1 text-[9px] font-bold leading-[14px] text-white text-center">
                     {badge}
                   </span>
                 )}
               </span>
-              <span className="font-medium">{tab.label}</span>
+              <span className={clsx("font-semibold", active && "tracking-wide")}>{tab.label}</span>
             </Link>
           );
         })}
