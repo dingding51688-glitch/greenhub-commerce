@@ -102,7 +102,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
       "@type": "Offer",
       url: `https://www.greenhub420.co.uk/products/${product.slug}`,
       priceCurrency: "GBP",
-      price: product.price ?? 0,
+      price: product.priceFrom ?? 0,
       availability: "https://schema.org/InStock",
     },
   };
