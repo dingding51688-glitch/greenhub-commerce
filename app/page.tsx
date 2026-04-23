@@ -138,7 +138,43 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── 9. Telegram — sci-fi ── */}
+      {/* ── 9. Daily Lottery Banner ── */}
+      <section className="relative isolate overflow-hidden rounded-2xl border border-amber-400/20 px-4 py-5 sm:rounded-3xl sm:px-8 sm:py-7">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-[#0d0d0d] to-purple-600/8" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
+        <div className="absolute -top-8 -right-8 h-28 w-28 rounded-full bg-amber-400/10 blur-3xl animate-pulse" aria-hidden="true" />
+        <div className="absolute -bottom-6 -left-6 h-20 w-20 rounded-full bg-purple-400/8 blur-2xl" aria-hidden="true" />
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-2xl">🎰</span>
+            <h3 className="text-base font-bold text-white">Daily £100 Lottery</h3>
+          </div>
+          <p className="text-xs text-gray-400 leading-relaxed mb-3">Join our Telegram group for a chance to win £100 bonus every day at 8PM. Register, enter your Wallet ID, and you could be tonight&apos;s winner!</p>
+          
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5">
+              <span className="text-xs">🕗</span>
+              <span className="text-[11px] text-gray-300">8PM daily</span>
+            </div>
+            <div className="flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5">
+              <span className="text-xs">💰</span>
+              <span className="text-[11px] text-gray-300">£100 bonus</span>
+            </div>
+            <div className="flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5">
+              <span className="text-xs">🎲</span>
+              <span className="text-[11px] text-gray-300">Random draw</span>
+            </div>
+          </div>
+
+          <a href="https://t.me/+CPvB4XJ1Rzg4NDZk" target="_blank" rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 py-3 text-sm font-bold text-black shadow-lg shadow-amber-500/20 active:scale-[0.98] transition">
+            <span>🎰</span> Join Lottery Group
+          </a>
+        </div>
+      </section>
+
+      {/* ── 9b. Telegram Channel ── */}
       <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
         className="relative isolate flex items-center gap-3 overflow-hidden rounded-2xl border border-blue-400/15 px-4 py-4 active:scale-[0.98] transition">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-blue-400/5 to-transparent" aria-hidden="true" />
@@ -148,10 +184,10 @@ export default async function HomePage() {
           <span className="text-xl">✈️</span>
         </div>
         <div className="relative z-10 flex-1 min-w-0">
-          <p className="text-sm font-bold text-white">Join us on Telegram</p>
-          <p className="mt-0.5 text-[10px] text-blue-300/50">New drops · Exclusive deals · Giveaways</p>
+          <p className="text-sm font-bold text-white">Follow @greenhub420</p>
+          <p className="mt-0.5 text-[10px] text-blue-300/50">New drops · Deals · Lottery results</p>
         </div>
-        <span className="relative z-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-400 px-3.5 py-1.5 text-[10px] font-bold text-white shadow-lg shadow-blue-500/15">Join</span>
+        <span className="relative z-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-400 px-3.5 py-1.5 text-[10px] font-bold text-white shadow-lg shadow-blue-500/15">Follow</span>
       </a>
 
       {/* ── 10. AI Support CTA — sci-fi style ── */}
