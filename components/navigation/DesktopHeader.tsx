@@ -186,12 +186,11 @@ export function DesktopHeader() {
                   </span>
                 </Link>
               ) : (
-                <Link href="/login" className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-emerald-500/15 to-emerald-400/5 border border-emerald-400/20 pl-2 pr-3 py-1.5 active:scale-[0.95] transition">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-emerald-400">
+                <Link href="/login" aria-label="Sign In" className="flex h-9 w-9 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/[0.08] active:scale-[0.9] transition">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-emerald-400">
                     <circle cx="12" cy="8" r="4" />
                     <path d="M4 20c1.5-3 4.5-4.5 8-4.5s6.5 1.5 8 4.5" strokeLinecap="round" />
                   </svg>
-                  <span className="text-[11px] font-semibold text-emerald-400 whitespace-nowrap">Sign In</span>
                 </Link>
               )}
             </span>
