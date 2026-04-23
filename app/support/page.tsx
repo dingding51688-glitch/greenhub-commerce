@@ -38,24 +38,52 @@ export default function SupportPage() {
         <p className="mt-2 text-sm text-white/40 max-w-sm mx-auto">Our AI support bot handles most questions instantly. For complex issues, a human agent takes over.</p>
       </div>
 
-      {/* Main CTA — Support Bot */}
-      <a href="https://t.me/greenhub247_bot" target="_blank" rel="noopener noreferrer"
-        className="group relative block overflow-hidden rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/15 via-emerald-400/5 to-transparent p-5 active:scale-[0.98] transition-all">
-        <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-emerald-400/10 blur-3xl group-hover:bg-emerald-400/20 transition-colors" />
-        <div className="absolute -left-4 -bottom-4 h-16 w-16 rounded-full bg-emerald-500/5 blur-2xl" />
-        <div className="relative flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/15 text-3xl">
-            🤖
+      {/* Main CTA — Support Bot (sci-fi style) */}
+      <section className="relative isolate overflow-hidden rounded-2xl border border-cyan-400/20 px-5 py-6">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-blue-600/5 to-purple-600/10" aria-hidden="true" />
+        <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-cyan-400/10 blur-3xl" aria-hidden="true" />
+        <div className="absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-blue-500/10 blur-2xl" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
+
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                <span className="text-lg">🤖</span>
+              </div>
+              <span className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-emerald-400 border-2 border-[#0a0a0a]" />
+              </span>
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white">AI Support Agent</h2>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                <span className="text-[10px] font-medium text-emerald-400">Online — responds in seconds</span>
+              </div>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-base font-bold text-white">Chat with Support Bot</p>
-            <p className="text-xs text-emerald-300/60 mt-0.5">AI answers instantly · Human agent on standby</p>
+
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {[
+              { icon: "⚡", text: "Instant replies" },
+              { icon: "🌐", text: "24/7 available" },
+              { icon: "🔒", text: "Private & secure" },
+              { icon: "💬", text: "Any language" },
+            ].map((f) => (
+              <span key={f.text} className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] text-white/50">
+                <span>{f.icon}</span> {f.text}
+              </span>
+            ))}
           </div>
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white text-lg group-hover:bg-emerald-400 transition-colors">
-            →
-          </div>
+
+          <a href="https://t.me/greenhub247_bot" target="_blank" rel="noopener noreferrer"
+            className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 active:scale-[0.97] transition">
+            <span>💬</span> Chat with AI
+          </a>
         </div>
-      </a>
+      </section>
 
       {/* Feature Grid */}
       <div className="grid grid-cols-2 gap-2.5">
