@@ -1,7 +1,6 @@
 "use client";
 
 import clsx from "clsx";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import type { DrawerSection, MenuCTAGroup, NavItem } from "@/data/fixtures/navigation";
@@ -61,145 +60,114 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {/* ── User Card (logged in) ── */}
+          {/* ── User Card ── */}
           {isAuthenticated && (
-            <div className="px-4 pt-4 pb-2">
-              <div className="relative isolate overflow-hidden rounded-xl border border-emerald-400/10 p-3.5">
+            <div className="px-4 pt-4 pb-1">
+              <button onClick={() => go("/account")} className="relative isolate overflow-hidden w-full rounded-xl border border-emerald-400/10 p-3.5 text-left">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#0a1a12] to-[#0d0d0d]" aria-hidden="true" />
-                <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "24px 24px" }} aria-hidden="true" />
                 <div className="absolute -top-6 -right-6 h-16 w-16 rounded-full bg-emerald-400/8 blur-2xl" aria-hidden="true" />
-
-                <div className="relative z-10">
-                  <button onClick={() => go("/account")} className="flex w-full items-center gap-3 text-left">
-                    <div className="relative">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400/20 to-cyan-400/10 text-base font-bold text-emerald-300 ring-1 ring-emerald-400/25">
-                        {displayName.charAt(0).toUpperCase() || "?"}
-                      </div>
-                      <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 border-[1.5px] border-[#0a0a0a]" />
-                      </span>
+                <div className="relative z-10 flex items-center gap-3">
+                  <div className="relative">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400/20 to-cyan-400/10 text-base font-bold text-emerald-300 ring-1 ring-emerald-400/25">
+                      {displayName.charAt(0).toUpperCase() || "?"}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-white truncate">{displayName}</p>
-                      <p className="text-[10px] text-white/25">View account →</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[8px] uppercase tracking-widest text-white/20">Balance</p>
-                      <p className="text-sm font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                        {balance !== null ? `£${balance.toFixed(2)}` : "—"}
-                      </p>
-                    </div>
-                  </button>
+                    <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 border-[1.5px] border-[#0a0a0a]" />
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-white truncate">{displayName}</p>
+                    <p className="text-[10px] text-white/25">View account →</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[8px] uppercase tracking-widest text-white/20">Balance</p>
+                    <p className="text-sm font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                      {balance !== null ? `£${balance.toFixed(2)}` : "—"}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              </button>
             </div>
           )}
 
-          {/* ── Quick Actions ── */}
+          {/* ── 2×2 Grid Actions ── */}
           {isAuthenticated && (
-            <div className="px-4 py-1.5">
-              <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="px-4 py-3">
+              <div className="grid grid-cols-2 gap-2.5">
                 {[
-                  { emoji: "📦", label: "Orders", href: "/orders", glow: "bg-blue-400/8", border: "border-blue-400/10" },
-                  { emoji: "🔔", label: "Alerts", href: "/account/notifications", glow: "bg-rose-400/8", border: "border-rose-400/10", badge: unreadCount > 0 ? (unreadCount > 99 ? "99+" : `${unreadCount}`) : undefined },
-                  { emoji: "🤝", label: "Earn", href: "/account/commission", glow: "bg-purple-400/8", border: "border-purple-400/10" },
-                ].map((a) => (
-                  <button key={a.href} onClick={() => go(a.href)}
-                    className={`relative isolate overflow-hidden flex flex-col items-center gap-1 rounded-xl border ${a.border} bg-white/[0.01] px-4 py-2.5 active:scale-[0.95] transition shrink-0`}>
-                    <div className={`absolute -top-3 -right-3 h-10 w-10 ${a.glow} rounded-full blur-xl`} aria-hidden="true" />
-                    <span className="relative text-base">{a.emoji}</span>
-                    <span className="relative text-[9px] font-medium text-white/40">{a.label}</span>
-                    {a.badge && (
-                      <span className="absolute -right-1 -top-1 min-w-[18px] h-[18px] rounded-full bg-rose-500 px-1 text-[10px] font-bold leading-[18px] text-white text-center shadow-lg">{a.badge}</span>
-                    )}
-                  </button>
-                ))}
+                  { emoji: "📦", label: "Orders", desc: "Track deliveries", href: "/orders", grad: "from-blue-500/10 to-blue-400/5", border: "border-blue-400/12", text: "text-blue-300" },
+                  { emoji: "💰", label: "Wallet", desc: "Top up & transfer", href: "/wallet", grad: "from-emerald-500/10 to-emerald-400/5", border: "border-emerald-400/12", text: "text-emerald-300" },
+                  { emoji: "🎰", label: "Lucky Draw", desc: "Win £100 daily", href: "/lottery", grad: "from-amber-500/10 to-yellow-400/5", border: "border-amber-400/12", text: "text-amber-300" },
+                  { emoji: "🤝", label: "Earn Hub", desc: "Invite & earn", href: "/account/commission", grad: "from-purple-500/10 to-pink-400/5", border: "border-purple-400/12", text: "text-purple-300" },
+                ].map((item) => {
+                  const active = pathname === item.href || pathname.startsWith(item.href + "/");
+                  return (
+                    <button key={item.href} onClick={() => go(item.href)}
+                      className={clsx(
+                        "relative isolate overflow-hidden rounded-xl border p-3 text-left active:scale-[0.97] transition",
+                        item.border, active ? "ring-1 ring-white/10" : ""
+                      )}>
+                      <div className={`absolute inset-0 bg-gradient-to-br ${item.grad}`} aria-hidden="true" />
+                      <div className="relative z-10">
+                        <span className="text-xl">{item.emoji}</span>
+                        <p className={`text-xs font-bold mt-1.5 ${item.text}`}>{item.label}</p>
+                        <p className="text-[9px] text-white/25 mt-0.5">{item.desc}</p>
+                      </div>
+                      {item.href === "/orders" && totalItems > 0 && (
+                        <span className="absolute top-2 right-2 min-w-[18px] h-[18px] rounded-full bg-rose-500 px-1 text-[10px] font-bold leading-[18px] text-white text-center">
+                          {totalItems > 99 ? "99+" : totalItems}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
 
-          {/* ── Shop ── */}
-          <div className="px-4 py-2">
-            <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-white/20 mb-2">Shop</p>
-            <div className="rounded-xl border border-white/6 bg-white/[0.01] overflow-hidden divide-y divide-white/5">
-              {[
-                { emoji: "🛍️", label: "All Products", href: "/products" },
-                { emoji: "🌿", label: "Flowers", href: "/products?category=flowers" },
-                { emoji: "🚬", label: "Pre-rolls", href: "/products?category=pre-rolls" },
-                { emoji: "💨", label: "Vapes", href: "/products?category=vapes" },
-                { emoji: "🍬", label: "Edibles", href: "/products?category=edibles" },
-                { emoji: "🧊", label: "Concentrates", href: "/products?category=concentrates" },
-              ].map((cat) => {
-                const isActive = pathname === cat.href || (cat.href.includes("=") && pathname?.includes(cat.href.split("=")[1] || ""));
-                return (
-                  <button key={cat.href} onClick={() => go(cat.href)}
-                    className={clsx(
-                      "flex w-full items-center gap-3 px-3.5 py-2.5 text-left transition",
-                      isActive ? "bg-emerald-400/[0.06] text-emerald-300" : "text-white/50 active:bg-white/[0.04]"
-                    )}>
-                    <span className="text-sm">{cat.emoji}</span>
-                    <span className="text-xs font-medium">{cat.label}</span>
-                    {isActive && <span className="ml-auto inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />}
-                  </button>
-                );
-              })}
-            </div>
+          {/* ── Shop (single row) ── */}
+          <div className="px-4 py-1">
+            <button onClick={() => go("/products")}
+              className={clsx(
+                "flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left active:scale-[0.98] transition",
+                pathname.startsWith("/products")
+                  ? "border-emerald-400/15 bg-emerald-400/[0.04]"
+                  : "border-white/6 bg-white/[0.01]"
+              )}>
+              <span className="text-lg">🛍️</span>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-white">Shop</p>
+                <p className="text-[9px] text-white/25">Flowers, vapes, edibles & more</p>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-white/20"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
           </div>
 
-          {/* ── Lucky Draw ── */}
+          {/* ── Links ── */}
           <div className="px-4 py-2">
-            <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-amber-400/40 mb-2">🎰 Lucky Draw</p>
-            <div className="rounded-xl border border-amber-400/10 bg-gradient-to-br from-amber-400/[0.03] to-transparent overflow-hidden divide-y divide-amber-400/5">
-              {[
-                { emoji: "🎰", label: "Daily £100 Bonus", href: "/lottery", desc: "Free daily draw" },
-                { emoji: "🎟️", label: "Competition", href: "/competition", desc: "£2/ticket, £200 prize" },
-              ].map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <button key={item.href} onClick={() => go(item.href)}
-                    className={clsx(
-                      "flex w-full items-center gap-3 px-3.5 py-2.5 text-left transition",
-                      isActive ? "bg-amber-400/[0.06] text-amber-300" : "text-white/50 active:bg-white/[0.04]"
-                    )}>
-                    <span className="text-sm">{item.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <span className="text-xs font-medium block">{item.label}</span>
-                      <span className="text-[9px] text-white/25 block">{item.desc}</span>
-                    </div>
-                    {isActive && <span className="ml-auto inline-block h-1.5 w-1.5 rounded-full bg-amber-400" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-
-          {/* ── Navigation ── */}
-          <div className="px-4 py-2">
-            <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-white/20 mb-2">More</p>
             <div className="rounded-xl border border-white/6 bg-white/[0.01] overflow-hidden divide-y divide-white/5">
               {[
                 ...(isAuthenticated ? [
-                  { icon: "👤", label: "Account", href: "/account", color: "text-cyan-400" },
-                  { icon: "🤝", label: "Earn Hub", href: "/account/commission", color: "text-purple-400" },
+                  { icon: "🔔", label: "Notifications", href: "/account/notifications", badge: unreadCount > 0 ? (unreadCount > 99 ? "99+" : `${unreadCount}`) : null },
                 ] : []),
-                { icon: "📖", label: "How It Works", href: "/how-it-works", color: "text-emerald-400" },
-                { icon: "💬", label: "AI Support", href: "/support", color: "text-blue-400" },
-                { icon: "📝", label: "Blog", href: "/blog", color: "text-amber-400" },
+                { icon: "💬", label: "AI Support", href: "/support", badge: null },
+                { icon: "📖", label: "How It Works", href: "/how-it-works", badge: null },
+                { icon: "📝", label: "Blog", href: "/blog", badge: null },
               ].map((item) => {
-                const isActive = pathname === item.href;
+                const active = pathname === item.href;
                 return (
                   <button key={item.href} onClick={() => go(item.href)}
                     className={clsx(
                       "flex w-full items-center gap-3 px-3.5 py-2.5 text-left transition",
-                      isActive ? "bg-white/[0.04] text-white" : "text-white/50 active:bg-white/[0.03]"
+                      active ? "bg-white/[0.04] text-white" : "text-white/50 active:bg-white/[0.03]"
                     )}>
-                    <div className={`flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.04] text-xs ${item.color}`}>
-                      {item.icon}
-                    </div>
-                    <span className="text-xs font-medium">{item.label}</span>
-                    {isActive && <span className="ml-auto inline-block h-1.5 w-1.5 rounded-full bg-white/40" />}
+                    <span className="text-sm w-5 text-center">{item.icon}</span>
+                    <span className="flex-1 text-xs font-medium">{item.label}</span>
+                    {item.badge && (
+                      <span className="min-w-[20px] h-[20px] rounded-full bg-rose-500 px-1.5 text-[10px] font-bold leading-[20px] text-white text-center">{item.badge}</span>
+                    )}
+                    {active && <span className="inline-block h-1.5 w-1.5 rounded-full bg-white/40" />}
                   </button>
                 );
               })}
@@ -211,9 +179,7 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
             <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
               className="relative isolate overflow-hidden flex w-full items-center gap-3 rounded-xl border border-blue-400/10 px-3.5 py-2.5 active:bg-blue-400/[0.06] transition">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/[0.04] to-transparent" aria-hidden="true" />
-              <div className="relative z-10 flex h-7 w-7 items-center justify-center rounded-lg bg-blue-400/10">
-                <span className="text-xs">✈️</span>
-              </div>
+              <span className="relative z-10 text-sm">✈️</span>
               <span className="relative z-10 text-xs font-medium text-blue-300/70">Telegram Channel</span>
               <span className="relative z-10 ml-auto rounded-full bg-blue-400/15 px-2 py-0.5 text-[8px] font-bold text-blue-300/60">JOIN</span>
             </a>
