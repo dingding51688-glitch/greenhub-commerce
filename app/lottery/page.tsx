@@ -199,9 +199,9 @@ function DailyLotteryTab({
         <p className="text-xs font-bold text-white/60 mb-3">How to Enter</p>
         <div className="space-y-2.5">
           {[
-            { step: '1', text: 'Join our Telegram channel', sub: '@greenhub420 — required to participate', highlight: true },
+            { step: '1', text: 'Join @greenhub420 channel', sub: 'Required to participate in the lottery', highlight: true },
             { step: '2', text: 'Bind your Wallet ID', sub: 'Message @gh420lottery_bot with /bind GH-XXXXXX' },
-            { step: '3', text: 'Send /join daily', sub: 'Message the bot each day to enter that day\'s draw' },
+            { step: '3', text: 'Click JOIN in channel', sub: 'Tap the pinned JOIN button in @greenhub420 each day' },
             { step: '4', text: 'Wait for 8PM draw', sub: 'Winner announced in channel, £100 credited instantly' },
           ].map(s => (
             <div key={s.step} className="flex items-center gap-3">
@@ -222,12 +222,12 @@ function DailyLotteryTab({
           <a href="https://t.me/greenhub420"
             target="_blank" rel="noopener noreferrer"
             className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-500 to-blue-400 py-3 text-xs font-bold text-white shadow-lg shadow-blue-500/20 active:scale-[0.98] transition">
-            ✈️ Join Channel
+            ✈️ Join &amp; Enter
           </a>
-          <a href="https://t.me/gh420lottery_bot?start=join"
+          <a href="https://t.me/gh420lottery_bot?start=bind"
             target="_blank" rel="noopener noreferrer"
             className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-amber-400/20 bg-amber-400/5 py-3 text-xs font-bold text-amber-300 active:scale-[0.98] transition">
-            🎰 Open Bot
+            🔗 Bind Wallet
           </a>
         </div>
       </div>
