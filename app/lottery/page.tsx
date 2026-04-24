@@ -199,28 +199,37 @@ function DailyLotteryTab({
         <p className="text-xs font-bold text-white/60 mb-3">How to Enter</p>
         <div className="space-y-2.5">
           {[
-            { step: '1', text: 'Link Telegram', sub: 'Account → Bind Telegram' },
-            { step: '2', text: 'Join lottery group', sub: 'Via Telegram bot' },
-            { step: '3', text: 'Send /join daily', sub: 'In the lottery group' },
-            { step: '4', text: 'Wait for draw', sub: '8 PM UK time, winner gets £100' },
+            { step: '1', text: 'Join our Telegram channel', sub: '@greenhub420 — required to participate', highlight: true },
+            { step: '2', text: 'Bind your Wallet ID', sub: 'Message @gh420lottery_bot with /bind GH-XXXXXX' },
+            { step: '3', text: 'Send /join daily', sub: 'Message the bot each day to enter that day\'s draw' },
+            { step: '4', text: 'Wait for 8PM draw', sub: 'Winner announced in channel, £100 credited instantly' },
           ].map(s => (
             <div key={s.step} className="flex items-center gap-3">
-              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-400/10 text-[10px] font-bold text-amber-400">
+              <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+                (s as any).highlight ? 'bg-amber-400/20 text-amber-300 ring-1 ring-amber-400/30' : 'bg-amber-400/10 text-amber-400'
+              }`}>
                 {s.step}
               </div>
               <div>
-                <p className="text-xs font-medium text-white/70">{s.text}</p>
+                <p className={`text-xs font-medium ${(s as any).highlight ? 'text-amber-300' : 'text-white/70'}`}>{s.text}</p>
                 <p className="text-[9px] text-white/25">{s.sub}</p>
               </div>
             </div>
           ))}
         </div>
-        
-        <a href="https://t.me/gh420lottery_bot?start=join"
-          target="_blank" rel="noopener noreferrer"
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-400 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 active:scale-[0.98] transition">
-          ✈️ Join Lottery on Telegram
-        </a>
+
+        <div className="mt-4 flex gap-2">
+          <a href="https://t.me/greenhub420"
+            target="_blank" rel="noopener noreferrer"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-500 to-blue-400 py-3 text-xs font-bold text-white shadow-lg shadow-blue-500/20 active:scale-[0.98] transition">
+            ✈️ Join Channel
+          </a>
+          <a href="https://t.me/gh420lottery_bot?start=join"
+            target="_blank" rel="noopener noreferrer"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-amber-400/20 bg-amber-400/5 py-3 text-xs font-bold text-amber-300 active:scale-[0.98] transition">
+            🎰 Open Bot
+          </a>
+        </div>
       </div>
 
       {/* History */}
