@@ -60,6 +60,33 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
         </div>
 
         <div className="flex-1 overflow-y-auto">
+          {/* ── Sign In / Register (not logged in) ── */}
+          {!isAuthenticated && (
+            <div className="px-4 pt-4 pb-2">
+              <div className="relative isolate overflow-hidden rounded-xl border border-emerald-400/10 p-4 text-center">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0a1a12] to-[#0d0d0d]" aria-hidden="true" />
+                <div className="absolute -top-8 -right-8 h-20 w-20 rounded-full bg-emerald-400/8 blur-2xl" aria-hidden="true" />
+                <div className="relative z-10">
+                  <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-full bg-gradient-to-br from-emerald-400/20 to-cyan-400/10 text-xl ring-1 ring-emerald-400/25 mb-3">
+                    👋
+                  </div>
+                  <p className="text-sm font-bold text-white">Welcome to GreenHub 420</p>
+                  <p className="text-[10px] text-white/30 mt-1">Sign in to access your wallet, orders & more</p>
+                  <div className="flex gap-2 mt-3">
+                    <button onClick={() => go("/login")}
+                      className="flex flex-1 min-h-[40px] items-center justify-center rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-sm font-bold text-black shadow-lg shadow-emerald-500/20 active:scale-[0.97] transition">
+                      Sign In
+                    </button>
+                    <button onClick={() => go("/register")}
+                      className="flex flex-1 min-h-[40px] items-center justify-center rounded-xl border border-white/15 bg-white/[0.03] text-sm font-medium text-white/70 active:scale-[0.97] transition">
+                      Register
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ── User Card ── */}
           {isAuthenticated && (
             <div className="px-4 pt-4 pb-1">
