@@ -11,6 +11,10 @@ const FAQ = [
   { q: "What's the return policy?", a: "Due to the nature of our products, we do not accept returns. If there's an issue with your order, contact support and we'll resolve it." },
   { q: "How do withdrawals work?", a: "Minimum £100, 3% fee. Go to Wallet → Withdraw. UK bank transfer or USDT. Processed within 24 hours." },
   { q: "Is my package discreet?", a: "Yes. All orders are vacuum-sealed in plain, unmarked packaging. No branding, no product descriptions. Looks like any other online order." },
+  { q: "How do I join the daily £100 lottery?", a: "1) Join our @greenhub420 Telegram channel. 2) Message @gh420lottery_bot and send /bind GH-XXXXXXXX (your wallet ID). 3) Go back to the channel and tap the pinned JOIN button. Draw is at 8PM UK time daily. First-time bind gets £5 bonus free!" },
+  { q: "What is the Competition?", a: "100 tickets at £2 each. Pick your lucky numbers or get random ones. Max 5 tickets per person. When all tickets sell out (or 24h passes), one number is drawn — if it was sold, the owner wins £200 (real balance, withdrawable!)." },
+  { q: "How do I bind my Telegram for the lottery?", a: "Open Telegram, message @gh420lottery_bot, and send: /bind GH-XXXXXXXX (replace with your wallet ID from the Wallet page). You'll get £5 bonus on first bind. Then go to @greenhub420 channel and click JOIN." },
+  { q: "What's the referral/earn programme?", a: "Share your unique referral link (Account → Earn Hub). Friends who register and shop earn you 15-25% commission on every order, forever. Commission goes straight to your wallet." },
 ];
 
 const SUPPORT_FEATURES = [
@@ -102,7 +106,7 @@ export default function SupportPage() {
         <span className="text-2xl">✈️</span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold text-white">Join our Telegram Channel</p>
-          <p className="text-[10px] text-blue-300/50">New drops, exclusive deals & announcements</p>
+          <p className="text-[10px] text-blue-300/50">Daily £100 lottery · Updates · Deals</p>
         </div>
         <span className="rounded-full bg-blue-400/15 px-3 py-1 text-[10px] font-bold text-blue-300">Join</span>
       </a>

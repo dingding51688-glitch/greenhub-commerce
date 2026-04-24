@@ -232,6 +232,29 @@ function DailyLotteryTab({
         </div>
       </div>
 
+      {/* FAQ */}
+      <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+        <p className="text-xs font-bold text-white/60 mb-3">Frequently Asked Questions</p>
+        <div className="space-y-3">
+          {[
+            { q: 'Is it free to enter?', a: 'Yes! The daily lottery is completely free. Just join the channel, bind your wallet, and click JOIN each day.' },
+            { q: 'What do I win?', a: '\u00a3100 bonus credited to your wallet instantly. Bonus can be used for purchases on the website (non-withdrawable).' },
+            { q: 'What if not enough people join?', a: `Minimum ${minEntries} participants needed. If not reached, the draw is cancelled and a new round starts the next day.` },
+            { q: 'Can I enter every day?', a: 'Yes! You need to click the JOIN button in the channel each day. Entries reset at midnight UK time.' },
+            { q: 'How is the winner picked?', a: 'Completely random. Each participant has an equal chance. The draw is automated at 8PM UK time.' },
+            { q: 'What\u2019s the \u00a35 bind bonus?', a: 'First time you bind your wallet to Telegram via @gh420lottery_bot, you get \u00a35 bonus free. One-time reward.' },
+          ].map((faq, i) => (
+            <details key={i} className="group">
+              <summary className="flex items-center justify-between cursor-pointer text-xs font-medium text-white/70 list-none">
+                <span>{faq.q}</span>
+                <span className="text-white/20 group-open:rotate-180 transition-transform text-[10px]">\u25BC</span>
+              </summary>
+              <p className="mt-1.5 text-[11px] text-white/35 leading-relaxed pl-0">{faq.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+
       {/* History */}
       {history.length > 0 && (
         <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
