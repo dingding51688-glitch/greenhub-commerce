@@ -181,7 +181,7 @@ export default function CompetitionTab({ walletId, authToken }: { walletId?: str
         </div>
         <div className="grid grid-cols-10 gap-1.5">
           {Array.from({ length: totalTickets }, (_, i) => i + 1).map(num => {
-            const ticket = data.tickets?.[String(num)] || data.tickets?.[num];
+            const ticket = data.tickets?.[num];
             const isSold = ticket?.sold;
             const isMine = myTickets.includes(num);
             const isSelected = selected.includes(num);
