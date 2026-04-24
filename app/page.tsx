@@ -120,39 +120,40 @@ export default async function HomePage() {
       <RecentReviews />
 
       {/* ── 6. Why Us — Earn Hub + Payment Methods combined ── */}
-      <section className="relative isolate overflow-hidden rounded-2xl border border-white/8 p-4 sm:p-6">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0d0d0d] to-[#0a0d1a]" aria-hidden="true" />
+      <section className="relative isolate overflow-hidden rounded-2xl border border-purple-400/15 p-4 sm:p-6">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.06] via-[#0d0d0d] to-[#0a0d1a]" aria-hidden="true" />
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
+        <div className="absolute -top-6 -right-6 h-20 w-20 rounded-full bg-purple-400/10 blur-3xl" aria-hidden="true" />
         <div className="relative z-10 space-y-4">
           {/* Earn Hub */}
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-400/15">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-400/20 ring-1 ring-purple-400/25">
               <span className="text-lg">💰</span>
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-bold text-white">Earn 15–25% Commission</h3>
-              <p className="mt-0.5 text-[10px] leading-relaxed text-white/35">Share your referral link. Every order from friends = instant commission.</p>
-              <Link href="/account/commission" className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-purple-400/80 hover:text-purple-300">
-                Open Earn Hub <span>→</span>
+              <p className="mt-0.5 text-[11px] leading-relaxed text-white/60">Share your referral link. Every order from friends = instant commission.</p>
+              <Link href="/account/commission" className="mt-2 inline-flex items-center gap-1 rounded-full bg-purple-500/15 px-3 py-1 text-[10px] font-bold text-purple-300 hover:bg-purple-500/25 transition">
+                Open Earn Hub →
               </Link>
             </div>
           </div>
 
-          <div className="h-px bg-white/5" />
+          <div className="h-px bg-white/8" />
 
           {/* Payment Methods */}
           <div>
-            <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/25 mb-2.5">Secure Payments</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40 mb-2.5">Secure Payments</p>
             <div className="flex gap-2">
               {[
-                { icon: "🏦", name: "Bank Transfer", tag: "5 min", border: "border-blue-400/10" },
-                { icon: "💳", name: "Wallet", tag: "Instant", border: "border-emerald-400/10" },
-                { icon: "₮", name: "USDT", tag: "Crypto", border: "border-purple-400/10" },
+                { icon: "🏦", name: "Bank Transfer", tag: "5 min", border: "border-blue-400/15", bg: "bg-blue-400/[0.04]" },
+                { icon: "💳", name: "Wallet", tag: "Instant", border: "border-emerald-400/15", bg: "bg-emerald-400/[0.04]" },
+                { icon: "₮", name: "USDT", tag: "Crypto", border: "border-purple-400/15", bg: "bg-purple-400/[0.04]" },
               ].map((m) => (
-                <div key={m.name} className={`flex-1 rounded-lg border ${m.border} bg-white/[0.02] px-2.5 py-2 text-center`}>
+                <div key={m.name} className={`flex-1 rounded-lg border ${m.border} ${m.bg} px-2.5 py-2 text-center`}>
                   <span className="text-base">{m.icon}</span>
-                  <p className="mt-0.5 text-[9px] font-semibold text-white/50">{m.name}</p>
-                  <p className="text-[8px] font-medium text-emerald-400/60">{m.tag}</p>
+                  <p className="mt-0.5 text-[10px] font-semibold text-white/70">{m.name}</p>
+                  <p className="text-[9px] font-bold text-emerald-400/80">{m.tag}</p>
                 </div>
               ))}
             </div>
@@ -160,8 +161,24 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── 7. 🤖 AI Support ── */}
-      <section className="relative isolate overflow-hidden rounded-2xl border border-cyan-400/15 px-4 py-4 sm:px-6 sm:py-5">
+      {/* ── 7. Telegram Channel ── */}
+      <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
+        className="block relative isolate overflow-hidden rounded-2xl border border-blue-400/15 px-4 py-3.5 active:scale-[0.98] transition">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/[0.06] to-transparent" aria-hidden="true" />
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/15">
+            <span className="text-lg">✈️</span>
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-bold text-white">Join our Telegram</p>
+            <p className="text-[10px] text-white/50">Daily £100 lottery · Updates · Deals</p>
+          </div>
+          <span className="rounded-full bg-blue-400/15 px-3 py-1 text-[10px] font-bold text-blue-300">JOIN</span>
+        </div>
+      </a>
+
+      {/* ── 8. 🤖 AI Support ── */}
+      <section className="relative isolate overflow-hidden rounded-2xl border border-cyan-400/15 px-4 py-3.5 sm:px-6 sm:py-5">
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.06] via-transparent to-blue-600/[0.04]" aria-hidden="true" />
         <div className="absolute -top-6 -right-6 h-16 w-16 rounded-full bg-cyan-400/8 blur-2xl" aria-hidden="true" />
         <div className="relative z-10 flex items-center gap-3">
@@ -176,7 +193,7 @@ export default async function HomePage() {
           </div>
           <div className="flex-1">
             <h3 className="text-sm font-bold text-white">AI Support</h3>
-            <p className="text-[9px] text-white/30">24/7 · Instant replies · Private &amp; secure</p>
+            <p className="text-[10px] text-white/50">24/7 · Instant replies · Private &amp; secure</p>
           </div>
           <Link href="/support" className="inline-flex min-h-[36px] items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 px-4 text-xs font-bold text-white shadow-lg shadow-cyan-500/15 active:scale-[0.97] transition">
             💬 Chat
