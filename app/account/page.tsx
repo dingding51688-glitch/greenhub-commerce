@@ -476,10 +476,11 @@ function TelegramBindCard({
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/account/unbind-telegram", {
+      // Get JWT from cookie to call Strapi directly
+      const token = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('gh_auth_token='))?.split('=').slice(1).join('=') || '';
+      const res = await fetch("https://cms.greenhub420.co.uk/api/account/unbind-telegram", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({ password }),
       });
       const data = await res.json().catch(() => ({}));
