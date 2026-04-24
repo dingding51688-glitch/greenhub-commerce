@@ -102,9 +102,8 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {[
                   { emoji: "📦", label: "Orders", href: "/orders", glow: "bg-blue-400/8", border: "border-blue-400/10" },
-                  { emoji: "💰", label: "Top Up", href: "/wallet/topup", glow: "bg-emerald-400/8", border: "border-emerald-400/10" },
-                  { emoji: "🎰", label: "Lucky", href: "/lottery", glow: "bg-amber-400/8", border: "border-amber-400/10" },
                   { emoji: "🔔", label: "Alerts", href: "/account/notifications", glow: "bg-rose-400/8", border: "border-rose-400/10", badge: unreadCount > 0 ? (unreadCount > 99 ? "99+" : `${unreadCount}`) : undefined },
+                  { emoji: "🤝", label: "Earn", href: "/account/commission", glow: "bg-purple-400/8", border: "border-purple-400/10" },
                 ].map((a) => (
                   <button key={a.href} onClick={() => go(a.href)}
                     className={`relative isolate overflow-hidden flex flex-col items-center gap-1 rounded-xl border ${a.border} bg-white/[0.01] px-4 py-2.5 active:scale-[0.95] transition shrink-0`}>
@@ -155,7 +154,6 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
               {[
                 { emoji: "🎰", label: "Daily £100 Bonus", href: "/lottery", desc: "Free daily draw" },
                 { emoji: "🎟️", label: "Competition", href: "/competition", desc: "£2/ticket, £200 prize" },
-                { emoji: "📊", label: "Draw History", href: "/competition/history", desc: "Past results" },
               ].map((item) => {
                 const isActive = pathname === item.href;
                 return (
