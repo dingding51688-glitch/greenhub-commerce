@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 
 const API = process.env.NEXT_PUBLIC_STRAPI_URL || 'https://cms.greenhub420.co.uk';
 
@@ -289,78 +290,22 @@ export default function CompetitionTab({ walletId, authToken }: { walletId?: str
         </ul>
       </div>
 
-      {/* My Purchase History */}
-      {myHistory.length > 0 && (
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h2 className="font-semibold mb-3 text-sm">📝 My Purchase History</h2>
-          <div className="space-y-2">
-            {myHistory.map((h, i) => (
-              <div key={i} className={`p-3 rounded-xl text-sm ${h.won ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-gray-800/50'}`}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-300 font-medium">Round {h.round}</span>
-                  <span className="text-gray-500 text-xs">{new Date(h.drawnAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-wrap gap-1.5">
-                    {h.myTickets.map(n => (
-                      <span key={n} className={`text-xs font-mono px-2 py-0.5 rounded ${n === h.winnerTicket ? 'bg-amber-500/30 text-amber-300 ring-1 ring-amber-400/50' : 'bg-purple-500/20 text-purple-300'}`}>
-                        #{String(n).padStart(2, '0')}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="text-right ml-3 flex-shrink-0">
-                    <div className="text-[10px] text-gray-500">Draw: <span className="text-amber-400 font-mono">#{String(h.winnerTicket).padStart(2, '0')}</span></div>
-                    {h.won ? (
-                      <span className="text-emerald-400 text-xs font-bold">🏆 Won £200!</span>
-                    ) : (
-                      <span className="text-gray-500 text-xs">Not this time</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* History link */}
+      <Link
+        href="/competition/history"
+        className="block bg-gray-900 border border-gray-800 rounded-2xl p-4 text-center hover:border-gray-700 transition-colors"
+      >
+        <div className="flex items-center justify-center gap-2">
+          <span>🏆</span>
+          <span className="text-sm font-medium">View Draw History & My Tickets</span>
+          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/></svg>
         </div>
-      )}
-
-      {/* Draw History - Public */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-        <h2 className="font-semibold mb-3 text-sm">🏆 Draw History</h2>
-        {history.length === 0 ? (
-          <div className="text-center py-6">
-            <p className="text-3xl mb-2">🎰</p>
-            <p className="text-gray-500 text-sm">No draws yet</p>
-            <p className="text-gray-600 text-xs mt-1">Results will appear here after the first draw</p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {history.map((h, i) => (
-              <div key={i} className="p-3 bg-gray-800/50 rounded-xl text-sm">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-white font-medium">Round {h.round}</span>
-                  <span className="text-gray-500 text-xs">{new Date(h.drawnAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="bg-amber-500/20 text-amber-300 text-sm font-mono font-bold px-2.5 py-1 rounded-lg">#{String(h.winnerTicket).padStart(2, '0')}</span>
-                    <span className="text-gray-500 text-xs">{h.soldCount}/{h.totalTickets || 100} sold</span>
-                  </div>
-                  <div className="text-right">
-                    {h.winnerWallet ? (
-                      <div>
-                        <span className="text-emerald-400 text-xs font-medium">🏆 {h.winnerWallet}</span>
-                        <p className="text-emerald-400/60 text-[10px]">Won £200</p>
-                      </div>
-                    ) : (
-                      <span className="text-amber-400 text-xs">No winner (unsold ticket)</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        {(history.length > 0 || myHistory.length > 0) && (
+          <p className="text-xs text-gray-500 mt-1">
+            {history.length} draws{myHistory.length > 0 ? ` · ${myHistory.length} rounds entered` : ''}
+          </p>
         )}
-      </div>
+      </Link>
     </div>
   );
 }
