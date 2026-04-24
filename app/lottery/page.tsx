@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/components/providers/AuthProvider';
+import CompetitionTab from './competition';
+
 const API = process.env.NEXT_PUBLIC_STRAPI_URL || 'https://cms.greenhub420.co.uk';
 
 type LotteryData = {
@@ -19,10 +22,15 @@ type LotteryData = {
   }>;
 };
 
-export default function LotteryPage() {
+export default function LuckyHubPage() {
+  const [tab, setTab] = useState<'lottery' | 'competition'>('lottery');
   const [data, setData] = useState<LotteryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [countdown, setCountdown] = useState('');
+  const { token, profile } = useAuth();
+
+  const [walletId, setWalletId] = useState<string>();
+  const [authToken, setAuthToken] = useState<string>();
 
   useEffect(() => {
     fetch(`${API}/api/lottery/status`)
@@ -30,6 +38,19 @@ export default function LotteryPage() {
       .then(d => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
+
+  // Get wallet ID for competition
+  useEffect(() => {
+    if (!token) return;
+    setAuthToken(token);
+    fetch(`${API}/api/account/profile`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then(d => {
+        const handle = d?.data?.attributes?.transferHandle || d?.transferHandle;
+        if (handle) setWalletId(handle);
+      })
+      .catch(() => {});
+  }, [token]);
 
   useEffect(() => {
     const tick = () => {
@@ -51,205 +72,185 @@ export default function LotteryPage() {
     return () => clearInterval(id);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" />
-      </div>
-    );
-  }
-
   const entries = data?.entries || 0;
   const minEntries = data?.minEntries || 100;
   const progress = Math.min((entries / minEntries) * 100, 100);
   const remaining = minEntries - entries;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      {/* Hero */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-gray-950 to-emerald-900/20" />
-        <div className="relative max-w-lg mx-auto px-4 pt-10 pb-6 text-center">
-          <div className="text-5xl mb-3">🎰</div>
-          <h1 className="text-2xl font-bold mb-1">Daily £100 Bonus Lottery</h1>
-          <p className="text-gray-400 text-sm">Every night at 8:00 PM UK time, we randomly pick 1 lucky winner</p>
+    <div className="min-h-screen text-white">
+      {/* Header */}
+      <div className="relative max-w-lg mx-auto px-4 pt-6 pb-4">
+        <h1 className="text-2xl font-black text-center">
+          <span className="bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 bg-clip-text text-transparent">
+            🎰 Lucky Draw
+          </span>
+        </h1>
+        <p className="text-center text-white/30 text-xs mt-1">Daily bonus & competition prizes</p>
+      </div>
+
+      {/* Tab Switcher */}
+      <div className="max-w-lg mx-auto px-4 mb-4">
+        <div className="flex rounded-xl border border-white/8 bg-white/[0.02] p-1 gap-1">
+          <button
+            onClick={() => setTab('lottery')}
+            className={`flex-1 rounded-lg py-2.5 text-center text-xs font-bold transition-all ${
+              tab === 'lottery'
+                ? 'bg-gradient-to-r from-amber-500/20 to-yellow-500/10 text-amber-300 shadow-sm shadow-amber-500/10'
+                : 'text-white/30 hover:text-white/50'
+            }`}
+          >
+            <span className="text-sm mr-1">🎰</span> Daily £100
+          </button>
+          <button
+            onClick={() => setTab('competition')}
+            className={`flex-1 rounded-lg py-2.5 text-center text-xs font-bold transition-all ${
+              tab === 'competition'
+                ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/10 text-purple-300 shadow-sm shadow-purple-500/10'
+                : 'text-white/30 hover:text-white/50'
+            }`}
+          >
+            <span className="text-sm mr-1">🎟️</span> Competition
+          </button>
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto px-4 space-y-4 pb-24">
+      {/* Tab Content */}
+      {tab === 'lottery' ? (
+        <DailyLotteryTab
+          data={data}
+          loading={loading}
+          countdown={countdown}
+          entries={entries}
+          minEntries={minEntries}
+          progress={progress}
+          remaining={remaining}
+        />
+      ) : (
+        <CompetitionTab walletId={walletId} authToken={authToken} />
+      )}
+    </div>
+  );
+}
 
+/* ── Daily Lottery Tab ── */
+function DailyLotteryTab({
+  data, loading, countdown, entries, minEntries, progress, remaining
+}: {
+  data: LotteryData | null; loading: boolean; countdown: string;
+  entries: number; minEntries: number; progress: number; remaining: number;
+}) {
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" />
+      </div>
+    );
+  }
 
-        {/* Countdown */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 text-center">
-          <p className="text-gray-400 text-xs uppercase tracking-wider mb-1">Next Draw</p>
-          <p className="text-3xl font-mono font-bold text-emerald-400">{countdown}</p>
-          <p className="text-gray-500 text-xs mt-2">Prize: <span className="text-amber-400 font-semibold">£100 bonus</span> (usable for purchases on site)</p>
+  const history = data?.history || [];
+
+  return (
+    <div className="max-w-lg mx-auto px-4 pb-32 space-y-4">
+      {/* Prize Card */}
+      <div className="relative overflow-hidden rounded-2xl border border-amber-400/15 bg-gradient-to-br from-amber-500/[0.06] to-transparent p-5">
+        <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-amber-400/8 blur-3xl" />
+        <div className="relative z-10 text-center">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-amber-400/50 font-bold">Today&apos;s Prize</p>
+          <p className="text-4xl font-black text-amber-300 mt-1">£100</p>
+          <p className="text-xs text-white/30 mt-1">Bonus credited to winner&apos;s wallet</p>
         </div>
+      </div>
 
-        {/* Progress - with clear explanation */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium">Today&apos;s Entries</span>
-            <span className="text-emerald-400 font-bold text-lg">{entries} / {minEntries}</span>
-          </div>
-          
-          {/* Progress bar */}
-          <div className="w-full bg-gray-800 rounded-full h-3.5 overflow-hidden mb-3">
-            <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${progress}%`,
-                background: progress >= 100
-                  ? 'linear-gradient(90deg, #10B981, #34D399)'
-                  : 'linear-gradient(90deg, #F59E0B, #FBBF24)',
-              }}
-            />
-          </div>
-
-          {/* Explanation */}
-          <div className="bg-gray-800/50 rounded-xl p-3 text-xs text-gray-400 space-y-1">
-            <p>⚠️ <strong className="text-white">Minimum {minEntries} participants required</strong> — if fewer than {minEntries} people enter, tonight&apos;s draw is <span className="text-amber-400">cancelled</span>.</p>
-            {progress >= 100 ? (
-              <p className="text-emerald-400 font-medium">✅ Minimum reached! Draw will happen at 8:00 PM tonight!</p>
-            ) : (
-              <p>📢 Need <span className="text-amber-400 font-semibold">{remaining} more</span> entries to activate tonight&apos;s draw. Invite your friends!</p>
-            )}
-          </div>
+      {/* Status */}
+      <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4 space-y-3">
+        <div className="flex justify-between items-center">
+          <span className="text-xs text-white/40">Participants</span>
+          <span className="text-sm font-bold text-white">{entries} / {minEntries}</span>
         </div>
+        
+        {/* Progress bar */}
+        <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+          <div 
+            className="h-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-500"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        
+        {remaining > 0 && (
+          <p className="text-[10px] text-amber-400/60 text-center">
+            ⚠️ {remaining} more needed for tonight&apos;s draw — minimum {minEntries} required
+          </p>
+        )}
 
-        {/* How to Join - step by step */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h2 className="font-semibold mb-4 text-sm">📌 How to Participate</h2>
-          <div className="space-y-4">
-            <div className="flex gap-3 items-start">
-              <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0 text-xs font-bold text-emerald-400">1</div>
+        <div className="flex justify-between items-center pt-1">
+          <span className="text-xs text-white/40">Draw Time</span>
+          <span className="text-sm font-bold text-emerald-400">8:00 PM UK</span>
+        </div>
+        
+        <div className="flex justify-between items-center">
+          <span className="text-xs text-white/40">Countdown</span>
+          <span className="text-sm font-bold font-mono text-amber-300">{countdown}</span>
+        </div>
+      </div>
+
+      {/* How to Enter */}
+      <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+        <p className="text-xs font-bold text-white/60 mb-3">How to Enter</p>
+        <div className="space-y-2.5">
+          {[
+            { step: '1', text: 'Link Telegram', sub: 'Account → Bind Telegram' },
+            { step: '2', text: 'Join lottery group', sub: 'Via Telegram bot' },
+            { step: '3', text: 'Send /join daily', sub: 'In the lottery group' },
+            { step: '4', text: 'Wait for draw', sub: '8 PM UK time, winner gets £100' },
+          ].map(s => (
+            <div key={s.step} className="flex items-center gap-3">
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-400/10 text-[10px] font-bold text-amber-400">
+                {s.step}
+              </div>
               <div>
-                <p className="text-sm font-medium text-white">Create an account</p>
-                <p className="text-xs text-gray-500 mt-0.5">Sign up at greenhub420.co.uk — it&apos;s free</p>
-                <Link href="/register" className="inline-block mt-1.5 text-xs text-emerald-400 underline">Register now →</Link>
+                <p className="text-xs font-medium text-white/70">{s.text}</p>
+                <p className="text-[9px] text-white/25">{s.sub}</p>
               </div>
             </div>
-            <div className="flex gap-3 items-start">
-              <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0 text-xs font-bold text-emerald-400">2</div>
-              <div>
-                <p className="text-sm font-medium text-white">Copy your Wallet ID</p>
-                <p className="text-xs text-gray-500 mt-0.5">Log in → go to Wallet page → copy your ID (e.g. GH-A1B2C3D4)</p>
-                <Link href="/wallet" className="inline-block mt-1.5 text-xs text-emerald-400 underline">Go to Wallet →</Link>
-              </div>
-            </div>
-            <div className="flex gap-3 items-start">
-              <div className="w-7 h-7 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0 text-xs font-bold text-blue-400">3</div>
-              <div>
-                <p className="text-sm font-medium text-white">Join Telegram &amp; bind wallet</p>
-                <p className="text-xs text-gray-500 mt-0.5">Follow our channel + open the Lottery Bot → send <code className="bg-gray-800 px-1.5 py-0.5 rounded text-emerald-400">/bind GH-XXXXX</code> with your Wallet ID</p>
-                <div className="flex gap-2 mt-1.5">
-                  <a href="https://t.me/greenhub420" className="text-xs text-blue-400 underline">📢 Follow channel</a>
-                  <a href="https://t.me/gh420lottery_bot?start=bind" className="text-xs text-blue-400 underline">🤖 Open Bot</a>
+          ))}
+        </div>
+        
+        <a href="https://t.me/gh420lottery_bot?start=join"
+          target="_blank" rel="noopener noreferrer"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-400 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 active:scale-[0.98] transition">
+          ✈️ Join Lottery on Telegram
+        </a>
+      </div>
+
+      {/* History */}
+      {history.length > 0 && (
+        <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+          <p className="text-xs font-bold text-white/60 mb-3">Recent Draws</p>
+          <div className="space-y-2">
+            {history.slice(0, 10).map((h, i) => (
+              <div key={i} className="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0">
+                <div>
+                  <p className="text-xs font-medium text-white/60">{h.date}</p>
+                  <p className="text-[9px] text-white/25">{h.entries} entries</p>
                 </div>
-              </div>
-            </div>
-            <div className="flex gap-3 items-start">
-              <div className="w-7 h-7 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center flex-shrink-0 text-xs font-bold text-amber-400">4</div>
-              <div>
-                <p className="text-sm font-medium text-white">Enter the lottery daily</p>
-                <p className="text-xs text-gray-500 mt-0.5">Go to the lottery group and tap the <strong className="text-white">🎰 JOIN</strong> button every day before 8 PM</p>
-                <a href="https://t.me/gh420lottery_bot?start=join" className="inline-block mt-1.5 text-xs text-amber-400 underline">Enter lottery group →</a>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-5 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-center">
-            <span className="text-emerald-400 text-sm font-medium">🎁 First-time wallet bind = instant FREE £5 bonus!</span>
-          </div>
-        </div>
-
-        {/* Requirements summary */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h2 className="font-semibold mb-3 text-sm">✅ Entry Requirements</h2>
-          <div className="space-y-2.5">
-            {[
-              { icon: '🌐', text: 'Registered account on greenhub420.co.uk' },
-              { icon: '🔗', text: 'Wallet bound to Telegram via Lottery Bot' },
-              { icon: '📢', text: 'Following @greenhub420 Telegram channel' },
-              { icon: '🎰', text: 'Tap JOIN button in lottery group each day' },
-            ].map((r, i) => (
-              <div key={i} className="flex items-center gap-3 text-sm">
-                <span className="text-base">{r.icon}</span>
-                <span className="text-gray-300">{r.text}</span>
+                <div className="text-right">
+                  {h.cancelled ? (
+                    <span className="text-[10px] text-red-400/60">Cancelled</span>
+                  ) : h.winner ? (
+                    <div>
+                      <p className="text-[10px] text-emerald-400 font-mono">{h.winner}</p>
+                      <p className="text-[9px] text-amber-300">+£{h.amount}</p>
+                    </div>
+                  ) : (
+                    <span className="text-[10px] text-white/25">No winner</span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </div>
-
-        {/* Rules */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h2 className="font-semibold mb-3 text-sm">⚠️ Rules</h2>
-          <ul className="space-y-2 text-sm text-gray-400">
-            <li>• Draw only happens if <strong className="text-white">{minEntries}+ people</strong> entered that day</li>
-            <li>• One entry per person per day — resets at midnight</li>
-            <li>• One Telegram account per person — multi-accounting = permanent ban</li>
-            <li>• Unbinding wallet after entry = entry removed</li>
-            <li>• Prize: <strong className="text-white">£100 bonus</strong> credited to winner&apos;s wallet</li>
-            <li>• Bonus is for site purchases only, <strong className="text-amber-400">not withdrawable</strong></li>
-          </ul>
-        </div>
-
-        {/* History */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h2 className="font-semibold mb-3 text-sm">📊 Draw History</h2>
-          {(!data?.history || data.history.length === 0) ? (
-            <div className="text-center py-6">
-              <p className="text-3xl mb-2">🏆</p>
-              <p className="text-gray-500 text-sm">No draws yet — be the first winner!</p>
-              <p className="text-gray-600 text-xs mt-1">Results will appear here after the first draw</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {data.history.map((h, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-xl text-sm">
-                  <div>
-                    <span className="text-gray-300 font-medium">{h.date}</span>
-                    <span className="text-gray-500 ml-2 text-xs">{h.entries} entries</span>
-                  </div>
-                  {h.cancelled ? (
-                    <span className="text-amber-400 text-xs">Cancelled (&lt;{minEntries})</span>
-                  ) : (
-                    <div className="text-right">
-                      <span className="text-emerald-400 text-xs font-mono">{h.winner}</span>
-                      <span className="text-gray-500 text-xs ml-1">won £{h.amount}</span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* CTA */}
-        <div className="space-y-3">
-          <a
-            href="https://t.me/gh420lottery_bot?start=join"
-            className="block w-full text-center py-4 rounded-2xl font-bold text-lg text-white"
-            style={{ background: 'linear-gradient(135deg, #10B981, #059669)' }}
-          >
-            🎰 Join Lottery on Telegram
-          </a>
-          <div className="flex gap-3">
-            <a
-              href="https://t.me/greenhub420"
-              className="flex-1 text-center py-3 rounded-xl font-medium text-sm text-blue-400 border border-blue-500/20 bg-blue-500/5"
-            >
-              📢 Follow Channel
-            </a>
-            <Link
-              href="/register"
-              className="flex-1 text-center py-3 rounded-xl font-medium text-sm text-emerald-400 border border-emerald-500/20 bg-emerald-500/5"
-            >
-              📝 Register Free
-            </Link>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -103,8 +103,8 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
                 {[
                   { emoji: "📦", label: "Orders", href: "/orders", glow: "bg-blue-400/8", border: "border-blue-400/10" },
                   { emoji: "💰", label: "Top Up", href: "/wallet/topup", glow: "bg-emerald-400/8", border: "border-emerald-400/10" },
-                  { emoji: "🔔", label: "Alerts", href: "/account/notifications", glow: "bg-amber-400/8", border: "border-amber-400/10", badge: unreadCount > 0 ? (unreadCount > 99 ? "99+" : `${unreadCount}`) : undefined },
-                  { emoji: "🤝", label: "Earn", href: "/account/commission", glow: "bg-purple-400/8", border: "border-purple-400/10" },
+                  { emoji: "🎰", label: "Lucky", href: "/lottery", glow: "bg-amber-400/8", border: "border-amber-400/10" },
+                  { emoji: "🔔", label: "Alerts", href: "/account/notifications", glow: "bg-rose-400/8", border: "border-rose-400/10", badge: unreadCount > 0 ? (unreadCount > 99 ? "99+" : `${unreadCount}`) : undefined },
                 ].map((a) => (
                   <button key={a.href} onClick={() => go(a.href)}
                     className={`relative isolate overflow-hidden flex flex-col items-center gap-1 rounded-xl border ${a.border} bg-white/[0.01] px-4 py-2.5 active:scale-[0.95] transition shrink-0`}>
@@ -148,6 +148,34 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
             </div>
           </div>
 
+          {/* ── Lucky Draw ── */}
+          <div className="px-4 py-2">
+            <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-amber-400/40 mb-2">🎰 Lucky Draw</p>
+            <div className="rounded-xl border border-amber-400/10 bg-gradient-to-br from-amber-400/[0.03] to-transparent overflow-hidden divide-y divide-amber-400/5">
+              {[
+                { emoji: "🎰", label: "Daily £100 Bonus", href: "/lottery", desc: "Free daily draw" },
+                { emoji: "🎟️", label: "Competition", href: "/competition", desc: "£2/ticket, £200 prize" },
+                { emoji: "📊", label: "Draw History", href: "/competition/history", desc: "Past results" },
+              ].map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <button key={item.href} onClick={() => go(item.href)}
+                    className={clsx(
+                      "flex w-full items-center gap-3 px-3.5 py-2.5 text-left transition",
+                      isActive ? "bg-amber-400/[0.06] text-amber-300" : "text-white/50 active:bg-white/[0.04]"
+                    )}>
+                    <span className="text-sm">{item.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs font-medium block">{item.label}</span>
+                      <span className="text-[9px] text-white/25 block">{item.desc}</span>
+                    </div>
+                    {isActive && <span className="ml-auto inline-block h-1.5 w-1.5 rounded-full bg-amber-400" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* ── Cart (if has items) ── */}
           {totalItems > 0 && (
             <div className="px-4 py-1.5">
@@ -168,7 +196,10 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
             <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-white/20 mb-2">More</p>
             <div className="rounded-xl border border-white/6 bg-white/[0.01] overflow-hidden divide-y divide-white/5">
               {[
-                ...(isAuthenticated ? [{ icon: "👤", label: "Account", href: "/account", color: "text-cyan-400" }] : []),
+                ...(isAuthenticated ? [
+                  { icon: "👤", label: "Account", href: "/account", color: "text-cyan-400" },
+                  { icon: "🤝", label: "Earn Hub", href: "/account/commission", color: "text-purple-400" },
+                ] : []),
                 { icon: "📖", label: "How It Works", href: "/how-it-works", color: "text-emerald-400" },
                 { icon: "💬", label: "AI Support", href: "/support", color: "text-blue-400" },
                 { icon: "📝", label: "Blog", href: "/blog", color: "text-amber-400" },

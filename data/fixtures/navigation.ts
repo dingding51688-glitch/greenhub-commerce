@@ -20,6 +20,7 @@ export const primaryNav: NavItem[] = [
   { label: "Vapes", href: "/products?category=vapes" },
   { label: "Edibles", href: "/products?category=edibles" },
   { label: "Concentrates", href: "/products?category=concentrates" },
+  { label: "Lucky Draw", href: "/lottery", match: "prefix" },
   { label: "Ordering guide", href: "/how-it-works", match: "exact" },
   { label: "Support", href: "/support", match: "exact" }
 ];
