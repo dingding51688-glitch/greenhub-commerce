@@ -199,7 +199,7 @@ export default function WalletPage() {
 const TX_ICONS: Record<string, string> = {
   withdrawal: "💳", transfer_out: "↗️", transfer_in: "↙️", bonus: "🎁",
   topup: "💰", commission: "🤝", purchase: "🛒", referral_click_bonus: "🔗",
-  withdrawal_reversal: "↩️",
+  withdrawal_reversal: "↩️", competition_ticket: "🎟️", competition_win: "🏆",
 };
 
 const WD_STATUS: Record<string, { label: string; color: string }> = {
@@ -247,6 +247,11 @@ function TxRow({ tx, onNavigate }: { tx: WalletTransaction; onNavigate: (href: s
           <p className={`text-sm font-bold ${tx.amount >= 0 ? "text-emerald-300" : "text-red-300"}`}>
             {tx.amount >= 0 ? "+" : ""}{GBP.format(tx.amount)}
           </p>
+          {tx.balanceBefore != null && tx.balanceAfter != null && (
+            <p className="text-[9px] text-white/25">
+              {GBP.format(tx.balanceBefore)} → {GBP.format(tx.balanceAfter)}
+            </p>
+          )}
           <p className="text-[9px] text-white/25">
             {tx.createdAt ? TS.format(new Date(tx.createdAt)) : ""}
           </p>
