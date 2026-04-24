@@ -145,8 +145,8 @@ export default function CompetitionTab({ walletId, authToken }: { walletId?: str
         </div>
         <div className="flex justify-between items-end mb-3">
           <div>
-            <p className="text-2xl font-bold text-emerald-400">£{prizePool.toFixed(0)}</p>
-            <p className="text-xs text-gray-500">Prize Pool</p>
+            <p className="text-2xl font-bold text-emerald-400">£200</p>
+            <p className="text-xs text-gray-500">Winner Prize</p>
           </div>
           <div className="text-right">
             <p className="text-lg font-bold text-white">{soldCount}/{totalTickets}</p>
@@ -157,7 +157,7 @@ export default function CompetitionTab({ walletId, authToken }: { walletId?: str
           <div className="h-full rounded-full transition-all duration-500" style={{ width: `${progress}%`, background: progress >= 100 ? 'linear-gradient(90deg, #10B981, #34D399)' : 'linear-gradient(90deg, #8B5CF6, #A78BFA)' }} />
         </div>
         <p className="text-gray-500 text-xs mt-2">
-          {soldCount >= totalTickets ? '🎉 Sold out! Drawing now...' : `${totalTickets - soldCount} tickets left · £${ticketPrice} each · Max ${maxPerUser} per person`}
+          {soldCount >= totalTickets ? '🎉 Sold out! Drawing now...' : `${totalTickets - soldCount} tickets left · £${ticketPrice} each · Win chance: ${soldCount}/${totalTickets}`}
         </p>
       </div>
 
@@ -250,9 +250,10 @@ export default function CompetitionTab({ walletId, authToken }: { walletId?: str
           <li>• Pick your numbers or let us randomly assign</li>
           <li>• Max <strong className="text-white">{maxPerUser} tickets</strong> per person</li>
           <li>• When all 100 are sold or 24h expires → <strong className="text-amber-400">instant draw</strong></li>
-          <li>• <strong className="text-emerald-400">Winner takes the entire pool</strong> (up to £{totalTickets * ticketPrice})</li>
-          <li>• Prize is <strong className="text-white">real balance — withdrawable!</strong></li>
-          <li>• Your chance = your tickets ÷ total sold</li>
+          <li>• Draw picks <strong className="text-white">1 random number from 01-100</strong></li>
+          <li>• If that number was sold → <strong className="text-emerald-400">winner gets £200 (withdrawable!)</strong></li>
+          <li>• If not sold → <strong className="text-amber-400">no winner this round</strong></li>
+          <li>• Your chance = your tickets ÷ 100</li>
           <li>• New round starts automatically after each draw</li>
         </ul>
       </div>
@@ -269,8 +270,12 @@ export default function CompetitionTab({ walletId, authToken }: { walletId?: str
                   <span className="text-gray-500 ml-2 text-xs">{h.soldCount} tickets</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-emerald-400 text-xs font-mono">#{String(h.winnerTicket).padStart(2,'0')}</span>
-                  <span className="text-amber-400 text-xs ml-1">£{h.prizePool.toFixed(0)}</span>
+                  <span className="text-gray-400 text-xs font-mono">#{String(h.winnerTicket).padStart(2,'0')}</span>
+                  {h.winnerWallet ? (
+                    <span className="text-emerald-400 text-xs ml-1">🏆 £200</span>
+                  ) : (
+                    <span className="text-amber-400 text-xs ml-1">No winner</span>
+                  )}
                 </div>
               </div>
             ))}
