@@ -134,6 +134,14 @@ const faqs = [
     q: "How do withdrawals work?",
     a: "Go to Wallet → Withdraw. Minimum withdrawal is £100. A 3% processing fee applies. Funds arrive within 24 hours via UK bank transfer or USDT.",
   },
+  {
+    q: "How do I join the daily £100 lottery?",
+    a: "Join our @greenhub420 Telegram channel, message @gh420lottery_bot to bind your wallet (/bind GH-XXXXXXXX), then tap the JOIN button in the channel each day. Draw at 8PM UK time — winner gets £100 bonus!",
+  },
+  {
+    q: "What is the Competition?",
+    a: "100 tickets at £2 each, max 5 per person. Pick your lucky numbers or go random. When all tickets sell out, one number is drawn — if sold, the owner wins £200 real balance (withdrawable!).",
+  },
 ];
 
 const trustPoints = [
@@ -275,6 +283,45 @@ export default function HowItWorksPage() {
               <p className="mt-0.5 text-[9px] leading-relaxed text-white/30">{t.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── Lucky Draw ── */}
+      <section className="relative isolate overflow-hidden rounded-2xl border border-amber-400/15 p-5 sm:p-6">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-emerald-500/5" aria-hidden="true" />
+        <div className="absolute -top-8 -left-8 h-24 w-24 rounded-full bg-amber-400/10 blur-3xl" aria-hidden="true" />
+        <div className="relative z-10">
+          <h2 className="text-base font-bold text-white sm:text-lg">🎰 Lucky Draw</h2>
+          <p className="text-[10px] text-white/30 mt-0.5">Free daily lottery + ticket competition</p>
+
+          <div className="mt-4 space-y-2.5">
+            <div className="rounded-xl border border-amber-400/10 bg-white/[0.02] p-3.5 flex items-start gap-3">
+              <span className="text-2xl mt-0.5">🎰</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xs font-bold text-white">Daily £100 Lottery</h3>
+                  <span className="rounded-full bg-emerald-400/10 text-emerald-400 px-2 py-0.5 text-[9px] font-semibold">Free</span>
+                </div>
+                <p className="mt-1 text-[11px] leading-relaxed text-white/40">Join our Telegram channel, bind your wallet, and tap JOIN every day. Draw at 8PM — winner gets £100 bonus. First bind = £5 free!</p>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-purple-400/10 bg-white/[0.02] p-3.5 flex items-start gap-3">
+              <span className="text-2xl mt-0.5">🎟️</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xs font-bold text-white">Competition</h3>
+                  <span className="rounded-full bg-purple-400/10 text-purple-400 px-2 py-0.5 text-[9px] font-semibold">£2/ticket</span>
+                </div>
+                <p className="mt-1 text-[11px] leading-relaxed text-white/40">100 tickets per round, max 5 per person. Pick your lucky numbers. Winner takes £200 real balance — fully withdrawable!</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-3.5 flex gap-2">
+            <Link href="/lottery" className="inline-flex min-h-[36px] flex-1 items-center justify-center rounded-full bg-amber-500/15 border border-amber-500/20 text-xs font-semibold text-amber-400 transition hover:bg-amber-500/25">🎰 Join Lottery</Link>
+            <Link href="/lottery" className="inline-flex min-h-[36px] flex-1 items-center justify-center rounded-full bg-purple-500/15 border border-purple-500/20 text-xs font-semibold text-purple-400 transition hover:bg-purple-500/25">🎟️ Buy Tickets</Link>
+          </div>
         </div>
       </section>
 
