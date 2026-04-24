@@ -22,7 +22,7 @@ const schema = z
 
 type Form = z.infer<typeof schema>;
 
-const inputCls = "w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-base text-white outline-none placeholder:text-white/25 focus:border-emerald-400/40 focus:bg-white/[0.06] transition";
+const inputCls = "w-full rounded-lg border border-white/8 bg-white/[0.03] px-3 py-2.5 text-[15px] text-white outline-none placeholder:text-white/20 focus:border-emerald-400/30 focus:bg-white/[0.05] transition";
 
 function strength(pw: string) {
   const s = [/.{8,}/, /[A-Z]/, /[0-9]/, /[^A-Za-z0-9]/].filter((r) => r.test(pw)).length;
@@ -77,31 +77,47 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-sm space-y-5 pb-8">
-      {/* Header */}
-      <div className="text-center">
-        <p className="text-4xl">🌿</p>
-        <h1 className="mt-2 text-xl font-bold text-white">Create Account</h1>
-        <p className="mt-1 text-sm text-white/40">Join Green Hub — order & collect anonymously</p>
+    <div className="mx-auto w-full max-w-[340px] pb-8">
+      {/* Header — compact */}
+      <div className="relative isolate overflow-hidden rounded-2xl border border-emerald-400/10 p-4 mb-4">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1a12] to-transparent opacity-60" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: "linear-gradient(rgba(16,185,129,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.5) 1px, transparent 1px)",
+          backgroundSize: "24px 24px"
+        }} aria-hidden="true" />
+        <div className="absolute -top-8 right-0 h-16 w-24 rounded-full bg-emerald-400/10 blur-3xl" aria-hidden="true" />
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-400/10 ring-1 ring-emerald-400/20">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-emerald-400">
+              <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="9" cy="7" r="4" strokeLinecap="round" strokeLinejoin="round"/>
+              <line x1="19" y1="8" x2="19" y2="14" strokeLinecap="round"/><line x1="22" y1="11" x2="16" y2="11" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-base font-bold text-white">Create Account</h1>
+            <p className="text-[10px] text-white/30">Anonymous ordering & collection</p>
+          </div>
+        </div>
       </div>
 
       {/* Referral badge */}
       {referralCode && (
-        <div className="flex items-center justify-center gap-2 rounded-xl border border-purple-400/20 bg-purple-400/5 px-3 py-2.5">
-          <span className="text-base">🎁</span>
-          <p className="text-xs text-purple-200">Invited by <span className="font-mono font-bold">{referralCode}</span></p>
+        <div className="flex items-center gap-2 rounded-lg border border-purple-400/15 bg-purple-400/5 px-3 py-2 mb-3">
+          <span className="text-sm">🎁</span>
+          <p className="text-[11px] text-purple-200">Invited by <span className="font-mono font-bold">{referralCode}</span></p>
         </div>
       )}
 
       {/* Success */}
       {success && (
-        <div className="space-y-3 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-5">
+        <div className="space-y-3 rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-4">
           <div className="text-center">
-            <p className="text-4xl">✅</p>
-            <p className="mt-2 text-base font-bold text-emerald-200">Account created!</p>
-            <p className="mt-1 text-sm text-emerald-200/70">Redirecting in {countdown > 0 ? countdown : 1}s…</p>
+            <p className="text-3xl">✅</p>
+            <p className="mt-2 text-sm font-bold text-emerald-200">Account created!</p>
+            <p className="mt-1 text-xs text-emerald-200/60">Redirecting in {countdown > 0 ? countdown : 1}s…</p>
           </div>
-          <Link href="/products" className="flex w-full min-h-[48px] items-center justify-center rounded-xl cta-gradient text-sm font-bold text-white">
+          <Link href="/products" className="flex w-full min-h-[44px] items-center justify-center rounded-xl cta-gradient text-sm font-bold text-white">
             Browse Products
           </Link>
         </div>
@@ -109,7 +125,7 @@ export default function RegisterPage() {
 
       {/* Form */}
       {!success && (
-        <form className="space-y-3" onSubmit={handleSubmit(onSubmit)} noValidate>
+        <form className="space-y-2.5" onSubmit={handleSubmit(onSubmit)} noValidate>
           <Field label="Full name" error={errors.fullName?.message}>
             <input type="text" {...register("fullName")} className={inputCls} placeholder="John Smith" autoComplete="name" />
           </Field>
@@ -128,23 +144,23 @@ export default function RegisterPage() {
           </div>
 
           <Field label="Password" error={errors.password?.message}>
-            <input type="password" {...register("password")} className={inputCls} placeholder="Min 8 chars, 1 uppercase, 1 symbol" autoComplete="new-password" />
+            <input type="password" {...register("password")} className={inputCls} placeholder="Min 8, 1 upper, 1 symbol" autoComplete="new-password" />
             {pw && (
-              <div className="mt-2 flex items-center gap-2">
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/8">
+              <div className="mt-1.5 flex items-center gap-2">
+                <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/6">
                   <div className={`h-full rounded-full transition-all ${str.cls}`} style={{ width: `${str.pct}%` }} />
                 </div>
-                <span className={`text-[10px] font-medium ${str.pct === 100 ? "text-emerald-400" : str.pct >= 66 ? "text-amber-400" : "text-red-400"}`}>{str.label}</span>
+                <span className={`text-[9px] font-medium ${str.pct === 100 ? "text-emerald-400" : str.pct >= 66 ? "text-amber-400" : "text-red-400"}`}>{str.label}</span>
               </div>
             )}
           </Field>
 
-          <Field label="Confirm password" error={errors.confirm?.message}>
+          <Field label="Confirm" error={errors.confirm?.message}>
             <input type="password" {...register("confirm")} className={inputCls} placeholder="Re-enter password" autoComplete="new-password" />
           </Field>
 
           {error && (
-            <div className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
+            <div className="rounded-lg border border-red-400/20 bg-red-400/5 px-3 py-2 text-xs text-red-200">
               {error}
             </div>
           )}
@@ -152,32 +168,31 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex w-full min-h-[52px] items-center justify-center rounded-xl cta-gradient text-base font-bold text-white disabled:opacity-40 active:scale-[0.98] transition"
+            className="flex w-full min-h-[48px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-sm font-bold text-black shadow-lg shadow-emerald-500/20 disabled:opacity-40 active:scale-[0.97] transition mt-1"
           >
-            {isSubmitting ? "Creating…" : "Create Account"}
+            {isSubmitting ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black" />
+            ) : (
+              <>
+                Create Account
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </>
+            )}
           </button>
         </form>
       )}
 
       {/* Login link */}
       {!success && (
-        <>
-          <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-white/8" />
-            <span className="text-[10px] text-white/25">ALREADY HAVE AN ACCOUNT?</span>
-            <div className="h-px flex-1 bg-white/8" />
-          </div>
-
-          <Link
-            href="/login"
-            className="flex w-full min-h-[48px] items-center justify-center rounded-xl border border-white/10 text-sm font-medium text-white transition hover:bg-white/[0.04] active:scale-[0.98]"
-          >
-            Sign In
+        <div className="mt-4 text-center">
+          <span className="text-[10px] text-white/20">Already have an account? </span>
+          <Link href="/login" className="text-[10px] font-medium text-emerald-400/70 hover:text-emerald-400">
+            Sign In →
           </Link>
-        </>
+        </div>
       )}
 
-      <p className="text-center text-[10px] text-white/20">
+      <p className="mt-3 text-center text-[9px] text-white/15">
         By registering you agree to our terms of service
       </p>
     </div>
@@ -187,9 +202,9 @@ export default function RegisterPage() {
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-[10px] uppercase tracking-wider text-white/40">{label}</label>
-      <div className="mt-1">{children}</div>
-      {error && <p className="mt-1 text-xs text-red-300">{error}</p>}
+      <label className="text-[9px] uppercase tracking-widest text-white/30 font-medium">{label}</label>
+      <div className="mt-0.5">{children}</div>
+      {error && <p className="mt-0.5 text-[10px] text-red-300">{error}</p>}
     </div>
   );
 }
