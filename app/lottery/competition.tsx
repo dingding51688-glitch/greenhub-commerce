@@ -111,6 +111,15 @@ export default function CompetitionTab({ walletId, authToken }: { walletId?: str
 
   const buyTickets = async (nums?: number[]) => {
     if (!walletId || !authToken) { setError('Please log in first'); return; }
+
+    // Confirmation dialog
+    const count = nums ? nums.length : (maxPerUser - myTickets.length);
+    const cost = count * (data?.ticketPrice || 2);
+    const msg = nums
+      ? `Buy ticket${count > 1 ? 's' : ''} #${nums.map(n => String(n).padStart(2,'0')).join(', #')} for \u00a3${cost.toFixed(2)}?`
+      : `Buy ${count} random ticket${count > 1 ? 's' : ''} for \u00a3${cost.toFixed(2)}?`;
+    if (!window.confirm(msg)) return;
+
     setBuying(true);
     setError('');
     setSuccess('');
