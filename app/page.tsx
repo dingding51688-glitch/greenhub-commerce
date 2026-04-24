@@ -80,6 +80,24 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── 🎰 Lottery Banner ── */}
+      <Link href="/lottery" className="block relative overflow-hidden rounded-2xl border border-amber-400/20 px-5 py-4 sm:rounded-3xl sm:px-8 sm:py-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-900/20 via-gray-900 to-emerald-900/20" />
+        <div className="relative flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-2xl">🎰</span>
+              <span className="text-sm font-bold text-amber-400">Daily £100 Lottery</span>
+            </div>
+            <p className="text-xs text-white/50">Join our Telegram group · Draw at 8PM daily</p>
+          </div>
+          <div className="text-right">
+            <p className="text-lg font-bold text-emerald-400">£100</p>
+            <p className="text-[10px] text-white/40 uppercase">bonus prize</p>
+          </div>
+        </div>
+      </Link>
+
       {/* ── 2. Category Cards ── */}
       <FeaturedCollections />
 
