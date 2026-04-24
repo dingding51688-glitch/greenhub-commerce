@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import CompetitionTab from './competition';
-
 const API = process.env.NEXT_PUBLIC_STRAPI_URL || 'https://cms.greenhub420.co.uk';
 
 type LotteryData = {
@@ -66,55 +64,21 @@ export default function LotteryPage() {
   const progress = Math.min((entries / minEntries) * 100, 100);
   const remaining = minEntries - entries;
 
-  const [tab, setTab] = useState<'lottery' | 'competition'>('lottery');
-
-  // Get wallet info
-  const [walletId, setWalletId] = useState<string>();
-  const [authToken, setAuthToken] = useState<string>();
-  useEffect(() => {
-    try {
-      const token = window.localStorage.getItem('bv:auth-token');
-      if (token) {
-        setAuthToken(token);
-        // Fetch customer profile to get walletId
-        fetch(`${API}/api/account/profile`, {
-          headers: { 'Authorization': `Bearer ${token}` },
-        })
-          .then(r => r.json())
-          .then(d => {
-            const handle = d?.data?.attributes?.transferHandle || d?.transferHandle;
-            if (handle) setWalletId(handle);
-          })
-          .catch(() => {});
-      }
-    } catch {}
-  }, []);
-
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Hero */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-gray-950 to-emerald-900/20" />
         <div className="relative max-w-lg mx-auto px-4 pt-10 pb-6 text-center">
-          <div className="text-5xl mb-3">{tab === 'lottery' ? '🎰' : '🎟️'}</div>
-          <h1 className="text-2xl font-bold mb-1">{tab === 'lottery' ? 'Daily £100 Lottery' : 'Competition'}</h1>
-          <p className="text-gray-400 text-sm">{tab === 'lottery' ? 'Every night at 8:00 PM · 1 winner · £100 bonus' : 'Pick your numbers · Win the prize pool · Withdrawable!'}</p>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="max-w-lg mx-auto px-4 mb-4">
-        <div className="flex gap-2 bg-gray-900 p-1 rounded-xl">
-          <button onClick={() => setTab('lottery')} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${tab === 'lottery' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-500'}`}>🎰 Daily Lottery</button>
-          <button onClick={() => setTab('competition')} className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${tab === 'competition' ? 'bg-purple-500/20 text-purple-400' : 'text-gray-500'}`}>🎟️ Competition</button>
+          <div className="text-5xl mb-3">🎰</div>
+          <h1 className="text-2xl font-bold mb-1">Daily £100 Bonus Lottery</h1>
+          <p className="text-gray-400 text-sm">Every night at 8:00 PM UK time, we randomly pick 1 lucky winner</p>
         </div>
       </div>
 
       <div className="max-w-lg mx-auto px-4 space-y-4 pb-24">
 
-        {tab === 'competition' && <CompetitionTab walletId={walletId} authToken={authToken} />}
 
-        {tab === 'lottery' && <>
         {/* Countdown */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 text-center">
           <p className="text-gray-400 text-xs uppercase tracking-wider mb-1">Next Draw</p>
@@ -285,7 +249,6 @@ export default function LotteryPage() {
             </Link>
           </div>
         </div>
-        </>}
       </div>
     </div>
   );

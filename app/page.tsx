@@ -98,6 +98,24 @@ export default async function HomePage() {
         </div>
       </Link>
 
+      {/* ── 🎟️ Competition Banner ── */}
+      <Link href="/competition" className="block relative overflow-hidden rounded-2xl border border-purple-400/20 px-5 py-4 sm:rounded-3xl sm:px-8 sm:py-6">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-gray-900 to-pink-900/20" />
+        <div className="relative flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-2xl">🎟️</span>
+              <span className="text-sm font-bold text-purple-400">Competition</span>
+            </div>
+            <p className="text-xs text-white/50">100 tickets · Pick your numbers · Winner takes all</p>
+          </div>
+          <div className="text-right">
+            <p className="text-lg font-bold text-purple-400">£200</p>
+            <p className="text-[10px] text-white/40 uppercase">max prize</p>
+          </div>
+        </div>
+      </Link>
+
       {/* ── 2. Category Cards ── */}
       <FeaturedCollections />
 
