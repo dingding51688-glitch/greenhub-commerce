@@ -206,15 +206,15 @@ export default function AccountPage() {
       />
 
       {/* ── Telegram Bind CTA ── */}
-      <a href="https://t.me/gh420lottery_bot?start=bind" target="_blank" rel="noopener noreferrer"
+      <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
         className="relative isolate flex items-center gap-3 overflow-hidden rounded-xl border border-blue-400/20 bg-blue-500/5 px-4 py-3.5 active:scale-[0.98] transition">
         <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-blue-400/8 blur-2xl" aria-hidden="true" />
         <div className="relative z-10 flex h-9 w-9 items-center justify-center rounded-lg bg-blue-400/15 text-lg">✈️</div>
         <div className="relative z-10 flex-1 min-w-0">
-          <p className="text-sm font-medium text-white">Bind Telegram</p>
-          <p className="text-[10px] text-blue-300/50">Link account → get £5 bonus + daily £100 lottery</p>
+          <p className="text-sm font-medium text-white">Join Telegram Channel</p>
+          <p className="text-[10px] text-blue-300/50">Follow us → join group → bind wallet → £5 bonus + daily £100 lottery</p>
         </div>
-        <span className="relative z-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-400 px-3 py-1 text-[10px] font-bold text-white">Bind</span>
+        <span className="relative z-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-400 px-3 py-1 text-[10px] font-bold text-white">Join</span>
       </a>
 
       {/* ── Account actions — terminal style ── */}

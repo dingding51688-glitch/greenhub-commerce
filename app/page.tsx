@@ -167,28 +167,14 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <a href="https://t.me/+CPvB4XJ1Rzg4NDZk" target="_blank" rel="noopener noreferrer"
+          <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 py-3 text-sm font-bold text-black shadow-lg shadow-amber-500/20 active:scale-[0.98] transition">
-            <span>🎰</span> Join Lottery Group
+            <span>🎰</span> Join Channel &amp; Enter Lottery
           </a>
         </div>
       </section>
 
-      {/* ── 9b. Telegram Channel ── */}
-      <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
-        className="relative isolate flex items-center gap-3 overflow-hidden rounded-2xl border border-blue-400/15 px-4 py-4 active:scale-[0.98] transition">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-blue-400/5 to-transparent" aria-hidden="true" />
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
-        <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-400/8 blur-2xl" aria-hidden="true" />
-        <div className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-400/15">
-          <span className="text-xl">✈️</span>
-        </div>
-        <div className="relative z-10 flex-1 min-w-0">
-          <p className="text-sm font-bold text-white">Follow @greenhub420</p>
-          <p className="mt-0.5 text-[10px] text-blue-300/50">New drops · Deals · Lottery results</p>
-        </div>
-        <span className="relative z-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-400 px-3.5 py-1.5 text-[10px] font-bold text-white shadow-lg shadow-blue-500/15">Follow</span>
-      </a>
+
 
       {/* ── 10. AI Support CTA — sci-fi style ── */}
       <section className="relative isolate overflow-hidden rounded-2xl border border-cyan-400/20 px-5 py-6 sm:rounded-3xl sm:px-8 sm:py-8">
