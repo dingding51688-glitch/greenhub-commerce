@@ -174,6 +174,17 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
             </div>
           </div>
 
+          {/* ── Sign Out (in scroll area so always visible) ── */}
+          {isAuthenticated && (
+            <div className="px-4 py-1">
+              <button onClick={() => { logout(); onClose(); router.push("/login"); }}
+                className="flex w-full items-center gap-3 rounded-xl border border-red-400/8 px-3.5 py-2.5 text-left active:bg-red-400/5 transition">
+                <span className="text-sm w-5 text-center">⏻</span>
+                <span className="text-xs font-medium text-red-400/50">Sign Out</span>
+              </button>
+            </div>
+          )}
+
           {/* ── Telegram ── */}
           <div className="px-4 py-2">
             <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
@@ -187,7 +198,7 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
         </div>
 
         {/* ── Footer ── */}
-        <div className="border-t border-white/6 px-4 py-3">
+        <div className="border-t border-white/6 px-4 py-3 pb-[max(0.75rem,calc(env(safe-area-inset-bottom)+0.75rem))]">
           {isAuthenticated ? (
             <button onClick={() => { logout(); onClose(); router.push("/login"); }}
               className="relative isolate overflow-hidden flex w-full min-h-[40px] items-center justify-center gap-2 rounded-xl border border-red-400/10 text-sm font-medium text-red-400/50 active:bg-red-400/5 transition">
