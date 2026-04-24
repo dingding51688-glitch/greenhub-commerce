@@ -16,20 +16,16 @@ function strapiMedia(path?: string | null): string | undefined {
 export default async function HomePage() {
   return (
     <div className="space-y-5 pb-20 sm:space-y-10">
-      {/* ── 1. Hero — Sci-fi style ── */}
+      {/* ── 1. Hero ── */}
       <section className="relative isolate overflow-hidden rounded-2xl border border-emerald-400/15 px-4 py-6 sm:rounded-[40px] sm:px-12 sm:py-14">
-        {/* Layered sci-fi background */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#0a1a12] via-[#0d0d0d] to-[#0a0d1a]" aria-hidden="true" />
         <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(ellipse at 30% -20%, rgba(16,185,129,0.4), transparent 60%)" }} aria-hidden="true" />
         <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 120%, rgba(6,182,212,0.3), transparent 50%)" }} aria-hidden="true" />
-        {/* Grid overlay */}
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
-        {/* Floating orbs */}
         <div className="absolute -top-8 -right-8 h-28 w-28 rounded-full bg-emerald-400/8 blur-3xl animate-pulse" aria-hidden="true" />
         <div className="absolute -bottom-6 -left-10 h-20 w-20 rounded-full bg-cyan-400/8 blur-2xl" aria-hidden="true" />
 
         <div className="relative z-10">
-          {/* Status badge */}
           <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/5 px-3 py-1">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
@@ -47,21 +43,14 @@ export default async function HomePage() {
           </p>
 
           <div className="mt-4 flex gap-2.5 sm:mt-5">
-            <Link
-              href="/products"
-              className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 px-6 text-sm font-semibold uppercase tracking-wider text-black shadow-lg shadow-emerald-500/25 active:scale-[0.97] transition"
-            >
+            <Link href="/products" className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 px-6 text-sm font-semibold uppercase tracking-wider text-black shadow-lg shadow-emerald-500/25 active:scale-[0.97] transition">
               Shop Now
             </Link>
-            <Link
-              href="/how-it-works"
-              className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/15 bg-white/[0.03] px-6 text-sm font-semibold uppercase tracking-wider text-white/70 active:scale-[0.97] transition"
-            >
+            <Link href="/how-it-works" className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/15 bg-white/[0.03] px-6 text-sm font-semibold uppercase tracking-wider text-white/70 active:scale-[0.97] transition">
               How It Works
             </Link>
           </div>
 
-          {/* Stats row */}
           <div className="mt-5 flex gap-3 sm:gap-8">
             {[
               { val: "16,000+", label: "Lockers", icon: "📍" },
@@ -80,186 +69,117 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── 🎰 Lottery Banner ── */}
-      <Link href="/lottery" className="block relative overflow-hidden rounded-2xl border border-amber-400/20 px-5 py-4 sm:rounded-3xl sm:px-8 sm:py-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-900/20 via-gray-900 to-emerald-900/20" />
-        <div className="relative flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-2xl">🎰</span>
-              <span className="text-sm font-bold text-amber-400">Daily £100 Lottery</span>
-            </div>
-            <p className="text-xs text-white/50">Join our Telegram group · Draw at 8PM daily</p>
-          </div>
-          <div className="text-right">
-            <p className="text-lg font-bold text-emerald-400">£100</p>
-            <p className="text-[10px] text-white/40 uppercase">bonus prize</p>
-          </div>
-        </div>
-      </Link>
-
-      {/* ── 🎟️ Competition Banner ── */}
-      <Link href="/competition" className="block relative overflow-hidden rounded-2xl border border-purple-400/20 px-5 py-4 sm:rounded-3xl sm:px-8 sm:py-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-gray-900 to-pink-900/20" />
-        <div className="relative flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-2xl">🎟️</span>
-              <span className="text-sm font-bold text-purple-400">Competition</span>
-            </div>
-            <p className="text-xs text-white/50">100 tickets · Pick your numbers · Winner takes all</p>
-          </div>
-          <div className="text-right">
-            <p className="text-lg font-bold text-purple-400">£200</p>
-            <p className="text-[10px] text-white/40 uppercase">max prize</p>
-          </div>
-        </div>
-      </Link>
-
       {/* ── 2. Category Cards ── */}
       <FeaturedCollections />
 
-      {/* ── 3. 🔥 Hot Products — NEW ── */}
+      {/* ── 3. 🔥 Hot Products ── */}
       <HotProducts />
 
-      {/* ── 4. Earn Hub Promo — sci-fi ── */}
-      <section className="relative isolate overflow-hidden rounded-2xl border border-purple-400/15 px-5 py-5 sm:rounded-3xl sm:px-8 sm:py-8">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-[#0d0d0d] to-pink-500/5" aria-hidden="true" />
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
-        <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-purple-400/10 blur-3xl" aria-hidden="true" />
-        <div className="relative z-10 flex items-start gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-400/15">
-            <span className="text-2xl">💰</span>
-          </div>
-          <div className="flex-1">
-            <h2 className="text-base font-bold text-white sm:text-xl">Earn 15–25% commission</h2>
-            <p className="mt-1 text-xs leading-relaxed text-white/40 sm:text-sm">
-              Share your referral link. Every order from friends = instant commission to your wallet.
-            </p>
-            <Link
-              href="/account/commission"
-              className="mt-3 inline-flex min-h-[36px] items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-5 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 active:scale-[0.97] transition"
-            >
-              Open Earn Hub →
-            </Link>
-          </div>
+      {/* ── 4. 🎰 Lucky Draw — Lottery + Competition side by side ── */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-base">🎰</span>
+          <h2 className="text-base font-bold text-white sm:text-lg">Lucky Draw</h2>
+        </div>
+        <div className="grid grid-cols-2 gap-2.5">
+          {/* Daily Lottery */}
+          <Link href="/lottery" className="relative isolate overflow-hidden rounded-xl border border-amber-400/12 p-3.5 active:scale-[0.97] transition">
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.08] to-transparent" aria-hidden="true" />
+            <div className="absolute -top-4 -right-4 h-12 w-12 rounded-full bg-amber-400/10 blur-2xl" aria-hidden="true" />
+            <div className="relative z-10">
+              <span className="text-2xl">🎰</span>
+              <p className="text-sm font-bold text-amber-300 mt-2">Daily £100</p>
+              <p className="text-[9px] text-white/30 mt-0.5">Draw at 8PM daily</p>
+              <div className="mt-2 flex items-center gap-1">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                </span>
+                <span className="text-[8px] text-emerald-400/70">Free via Telegram</span>
+              </div>
+            </div>
+          </Link>
+
+          {/* Competition */}
+          <Link href="/competition" className="relative isolate overflow-hidden rounded-xl border border-purple-400/12 p-3.5 active:scale-[0.97] transition">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.08] to-transparent" aria-hidden="true" />
+            <div className="absolute -top-4 -right-4 h-12 w-12 rounded-full bg-purple-400/10 blur-2xl" aria-hidden="true" />
+            <div className="relative z-10">
+              <span className="text-2xl">🎟️</span>
+              <p className="text-sm font-bold text-purple-300 mt-2">Competition</p>
+              <p className="text-[9px] text-white/30 mt-0.5">100 tickets · £2 each</p>
+              <div className="mt-2 flex items-center gap-1">
+                <span className="text-[8px] text-purple-400/70">🏆 Win up to £200</span>
+              </div>
+            </div>
+          </Link>
         </div>
       </section>
 
-      {/* ── 7. Customer Reviews ── */}
+      {/* ── 5. ⭐ Reviews ── */}
       <RecentReviews />
 
-      {/* ── 8. Payment Methods — sci-fi ── */}
-      <section className="relative isolate overflow-hidden rounded-2xl border border-white/8 px-4 py-4 sm:rounded-3xl sm:px-8 sm:py-6">
+      {/* ── 6. Why Us — Earn Hub + Payment Methods combined ── */}
+      <section className="relative isolate overflow-hidden rounded-2xl border border-white/8 p-4 sm:p-6">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0d0d0d] to-[#0a0d1a]" aria-hidden="true" />
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
-        <div className="relative z-10">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/30">Secure Payments</p>
-          <div className="mt-3 flex gap-2.5">
-            {[
-              { icon: "🏦", name: "Bank Transfer", tag: "5 min", glow: "bg-blue-400/8", border: "border-blue-400/10" },
-              { icon: "💳", name: "Wallet", tag: "Instant", glow: "bg-emerald-400/8", border: "border-emerald-400/10" },
-              { icon: "₮", name: "USDT", tag: "Crypto", glow: "bg-purple-400/8", border: "border-purple-400/10" },
-            ].map((m) => (
-              <div key={m.name} className={`relative isolate overflow-hidden flex-1 rounded-xl border ${m.border} bg-white/[0.01] px-3 py-2.5 text-center`}>
-                <div className={`absolute -top-3 -right-3 h-10 w-10 ${m.glow} rounded-full blur-xl`} aria-hidden="true" />
-                <div className="relative z-10">
-                  <span className="text-lg">{m.icon}</span>
-                  <p className="mt-1 text-[10px] font-semibold text-white/60">{m.name}</p>
-                  <p className="text-[9px] font-medium text-emerald-400/70">{m.tag}</p>
+        <div className="relative z-10 space-y-4">
+          {/* Earn Hub */}
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-400/15">
+              <span className="text-lg">💰</span>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-white">Earn 15–25% Commission</h3>
+              <p className="mt-0.5 text-[10px] leading-relaxed text-white/35">Share your referral link. Every order from friends = instant commission.</p>
+              <Link href="/account/commission" className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-purple-400/80 hover:text-purple-300">
+                Open Earn Hub <span>→</span>
+              </Link>
+            </div>
+          </div>
+
+          <div className="h-px bg-white/5" />
+
+          {/* Payment Methods */}
+          <div>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/25 mb-2.5">Secure Payments</p>
+            <div className="flex gap-2">
+              {[
+                { icon: "🏦", name: "Bank Transfer", tag: "5 min", border: "border-blue-400/10" },
+                { icon: "💳", name: "Wallet", tag: "Instant", border: "border-emerald-400/10" },
+                { icon: "₮", name: "USDT", tag: "Crypto", border: "border-purple-400/10" },
+              ].map((m) => (
+                <div key={m.name} className={`flex-1 rounded-lg border ${m.border} bg-white/[0.02] px-2.5 py-2 text-center`}>
+                  <span className="text-base">{m.icon}</span>
+                  <p className="mt-0.5 text-[9px] font-semibold text-white/50">{m.name}</p>
+                  <p className="text-[8px] font-medium text-emerald-400/60">{m.tag}</p>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── 9. Daily Lottery Banner ── */}
-      <section className="relative isolate overflow-hidden rounded-2xl border border-amber-400/20 px-4 py-5 sm:rounded-3xl sm:px-8 sm:py-7">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-[#0d0d0d] to-purple-600/8" aria-hidden="true" />
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} aria-hidden="true" />
-        <div className="absolute -top-8 -right-8 h-28 w-28 rounded-full bg-amber-400/10 blur-3xl animate-pulse" aria-hidden="true" />
-        <div className="absolute -bottom-6 -left-6 h-20 w-20 rounded-full bg-purple-400/8 blur-2xl" aria-hidden="true" />
-        
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">🎰</span>
-            <h3 className="text-base font-bold text-white">Daily £100 Lottery</h3>
+      {/* ── 7. 🤖 AI Support ── */}
+      <section className="relative isolate overflow-hidden rounded-2xl border border-cyan-400/15 px-4 py-4 sm:px-6 sm:py-5">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.06] via-transparent to-blue-600/[0.04]" aria-hidden="true" />
+        <div className="absolute -top-6 -right-6 h-16 w-16 rounded-full bg-cyan-400/8 blur-2xl" aria-hidden="true" />
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="relative">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/15">
+              <span className="text-lg">🤖</span>
+            </div>
+            <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 border-[1.5px] border-[#0a0a0a]" />
+            </span>
           </div>
-          <p className="text-xs text-gray-400 leading-relaxed mb-3">Join our Telegram group, bind your Wallet ID to get <b className="text-amber-300">£5 bonus</b> instantly + enter the daily £100 draw at 8PM!</p>
-          
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5">
-              <span className="text-xs">🕗</span>
-              <span className="text-[11px] text-gray-300">8PM daily</span>
-            </div>
-            <div className="flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5">
-              <span className="text-xs">💰</span>
-              <span className="text-[11px] text-gray-300">£100 bonus</span>
-            </div>
-            <div className="flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5">
-              <span className="text-xs">🎲</span>
-              <span className="text-[11px] text-gray-300">Random draw</span>
-            </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-bold text-white">AI Support</h3>
+            <p className="text-[9px] text-white/30">24/7 · Instant replies · Private &amp; secure</p>
           </div>
-
-          <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 py-3 text-sm font-bold text-black shadow-lg shadow-amber-500/20 active:scale-[0.98] transition">
-            <span>🎰</span> Join Channel &amp; Enter Lottery
-          </a>
-        </div>
-      </section>
-
-
-
-      {/* ── 10. AI Support CTA — sci-fi style ── */}
-      <section className="relative isolate overflow-hidden rounded-2xl border border-cyan-400/20 px-5 py-6 sm:rounded-3xl sm:px-8 sm:py-8">
-        {/* Animated glow background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-blue-600/5 to-purple-600/10" aria-hidden="true" />
-        <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-cyan-400/10 blur-3xl" aria-hidden="true" />
-        <div className="absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-blue-500/10 blur-2xl" aria-hidden="true" />
-
-        <div className="relative z-10">
-          {/* AI Bot avatar + status */}
-          <div className="flex items-center gap-3 mb-3">
-            <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                <span className="text-lg">🤖</span>
-              </div>
-              {/* Pulsing online dot */}
-              <span className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-emerald-400 border-2 border-[#0a0a0a]" />
-              </span>
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-white sm:text-lg">AI Support Agent</h2>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                <span className="text-[10px] font-medium text-emerald-400">Online — responds in seconds</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature pills */}
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {[
-              { icon: "⚡", text: "Instant replies" },
-              { icon: "🌐", text: "24/7 available" },
-              { icon: "🔒", text: "Private & secure" },
-            ].map((f) => (
-              <span key={f.text} className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] text-white/50">
-                <span>{f.icon}</span> {f.text}
-              </span>
-            ))}
-          </div>
-
-          {/* CTA button */}
-          <Link
-            href="/support"
-            className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 active:scale-[0.97] transition sm:w-auto sm:px-8"
-          >
-            <span>💬</span> Chat with AI
+          <Link href="/support" className="inline-flex min-h-[36px] items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 px-4 text-xs font-bold text-white shadow-lg shadow-cyan-500/15 active:scale-[0.97] transition">
+            💬 Chat
           </Link>
         </div>
       </section>
@@ -307,7 +227,6 @@ async function HotProducts() {
 async function RecentReviews() {
   let reviews: Array<{ rating: number; comment: string; displayName: string; productTitle: string; slug: string }> = [];
 
-  // Product IDs → name + slug
   const productMap: Record<number, { name: string; slug: string }> = {
     1: { name: "Stardawg", slug: "stardawg" },
     2: { name: "Amnesia Haze", slug: "amnesia-haze" },
@@ -321,7 +240,6 @@ async function RecentReviews() {
 
   try {
     const strapiUrl = process.env.STRAPI_DIRECT_URL || "https://cms.greenhub420.co.uk";
-    // Fetch reviews from a few products in parallel
     const productIds = Object.keys(productMap);
     const results = await Promise.allSettled(
       productIds.map((id) =>
@@ -345,7 +263,6 @@ async function RecentReviews() {
         }
       }
     }
-    // Sort by most recent, limit to 6
     reviews = reviews.slice(0, 6);
   } catch {
     // Silent fail
