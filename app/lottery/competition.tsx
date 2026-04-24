@@ -47,7 +47,12 @@ export default function CompetitionTab({ walletId, authToken }: { walletId?: str
       ]);
       const comp = await compRes.json();
       const hist = await histRes.json();
-      setData(comp);
+      // Guard against Strapi error responses
+      if (comp.error) {
+        setData({ active: false });
+      } else {
+        setData(comp);
+      }
       setHistory(hist.history || []);
 
       if (walletId && comp.active) {
@@ -106,7 +111,8 @@ export default function CompetitionTab({ walletId, authToken }: { walletId?: str
         setSelected([]);
         await loadData();
       } else {
-        setError(result.error || 'Purchase failed');
+        const errMsg = result.error;
+        setError(typeof errMsg === 'string' ? errMsg : (errMsg?.message || JSON.stringify(errMsg) || 'Purchase failed'));
       }
     } catch (e: any) {
       setError(e.message || 'Network error');
@@ -216,8 +222,8 @@ export default function CompetitionTab({ walletId, authToken }: { walletId?: str
       {/* Buy buttons */}
       {data.status === 'selling' && remaining > 0 && (
         <div className="space-y-3">
-          {error && <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-400 text-sm">{error}</div>}
-          {success && <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-emerald-400 text-sm">{success}</div>}
+          {error && <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-red-400 text-sm">{typeof error === 'string' ? error : JSON.stringify(error)}</div>}
+          {success && <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-emerald-400 text-sm">{typeof success === 'string' ? success : String(success)}</div>}
 
           <div className="flex gap-3">
             {selected.length > 0 && (
