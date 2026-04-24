@@ -176,20 +176,6 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
             </div>
           </div>
 
-          {/* ── Cart (if has items) ── */}
-          {totalItems > 0 && (
-            <div className="px-4 py-1.5">
-              <button onClick={() => go("/cart")}
-                className="relative isolate overflow-hidden flex w-full items-center justify-between rounded-xl border border-emerald-400/15 px-4 py-3 active:scale-[0.98] transition">
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/[0.06] to-transparent" aria-hidden="true" />
-                <div className="relative z-10 flex items-center gap-3">
-                  <span className="text-base">🛒</span>
-                  <span className="text-sm font-semibold text-white">Cart</span>
-                </div>
-                <span className="relative z-10 rounded-full bg-emerald-400/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300">{totalItems} items</span>
-              </button>
-            </div>
-          )}
 
           {/* ── Navigation ── */}
           <div className="px-4 py-2">
