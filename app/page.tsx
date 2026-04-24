@@ -146,12 +146,19 @@ export default async function HomePage() {
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40 mb-2.5">Secure Payments</p>
             <div className="flex gap-2">
               {[
-                { icon: "🏦", name: "Bank Transfer", tag: "5 min", border: "border-blue-400/15", bg: "bg-blue-400/[0.04]" },
-                { icon: "💳", name: "Wallet", tag: "Instant", border: "border-emerald-400/15", bg: "bg-emerald-400/[0.04]" },
-                { icon: "₮", name: "USDT", tag: "Crypto", border: "border-purple-400/15", bg: "bg-purple-400/[0.04]" },
+                { icon: "🏦", name: "Bank Transfer", tag: "5 min", border: "border-blue-400/15", bg: "bg-blue-400/[0.04]", usdt: false },
+                { icon: "💳", name: "Wallet", tag: "Instant", border: "border-emerald-400/15", bg: "bg-emerald-400/[0.04]", usdt: false },
+                { icon: "", name: "USDT", tag: "Crypto", border: "border-teal-400/15", bg: "bg-teal-400/[0.04]", usdt: true },
               ].map((m) => (
                 <div key={m.name} className={`flex-1 rounded-lg border ${m.border} ${m.bg} px-2.5 py-2 text-center`}>
-                  <span className="text-base">{m.icon}</span>
+                  {m.usdt ? (
+                    <svg width="20" height="20" viewBox="0 0 32 32" className="mx-auto" aria-label="USDT">
+                      <circle cx="16" cy="16" r="16" fill="#26A17B"/>
+                      <path d="M17.922 17.383v-.002c-.11.008-.677.042-1.942.042-1.01 0-1.721-.03-1.971-.042v.003c-3.888-.171-6.79-.848-6.79-1.658 0-.809 2.902-1.486 6.79-1.66v2.644c.254.018.982.061 1.988.061 1.207 0 1.812-.05 1.925-.06v-2.643c3.88.173 6.775.85 6.775 1.658 0 .81-2.895 1.485-6.775 1.657m0-3.59v-2.366h5.414V7.819H8.595v3.608h5.414v2.365c-4.4.202-7.709 1.074-7.709 2.118 0 1.044 3.309 1.915 7.709 2.118v7.582h3.913v-7.584c4.393-.202 7.694-1.073 7.694-2.116 0-1.043-3.301-1.914-7.694-2.117" fill="white"/>
+                    </svg>
+                  ) : (
+                    <span className="text-base">{m.icon}</span>
+                  )}
                   <p className="mt-0.5 text-[10px] font-semibold text-white/70">{m.name}</p>
                   <p className="text-[9px] font-bold text-emerald-400/80">{m.tag}</p>
                 </div>
