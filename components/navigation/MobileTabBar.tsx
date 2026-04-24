@@ -31,14 +31,22 @@ function ShopIcon({ active }: { active: boolean }) {
   );
 }
 
-function LuckyIcon({ active }: { active: boolean }) {
+function CartIcon({ active }: { active: boolean }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      {/* Star/sparkle icon for lottery/lucky draw */}
-      <path d="M12 2l2.4 7.2H22l-6 4.8 2.4 7.2L12 16.4l-6.4 4.8 2.4-7.2-6-4.8h7.6z" 
-        stroke="currentColor" 
-        fill={active ? "currentColor" : "none"} 
-        fillOpacity={active ? 0.2 : 0} />
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.15 : 0} />
+      <path d="M3 6h18" stroke="currentColor" />
+      <path d="M16 10a4 4 0 01-8 0" stroke="currentColor" />
+    </svg>
+  );
+}
+
+function EarnIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" fill={active ? "currentColor" : "none"} fillOpacity={active ? 0.15 : 0} />
+      <path d="M12 8v4.5l3 1.5" stroke={active ? "#fff" : "currentColor"} />
+      <path d="M15 6l1.5-1.5M9 6L7.5 4.5" stroke="currentColor" />
     </svg>
   );
 }
@@ -53,21 +61,12 @@ function WalletIcon({ active }: { active: boolean }) {
   );
 }
 
-function MenuIcon({ active }: { active: boolean }) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round">
-      <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" />
-      {active && <circle cx="20" cy="5" r="3" fill="currentColor" opacity="0.3" />}
-    </svg>
-  );
-}
-
 const tabs = [
   { label: "Home", href: "/", icon: HomeIcon, match: "exact" as const },
-  { label: "Shop", href: "/products", icon: ShopIcon, match: "prefix" as const, badge: "cart" as const },
-  { label: "Lucky", href: "/lottery", icon: LuckyIcon, match: "prefix" as const, accent: true },
+  { label: "Shop", href: "/products", icon: ShopIcon, match: "prefix" as const },
+  { label: "Cart", href: "/cart", icon: CartIcon, match: "exact" as const, badge: "cart" as const },
+  { label: "Earn", href: "/account/commission", icon: EarnIcon, match: "prefix" as const, accent: true },
   { label: "Wallet", href: "/wallet", icon: WalletIcon, match: "prefix" as const },
-  { label: "More", href: "/account", icon: MenuIcon, match: "prefix" as const, badge: "notifications" as const },
 ];
 
 export function MobileTabBar() {
@@ -77,12 +76,6 @@ export function MobileTabBar() {
 
   const isActive = (href: string, match: "exact" | "prefix") => {
     if (match === "exact") return pathname === href;
-    // Special: "Lucky" tab matches /lottery and /competition
-    if (href === "/lottery") return pathname.startsWith("/lottery") || pathname.startsWith("/competition");
-    // Special: "More" tab matches /account, /orders, /referral, /support etc
-    if (href === "/account") {
-      return pathname.startsWith("/account") || pathname.startsWith("/orders") || pathname.startsWith("/referral") || pathname.startsWith("/support");
-    }
     return pathname.startsWith(href);
   };
 
@@ -108,15 +101,15 @@ export function MobileTabBar() {
               className={clsx(
                 "relative flex flex-col items-center gap-0.5 px-3 py-1.5 text-[10px] transition-colors",
                 active
-                  ? isAccent ? "text-amber-400" : "text-emerald-400"
-                  : isAccent ? "text-amber-300/40" : "text-white/35"
+                  ? isAccent ? "text-purple-400" : "text-emerald-400"
+                  : isAccent ? "text-purple-300/40" : "text-white/35"
               )}
             >
               <span className="relative">
                 {active && (
                   <span className={clsx(
                     "absolute -inset-2 rounded-full blur-lg opacity-60",
-                    isAccent ? "bg-amber-400/20" : "bg-emerald-400/20"
+                    isAccent ? "bg-purple-400/20" : "bg-emerald-400/20"
                   )} />
                 )}
                 <span className="relative block">
@@ -132,7 +125,7 @@ export function MobileTabBar() {
               {active && (
                 <span className={clsx(
                   "absolute -top-px left-1/2 -translate-x-1/2 h-[2px] w-6 rounded-full",
-                  isAccent ? "bg-amber-400" : "bg-emerald-400"
+                  isAccent ? "bg-purple-400" : "bg-emerald-400"
                 )} />
               )}
             </Link>
