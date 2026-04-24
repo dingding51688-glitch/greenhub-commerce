@@ -36,7 +36,7 @@ export default function WalletWithdrawPage() {
   const receive = amount - fee;
 
   if (!token) {
-    return <section className="px-4 py-10"><StateMessage title="Please sign in" body="Sign in to withdraw." actionLabel="Login" onAction={() => router.push("/login")} /></section>;
+    return <section className="px-4 py-10"><StateMessage variant="auth" title="Please sign in" body="Sign in to withdraw." actionLabel="Login" onAction={() => router.push("/login")} /></section>;
   }
 
   const handleBankField = (key: string, value: string) => {

@@ -83,7 +83,7 @@ export default function DashboardPage() {
       <StateMessage
         title="Please sign in"
         body="Sign in to see your wallet balance, recent orders, and support shortcuts."
-        actionLabel="Go to login"
+        actionLabel="Sign In"
         onAction={() => router.push("/login")}
       />
     );

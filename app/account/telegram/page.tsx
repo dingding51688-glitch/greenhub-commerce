@@ -68,7 +68,7 @@ export default function TelegramLinkingPage() {
       <StateMessage
         title="Please sign in"
         body="Log in to link Telegram notifications."
-        actionLabel="Go to login"
+        actionLabel="Sign In"
         onAction={() => router.push("/login")}
       />
     );

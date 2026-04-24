@@ -81,7 +81,7 @@ export default function WalletTopupPage() {
   if (!token) {
     return (
       <section className="px-4 py-10">
-        <StateMessage title="Please sign in" body="Sign in to top up your wallet." actionLabel="Go to login" onAction={() => router.push("/login")} />
+        <StateMessage variant="auth" title="Please sign in" body="Sign in to top up your wallet balance." actionLabel="Sign In" onAction={() => router.push("/login")} />
       </section>
     );
   }

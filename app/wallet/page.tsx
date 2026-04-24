@@ -60,7 +60,7 @@ export default function WalletPage() {
   if (!token) {
     return (
       <section className="px-4 py-10">
-        <StateMessage title="Please sign in" body="Sign in to view your wallet." actionLabel="Go to login" onAction={() => router.push("/login")} />
+        <StateMessage variant="auth" title="Please sign in" body="Sign in to access your wallet, track orders, and manage your balance." actionLabel="Sign In" onAction={() => router.push("/login")} />
       </section>
     );
   }

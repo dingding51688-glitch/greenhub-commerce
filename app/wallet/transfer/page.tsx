@@ -34,7 +34,7 @@ export default function WalletTransferPage() {
   if (!token) {
     return (
       <section className="px-4 py-10">
-        <StateMessage title="Please sign in" body="Sign in to make a transfer." actionLabel="Go to login" onAction={() => router.push("/login")} />
+        <StateMessage variant="auth" title="Please sign in" body="Sign in to transfer funds between wallets." actionLabel="Sign In" onAction={() => router.push("/login")} />
       </section>
     );
   }
