@@ -35,6 +35,9 @@ type CustomerProfileResponse = {
       transferHandle?: string;
       emailVerifiedAt?: string | null;
       pendingEmail?: string | null;
+      telegramId?: string | null;
+      telegramUsername?: string | null;
+      telegramBoundAt?: string | null;
     };
   };
 };
@@ -205,17 +208,13 @@ export default function AccountPage() {
         userEmail={userEmail || undefined}
       />
 
-      {/* ── Telegram Bind CTA ── */}
-      <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
-        className="relative isolate flex items-center gap-3 overflow-hidden rounded-xl border border-blue-400/20 bg-blue-500/5 px-4 py-3.5 active:scale-[0.98] transition">
-        <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-blue-400/8 blur-2xl" aria-hidden="true" />
-        <div className="relative z-10 flex h-9 w-9 items-center justify-center rounded-lg bg-blue-400/15 text-lg">✈️</div>
-        <div className="relative z-10 flex-1 min-w-0">
-          <p className="text-sm font-medium text-white">Join Telegram Channel</p>
-          <p className="text-[10px] text-blue-300/50">Follow us → join group → bind wallet → £5 bonus + daily £100 lottery</p>
-        </div>
-        <span className="relative z-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-400 px-3 py-1 text-[10px] font-bold text-white">Join</span>
-      </a>
+      {/* ── Telegram Bind Section ── */}
+      <TelegramBindCard
+        telegramId={attrs?.telegramId}
+        telegramUsername={attrs?.telegramUsername}
+        telegramBoundAt={attrs?.telegramBoundAt}
+        onUnbind={() => refreshCustomer()}
+      />
 
       {/* ── Account actions — terminal style ── */}
       <div className="rounded-xl border border-white/8 bg-white/[0.01] overflow-hidden divide-y divide-white/5">
@@ -447,5 +446,131 @@ function Field({ label, error, children }: { label: string; error?: string; chil
       <div className="mt-1">{children}</div>
       {error && <p className="mt-1 text-[10px] text-red-300">{error}</p>}
     </label>
+  );
+}
+
+/* ━━━━━━━━━ Telegram Bind Card ━━━━━━━━━ */
+function TelegramBindCard({
+  telegramId,
+  telegramUsername,
+  telegramBoundAt,
+  onUnbind,
+}: {
+  telegramId?: string | null;
+  telegramUsername?: string | null;
+  telegramBoundAt?: string | null;
+  onUnbind: () => void;
+}) {
+  const [showUnbind, setShowUnbind] = useState(false);
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const isBound = !!telegramId;
+
+  const handleUnbind = async () => {
+    if (!password.trim()) {
+      setError("Please enter your password");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/account/unbind-telegram", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        setShowUnbind(false);
+        setPassword("");
+        onUnbind();
+      } else {
+        setError(data.error?.message || data.message || "Incorrect password");
+      }
+    } catch {
+      setError("Network error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isBound) {
+    return (
+      <a href="https://t.me/greenhub420" target="_blank" rel="noopener noreferrer"
+        className="relative isolate flex items-center gap-3 overflow-hidden rounded-xl border border-blue-400/20 bg-blue-500/5 px-4 py-3.5 active:scale-[0.98] transition">
+        <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-blue-400/8 blur-2xl" aria-hidden="true" />
+        <div className="relative z-10 flex h-9 w-9 items-center justify-center rounded-lg bg-blue-400/15 text-lg">✈️</div>
+        <div className="relative z-10 flex-1 min-w-0">
+          <p className="text-sm font-medium text-white">Join Telegram Channel</p>
+          <p className="text-[10px] text-blue-300/50">Follow us → join group → bind wallet → £5 bonus + daily £100 lottery</p>
+        </div>
+        <span className="relative z-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-400 px-3 py-1 text-[10px] font-bold text-white">Join</span>
+      </a>
+    );
+  }
+
+  return (
+    <div className="relative isolate overflow-hidden rounded-xl border border-emerald-400/15 bg-emerald-500/5">
+      <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-emerald-400/8 blur-2xl" aria-hidden="true" />
+      <div className="relative z-10 px-4 py-3.5">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-400/15 text-lg">✈️</div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium text-white">Telegram Linked</p>
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/10 px-2 py-0.5 text-[8px] font-bold text-emerald-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Bound
+              </span>
+            </div>
+            <p className="text-[11px] text-white/50 mt-0.5">
+              @{telegramUsername || "user"}
+              {telegramBoundAt && (
+                <span className="ml-2 text-white/25">
+                  {new Date(telegramBoundAt).toLocaleDateString()}
+                </span>
+              )}
+            </p>
+          </div>
+          <button
+            onClick={() => setShowUnbind(!showUnbind)}
+            className="rounded-full border border-red-400/20 bg-red-400/5 px-3 py-1 text-[10px] font-medium text-red-400 transition hover:bg-red-400/10"
+          >
+            Unbind
+          </button>
+        </div>
+
+        {showUnbind && (
+          <div className="mt-3 space-y-2 rounded-lg border border-red-400/10 bg-black/20 p-3">
+            <p className="text-[10px] text-white/40">Enter your password to unbind Telegram account</p>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setError(""); }}
+              placeholder="Your password"
+              className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none placeholder:text-white/25 focus:border-red-400/40"
+            />
+            {error && <p className="text-[10px] text-red-400">{error}</p>}
+            <div className="flex gap-2">
+              <button
+                onClick={handleUnbind}
+                disabled={loading}
+                className="flex-1 rounded-lg bg-red-500/20 py-2 text-xs font-semibold text-red-400 transition hover:bg-red-500/30 disabled:opacity-50"
+              >
+                {loading ? "Verifying..." : "Confirm Unbind"}
+              </button>
+              <button
+                onClick={() => { setShowUnbind(false); setPassword(""); setError(""); }}
+                className="rounded-lg border border-white/10 px-4 py-2 text-xs text-white/50 transition hover:bg-white/5"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
